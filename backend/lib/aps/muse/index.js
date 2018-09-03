@@ -10,8 +10,8 @@ const utils = require('../utils')
 const WebSocket = require('ws')
 
 const PLC = {
-  // ip: '140.80.49.2',
-  ip: '192.168.59.2',
+  ip: '140.80.49.2',
+  // ip: '192.168.59.2',
   rack: 0,
   slot: 1,
   polling_time: 1000
