@@ -1,0 +1,21 @@
+{
+  "presets": ["es2015", "stage-2"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "components": "./lib"
+        }
+      }
+    ],
+    [
+      "transform-define",
+      {
+        "process.env.BACKEND_URL": "192.168.20.232",
+        "process.env.MONGODB_URI": "mongodb://localhost:27017/sws"
+      }
+    ]
+  ]
+}

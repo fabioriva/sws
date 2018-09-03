@@ -1,0 +1,31 @@
+{
+  "presets": [
+    "next/babel"
+  ],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "components": "./src"
+        }
+      }
+    ],
+    "transform-decorators-legacy",
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": "css"
+      }
+    ],
+    [
+      "transform-define",
+      {
+        "process.env.BACKEND_URL": "http://192.168.20.232",
+        "process.env.WEBSOCKET_URL": "ws://192.168.20.232"
+      }
+    ]
+  ]
+}
