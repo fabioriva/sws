@@ -229,7 +229,7 @@ for (let d = 0; d < s7def.MEASURES; d++) {
 
 var operations = []
 for (let o = 0; o < s7def.OPERATIONS; o++) {
-  operations.push(new Operation(0, strings.operations[o]))
+  operations.push(new Operation(o, strings.operations[o]))
 }
 
 var exitQueue = []
@@ -237,13 +237,13 @@ for (let q = 0; q < s7def.QUEUE; q++) {
   exitQueue.push(new Queue(q))
 }
 
-var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'modal', 'logout', 'Exit')
-var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'modal', 'login', 'Entry')
-var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'modal', 'rollback', 'Rollback')
-var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'modal', 'login', 'Entry')
-var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'modal', 'rollback', 'Rollback')
-var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'popconfirm', 'rollback', 'Rollback')
-var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'modal', 'rollback', 'Rollback')
+var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'logout', 'Exit')
+var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entry')
+var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollback')
+var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entry')
+var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
+var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'rollback', 'Rollback')
+var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'rollback', 'Rollback')
 
 var EL1 = {
   a: devices[0],
@@ -361,6 +361,12 @@ for (let s = 0; s < s7def.STALLS; s++) {
 }
 
 var map = {
+  limits: {
+    minCard: 1,
+    maxCard: s7def.CARDS,
+    minStall: 1,
+    maxStall: s7def.STALLS
+  },
   statistics: [
     TYPE_0,
     TYPE_1,

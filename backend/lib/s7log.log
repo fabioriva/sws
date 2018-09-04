@@ -4114,3 +4114,30 @@ Error: listen EADDRNOTAVAIL 192.168.20.232:49000
   __v: 0 }
 2018-09-03 12:47:10 info: 192.168.59.2:49305 socket close
 2018-09-03 12:47:10 info: 192.168.59.2:49305 socket close
+2018-09-04 08:09:53 error: uncaughtException: Cannot read property 'LOCK' of undefined
+TypeError: Cannot read property 'LOCK' of undefined
+    at mapCount (/home/webservice/github/sws/backend/lib/aps/utils.js:186:26)
+    at Object.updateStatistics (/home/webservice/github/sws/backend/lib/aps/utils.js:170:5)
+    at /home/webservice/github/sws/backend/lib/aps/muse/index.js:418:13
+    at /home/webservice/github/sws/backend/node_modules/async/dist/async.js:3880:24
+    at replenish (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:1011:17)
+    at /home/webservice/github/sws/backend/node_modules/async/dist/async.js:1016:9
+    at eachOfLimit (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:1041:24)
+    at /home/webservice/github/sws/backend/node_modules/async/dist/async.js:1046:16
+    at _parallel (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:3879:5)
+    at Object.series (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:4735:5)
+    at updateMap (/home/webservice/github/sws/backend/lib/aps/muse/index.js:410:9)
+    at /home/webservice/github/sws/backend/lib/aps/muse/index.js:266:11
+2018-09-04 08:11:19 error: uncaughtException: callback is not a function
+TypeError: callback is not a function
+    at Object.updateStatistics (/home/webservice/github/sws/backend/lib/aps/utils.js:173:7)
+    at /home/webservice/github/sws/backend/lib/aps/muse/index.js:418:13
+    at /home/webservice/github/sws/backend/node_modules/async/dist/async.js:3880:24
+    at replenish (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:1011:17)
+    at /home/webservice/github/sws/backend/node_modules/async/dist/async.js:1016:9
+    at eachOfLimit (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:1041:24)
+    at /home/webservice/github/sws/backend/node_modules/async/dist/async.js:1046:16
+    at _parallel (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:3879:5)
+    at Object.series (/home/webservice/github/sws/backend/node_modules/async/dist/async.js:4735:5)
+    at updateMap (/home/webservice/github/sws/backend/lib/aps/muse/index.js:410:9)
+    at /home/webservice/github/sws/backend/lib/aps/muse/index.js:266:11

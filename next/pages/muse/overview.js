@@ -9,8 +9,8 @@ import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 
 function confirm (system, ws) {
   Modal.confirm({
-    title: 'Do you want to delete these items?',
-    content: 'When clicked the OK button, this dialog will be closed after 1 second',
+    title: `Elevator ${system} over-width detection at G0`,
+    content: 'Confirm to reject the vehicle to exit ?',
     onOk() {
       ws.send(
         JSON.stringify({
@@ -162,16 +162,6 @@ class AppUi extends React.Component {
     )
   }
   handleRollback = (system) => {
-    this.ws.send(
-      JSON.stringify({
-        event: 'overview-rollback',
-        data: {
-          id: system
-        }
-      })
-    )
-  }
-  handleRollbackModal = (system) => {
     confirm(system, this.ws)
   }
   render () {
@@ -204,7 +194,7 @@ class AppUi extends React.Component {
               <Col xs={24} sm={24} md={24} lg={10} xl={8}>
                 <Device
                   device={devices[3]}
-                  action={this.handleRollbackModal}
+                  action={this.handleRollback}
                 />
               </Col>
             </Row>

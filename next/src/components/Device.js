@@ -93,33 +93,18 @@ class Device extends Component {
       </div>
     const buttons = []
     device.d.forEach((b, i) => {
-      const { merker, action, icon } = b
-      if (action === 'popconfirm') {
-        buttons.push(
-          <Popconfirm title='Are you sure delete this task?' onConfirm={() => this.props.action(id)} okText='Yes' cancelText='No'>
-            <Button
-              type='primary'
-              disabled={!merker.status}
-              icon={icon !== undefined && icon}
-              key={i}
-            >
-              {b.label}
-            </Button>
-          </Popconfirm>
-        )
-      } else {
-        buttons.push(
-          <Button
-            type='primary'
-            disabled={!merker.status}
-            icon={icon !== undefined && icon}
-            key={i}
-            onClick={() => this.props.action(id)}
-          >
-            {b.label}
-          </Button>
-        )
-      }
+      const { merker, icon } = b
+      buttons.push(
+        <Button
+          type='primary'
+          disabled={!merker.status}
+          icon={icon !== undefined && icon}
+          key={i}
+          onClick={() => this.props.action !== undefined && this.props.action(id)}
+        >
+          {b.label}
+        </Button>
+      )
     })
     const pos = []
     device.b.forEach((b, i) => {

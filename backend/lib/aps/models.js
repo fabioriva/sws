@@ -57,9 +57,8 @@ export class Alarm {
 }
 
 export class Button {
-  constructor (merker, action, icon, label) {
+  constructor (merker, icon, label) {
     this.merker = merker
-    this.action = action
     this.icon = icon
     this.label = label
   }
@@ -75,13 +74,6 @@ export class Card {
   }
   getRandomIntInclusive (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
-  }
-}
-
-export class Operation {
-  constructor (id, info) {
-    this.id = id
-    this.info = info
   }
 }
 
@@ -114,6 +106,13 @@ export class Measure {
   // setName (id) {
   //   return id < strings.measures.length ? strings.measures[id] : '---'
   // }
+}
+
+export class Operation {
+  constructor (id, info) {
+    this.id = id
+    this.info = info
+  }
 }
 
 export class Queue {

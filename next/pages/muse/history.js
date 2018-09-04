@@ -9,10 +9,9 @@ import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
 import Query from 'src/components/QueryModal'
 import { Button, Popover, Table, notification } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 
 const { Column, ColumnGroup } = Table
-const APS_ID = 61
 const ITEMS_PER_PAGE = 22
 
 const initialState = {
@@ -207,7 +206,13 @@ class AppUi extends React.Component {
             title='Operation'
             dataIndex='operation.info'
             key='operation'
-            render={(text, record, index) => <Popover content={`${record.alarm.info}`} title={`Alarm ID ${record.alarm.id}`} trigger='hover'><span>{text}</span></Popover>}
+            render={(text, record, index) => (
+              record.alarm.id !== 0
+              ?
+              <Popover content={`${record.alarm.info}`} title={`Alarm ID ${record.alarm.id}`} trigger='hover'><span>{text}</span></Popover>
+              :
+              text
+            )}
           />
           <Column
             title='Card'

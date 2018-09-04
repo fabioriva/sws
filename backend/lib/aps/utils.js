@@ -164,6 +164,37 @@ const updateStalls = (start, buffer, offset, stalls, callback) => {
   }
 }
 
+var updateStatistics = (stalls, statistics, stallStatus, callback) => {
+  var iterations = 0
+  for (var s = 0; s < statistics.length; s++) {
+    mapCount(stalls, statistics[s], s, stallStatus)
+    if (++iterations === statistics.length) {
+      // console.log(iterations, statistics)
+      callback(null, iterations)
+    }
+  }
+}
+
+function mapCount (stalls, data, size, stallStatus) {
+  data[0].value = data[1].value = data[2].value = 0
+  for (var s = 0; s < stalls.length; s++) {
+    if (size === 0 || stalls[s].size === size) {
+      switch (stalls[s].status) {
+        case 0 :
+          ++data[0].value
+          break
+        case stallStatus.LOCK :
+          ++data[2].value
+          break
+        default :
+          ++data[1].value
+          break
+      }
+      // ++data.total
+    }
+  }
+}
+
 export {
   BytesToInt,
   BytesToLong,
@@ -175,5 +206,6 @@ export {
   updateDevices,
   updateMeasures,
   updateQueue,
-  updateStalls
+  updateStalls,
+  updateStatistics
 }

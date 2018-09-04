@@ -27,7 +27,10 @@ export const operations = [
   'Stall In',
   'Stall Out',
   'Shuffle In',
-  'Shuffle Out'
+  'Shuffle Out',
+  '---',
+  'Exit request',
+  'Entry request'
 ]
 
 export const measures = [

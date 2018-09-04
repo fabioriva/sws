@@ -196,7 +196,7 @@ export function s7log (log, callback) {
         },
         operation: {
           id: log.operation,
-          info: s7obj.operations[log.operation].info
+          info: s7obj.operations.find(o => o.id === log.operation) // s7obj.operations[log.operation].info
         },
         size: log.size,
         stall: log.stall,
@@ -260,7 +260,10 @@ export function createApplication () {
       function (cb) {
         s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
           if (err) return cb(err)
-          utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
+          // utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
+          //   cb(null, s7obj.stalls)
+          // })
+          updateMap(0, s7data, s7obj.stalls, s7obj.map.statistics, function (res) {
             cb(null, s7obj.stalls)
           })
         })
@@ -277,7 +280,7 @@ export function createApplication () {
       // console.log(results[1])
       // console.log(results[2].groups[0])
       wss.broadcast(JSON.stringify({ cards: results[0] }))
-      wss.broadcast(JSON.stringify({ map: results[1] }))
+      wss.broadcast(JSON.stringify({ map: s7obj.map }))
       wss.broadcast(JSON.stringify({ alarms: results[2] }))
     })
     // Main Loop
@@ -400,5 +403,25 @@ function updateAlarms (device, callback) {
   ], function (err, results) {
     if (err) return callback(err)
     callback(null, results[1])
+  })
+}
+
+function updateMap (start, buffer, stalls, statistics, callback) {
+  async.waterfall([
+    function (cb) {
+      utils.updateStalls(start, buffer, s7def.STALL_LEN, stalls, function (err, results) {
+        if (err) return cb(err)
+        cb(null, stalls)
+      })
+    },
+    function (stalls, cb) {
+      utils.updateStatistics(stalls, statistics, s7def.StallStatus, function (err, results) {
+        if (err) return cb(err)
+        cb(null, results)
+      })
+    }
+  ], (err, results) => {
+    if (err) return callback(err)
+    callback(null, results)
   })
 }
