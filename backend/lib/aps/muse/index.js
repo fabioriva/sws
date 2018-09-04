@@ -196,7 +196,7 @@ export function s7log (log, callback) {
         },
         operation: {
           id: log.operation,
-          info: s7obj.operations.find(o => o.id === log.operation) // s7obj.operations[log.operation].info
+          info: s7obj.operations.find(o => o.id === log.operation).info // s7obj.operations[log.operation].info
         },
         size: log.size,
         stall: log.stall,
