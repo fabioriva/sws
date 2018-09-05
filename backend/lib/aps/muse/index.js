@@ -96,7 +96,7 @@ wss.on('connection', function connection (ws, req) {
           default:
             if (s) {
               const buffer = Buffer.alloc(2)
-              buffer.writeUInt16BE(card, 0)
+              buffer.writeUInt16BE(value, 0)
               s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer, function (err) {
                 if (err) return s7comm.commError(err, PLC, s7client)
               })
@@ -167,7 +167,11 @@ export function s7log (log, callback) {
         case 8:
           s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
             if (err) return s7comm.commError(err, PLC, s7client)
-            utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
+            // utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
+            //   wss.broadcast(JSON.stringify({ map: s7obj.map }))
+            //   cb(null, log)
+            // })
+            updateMap(0, s7data, s7obj.stalls, s7obj.map.statistics, function (res) {
               wss.broadcast(JSON.stringify({ map: s7obj.map }))
               cb(null, log)
             })
@@ -187,12 +191,14 @@ export function s7log (log, callback) {
         date: log.date,
         device: {
           id: log.device,
-          name: log.device === 0 ? 'Operator' : s7obj.devices[log.device].name
+          name: s7obj.devices.find(d => d.id === log.device).name
+          // name: log.device === 0 ? 'Operator' : s7obj.devices[log.device].name
         },
         event: log.event,
         mode: {
           id: log.mode,
-          info: s7obj.devices[log.device].mode
+          name: s7obj.devices.find(d => d.id === log.device).mode
+          // info: s7obj.devices[log.device].mode
         },
         operation: {
           id: log.operation,
@@ -206,6 +212,7 @@ export function s7log (log, callback) {
     }
   ], function (err, document) {
     if (err) return callback(err)
+    console.log(document)
     wss.broadcast(JSON.stringify({ mesg: notification(document) }))
     callback(null, document) // LogSchema
   })
@@ -314,7 +321,7 @@ export function createApplication () {
                 })
               },
               function (cb) {
-                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
+                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices.slice(1), function (results) {
                   cb(null, s7obj.devices)
                 })
               },

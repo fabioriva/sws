@@ -155,7 +155,7 @@ class AppUi extends React.Component {
       JSON.stringify({
         event: 'overview-operation',
         data: {
-          id: operationId,
+          operation: operationId,
           value: card
         }
       })

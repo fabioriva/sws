@@ -219,7 +219,7 @@ for (let c = 0; c < s7def.CARDS; c++) {
 
 var devices = []
 for (let d = 0; d < s7def.DEVICES; d++) {
-  devices.push(new Device((d + 1), strings.devices[d + 1], strings.modes))
+  devices.push(new Device(d, strings.devices[d], strings.modes))
 }
 
 var measures = []
@@ -246,7 +246,7 @@ var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'rollback', 'Rollbac
 var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'rollback', 'Rollback')
 
 var EL1 = {
-  a: devices[0],
+  a: devices[1],
   b: measures.slice(0, 4),
   c: [
     inputs2.find(b => b.addr === 'E103.3'),
@@ -260,7 +260,7 @@ var EL1 = {
 }
 
 var EL2 = {
-  a: devices[1],
+  a: devices[2],
   b: measures.slice(4, 8),
   c: [
     inputs4.find(b => b.addr === 'E203.3'),
@@ -274,7 +274,7 @@ var EL2 = {
 }
 
 var EL3 = {
-  a: devices[2],
+  a: devices[3],
   b: measures.slice(8, 12),
   c: [
     inputs6.find(b => b.addr === 'E301.3'),
@@ -285,7 +285,7 @@ var EL3 = {
 }
 
 var EL4 = {
-  a: devices[3],
+  a: devices[4],
   b: measures.slice(12, 16),
   c: [
     inputs8.find(b => b.addr === 'E401.3'),

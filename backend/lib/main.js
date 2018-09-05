@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { logEmitter } from './log/logServer'
 import LogSchema from './log/LogSchema'
-import winston from './winston'
+// import winston from './winston'
 import * as aps from './aps/def'
 import * as muse from './aps/muse'
 
@@ -25,16 +25,16 @@ conn.once('open', () => {
    * Log.
    */
   logEmitter.on('close', (client) => {
-    winston.log('info', '%s socket close', client)
+    // winston.log('info', '%s socket close', client)
   })
   logEmitter.on('end', (client) => {
-    winston.log('info', '%s socket end', client)
+    // winston.log('info', '%s socket end', client)
   })
   logEmitter.on('error', (client, e) => {
     winston.log('error', '%s socket error %s', client, e)
   })
   logEmitter.on('data', (client, buffer, log) => {
-    winston.log('info', '%s %o', client, buffer)
+    // winston.log('info', '%s %o', client, buffer)
     const { system } = log
     switch (system) {
       case aps.BASSANO:
@@ -49,9 +49,9 @@ conn.once('open', () => {
           var document = new LogSchema(res)
           document.save((err, doc) => {
             if (err) throw err
-            console.log('s7log', log)
+            // console.log('s7log', log)
             console.log('log', doc)
-            winston.log('info', '%o', doc)
+            // winston.log('info', '%o', doc)
           })
         })
         break
