@@ -24,15 +24,15 @@ conn.once('open', () => {
   /**
    * Log.
    */
-  logEmitter.on('close', (client) => {
-    // winston.log('info', '%s socket close', client)
-  })
-  logEmitter.on('end', (client) => {
-    // winston.log('info', '%s socket end', client)
-  })
-  logEmitter.on('error', (client, e) => {
-    winston.log('error', '%s socket error %s', client, e)
-  })
+  // logEmitter.on('close', (client) => {
+  //   winston.log('info', '%s socket close', client)
+  // })
+  // logEmitter.on('end', (client) => {
+  //   winston.log('info', '%s socket end', client)
+  // })
+  // logEmitter.on('error', (client, e) => {
+  //   winston.log('error', '%s socket error %s', client, e)
+  // })
   logEmitter.on('data', (client, buffer, log) => {
     // winston.log('info', '%s %o', client, buffer)
     const { system } = log

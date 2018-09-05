@@ -308,8 +308,6 @@ var overview = {
   }
 }
 
-// console.log(overview.devices[0])
-
 var TYPE_0 = [
   {
     name: 'Free',

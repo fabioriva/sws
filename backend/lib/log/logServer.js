@@ -13,13 +13,13 @@ const LOG_LEN = 32
 const server = net.createServer((socket) => {
   let client = `${socket.remoteAddress}:${socket.remotePort}`
   socket.on('error', (e) => {
-    logEmitter.emit('close', client, e)
+    console.log('close', client, e)
   })
   socket.on('close', () => {
-    logEmitter.emit('close', client)
+    console.log('close', client)
   })
   socket.on('end', () => {
-    logEmitter.emit('end', client)
+    console.log('end', client)
   })
   socket.on('data', (data) => {
     const buffer = Buffer.alloc(LOG_LEN, data)

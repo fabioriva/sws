@@ -197,7 +197,7 @@ export function s7log (log, callback) {
         event: log.event,
         mode: {
           id: log.mode,
-          name: s7obj.devices.find(d => d.id === log.device).mode
+          info: s7obj.devices.find(d => d.id === log.device).mode
           // info: s7obj.devices[log.device].mode
         },
         operation: {
@@ -236,6 +236,10 @@ function notification (document) {
     case 6:
     case 7:
     case 8:
+      description += `${operation.info} stall ${stall} card ${card}`
+      break
+    case 10:
+    case 11:
       description += `${operation.info} stall ${stall} card ${card}`
       break
     default:
