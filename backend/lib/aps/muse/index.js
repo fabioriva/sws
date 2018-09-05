@@ -187,7 +187,7 @@ export function s7log (log, callback) {
         date: log.date,
         device: {
           id: log.device,
-          name: s7obj.devices[log.device].name
+          name: log.device === 0 ? 'Operator' : s7obj.devices[log.device].name
         },
         event: log.event,
         mode: {
@@ -314,7 +314,7 @@ export function createApplication () {
                 })
               },
               function (cb) {
-                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices.slice(1), function (results) {
+                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
                   cb(null, s7obj.devices)
                 })
               },

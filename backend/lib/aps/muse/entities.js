@@ -219,7 +219,7 @@ for (let c = 0; c < s7def.CARDS; c++) {
 
 var devices = []
 for (let d = 0; d < s7def.DEVICES; d++) {
-  devices.push(new Device((d + 1), strings.devices[d], strings.modes))
+  devices.push(new Device((d + 1), strings.devices[d + 1], strings.modes))
 }
 
 var measures = []
