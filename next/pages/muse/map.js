@@ -98,10 +98,10 @@ class AppUi extends React.Component {
   }
   handleMap (data) {
     const { map } = data
-    console.log(map, this.state.visibilityFilter)
     this.setState({
       isFetching: false,
-      map: setStallLabel(map, this.state.visibilityFilter)
+      map: setStallLabel(map, this.state.visibilityFilter),
+      occupancy: map.statistics[0]
     })
   }
   // Map Modal
