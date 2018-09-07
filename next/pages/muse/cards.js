@@ -1,11 +1,13 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
-import { Table, notification } from 'antd'
+import { Table } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { CARDS } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 
 const columns = [
   {
@@ -80,7 +82,7 @@ class AppUi extends React.Component {
       }
       if (eventName === 'mesg') {
         const { mesg } = data
-        notification.open(mesg)
+        openNotification(mesg)
       }
       if (eventName === 'cards') {
         // console.log(e, e.data)
@@ -210,6 +212,7 @@ class AppUi extends React.Component {
           }
         />
         <Edit
+          cards={CARDS}
           data={editModal}
           onCancel={this.handleCancel}
           onChange={this.handleChange}

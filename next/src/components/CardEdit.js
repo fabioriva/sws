@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Modal, Form, Button, Icon, Input, InputNumber, TimePicker } from 'antd'
-import { CARDS } from '../constants/demo'
 import moment from 'moment'
 
 const FormItem = Form.Item
@@ -88,7 +87,7 @@ class CardEditForm extends React.Component {
                 required: true,
                 type: 'integer',
                 min: 1,
-                max: CARDS,
+                max: this.props.cards,
                 message: 'Please insert a valid card number!' }],
             })(
               <InputNumber

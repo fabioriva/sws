@@ -1,11 +1,12 @@
 import React from 'react'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
 import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
-import { Row, Col, Modal, notification } from 'antd'
+import { Row, Col, Modal } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 
 function confirm (system, ws) {
   Modal.confirm({
@@ -75,7 +76,7 @@ class AppUi extends React.Component {
       }
       if (eventName === 'mesg') {
         const { mesg } = data
-        notification.open(mesg)
+        openNotification(mesg)
       }
       if (eventName === 'overview') {
         this.setState({

@@ -1,9 +1,10 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
-import { Alert, Badge, Button, Tabs, notification } from 'antd'
+import { Alert, Badge, Button, Tabs } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 
 const Alarm = (props) => {
   const { a } = props
@@ -68,7 +69,7 @@ class AppUi extends React.Component {
       }
       if (eventName === 'mesg') {
         const { mesg } = data
-        notification.open(mesg)
+        openNotification(mesg)
       }
       if (eventName === 'alarms') {
         // console.log(e, e.data)

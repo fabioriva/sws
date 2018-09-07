@@ -20,14 +20,14 @@ export const modes = [
 
 export const operations = [
   '---',
-  'Alarm On',
-  'Alarm Off',
-  'Switch Function Mode',
+  'Alarm on',
+  'Alarm off',
+  'Switch function mode',
   'Card PIN code changed',
-  'Stall In',
-  'Stall Out',
-  'Shuffle In',
-  'Shuffle Out',
+  'Stall in',
+  'Stall out',
+  'Shuffle in',
+  'Shuffle out',
   '---',
   'Exit request',
   'Entry request'

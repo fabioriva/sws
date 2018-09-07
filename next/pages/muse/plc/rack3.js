@@ -1,12 +1,12 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
 import List from 'src/components/PlcList'
 import Rack from 'src/components/PlcRack'
-import { notification } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 import styles from 'src/styles/muse/rack3'
 
 class AppUi extends React.Component {
@@ -41,7 +41,7 @@ class AppUi extends React.Component {
         this.setState({ diag: data.diag })
       }
       if (eventName === 'mesg') {
-        notification.open(data.mesg)
+        openNotification(data.mesg)
       }
       if (eventName === 'racks') {
         this.setState({

@@ -2,14 +2,12 @@ import React from 'react'
 import classnames from 'classnames'
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-// import { compose } from 'redux'
-import withAuth from 'src/lib/withAuth'
-// import withRedux from 'next-redux-wrapper'
-// import { initStore } from 'src/store'
 import Layout from 'src/components/Layout'
 import Query from 'src/components/QueryModal'
-import { Button, Popover, Table, notification } from 'antd'
+import { Button, Popover, Table } from 'antd'
 import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 
 const { Column, ColumnGroup } = Table
 const ITEMS_PER_PAGE = 22
@@ -36,7 +34,6 @@ const initialState = {
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '6'})
-    // const res = await fetch('https://www.sotefinservice.com/api/query?system=61&dateFrom="2018-01-01"')
     const res = await fetch(`${BACKEND_URL}/aps/history/query?system=${APS_ID}`)
     const json = await res.json()
     return json
@@ -80,7 +77,7 @@ class AppUi extends React.Component {
       }
       if (eventName === 'mesg') {
         const { mesg } = data
-        notification.open(mesg)
+        openNotification(mesg)
       }
     }
   }
@@ -190,7 +187,7 @@ class AppUi extends React.Component {
             title='Date'
             dataIndex='date'
             key='date'
-            render={(text) => (moment(text).format('YYYY-MM-DD HH:mm:ss'))}
+            render={(text) => (moment.utc(text).format('YYYY-MM-DD HH:mm:ss'))}
           />
           <Column
             title='Device'
@@ -209,7 +206,7 @@ class AppUi extends React.Component {
             render={(text, record, index) => (
               record.alarm.id !== 0
               ?
-              <Popover content={`${record.alarm.info}`} title={`Alarm ID ${record.alarm.id}`} trigger='hover'><span>{text}</span></Popover>
+              <Popover content={`${record.alarm.info}`} title={`Alarm ID ${record.alarm.id}`} trigger='hover'><span>{text} ID {record.alarm.id}</span></Popover>
               :
               text
             )}

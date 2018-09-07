@@ -1,5 +1,6 @@
 import net from 'net'
 import Log from './Log'
+import winston from './winston'
 import { EventEmitter } from 'events'
 
 class LogEmitter extends EventEmitter {}
@@ -13,19 +14,20 @@ const LOG_LEN = 32
 const server = net.createServer((socket) => {
   let client = `${socket.remoteAddress}:${socket.remotePort}`
   socket.on('error', (e) => {
-    console.log('close', client, e)
+    winston.log('error', '%s socket error %s', client, e)
   })
   socket.on('close', () => {
-    console.log('close', client)
+    winston.log('info', '%s socket close', client)
   })
   socket.on('end', () => {
-    console.log('end', client)
+    winston.log('info', '%s socket end', client)
   })
   socket.on('data', (data) => {
     const buffer = Buffer.alloc(LOG_LEN, data)
+    winston.log('info', '%s %o', client, buffer)
     if (buffer.length === LOG_LEN) {
       const log = new Log(buffer)
-      logEmitter.emit('data', client, buffer, log)
+      logEmitter.emit('data', log)
     }
   })
 })

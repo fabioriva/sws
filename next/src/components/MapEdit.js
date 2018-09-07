@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Button, InputNumber } from 'antd'
-import { CARDS, STALLS, StallStatus } from 'src/constants/muse'
 
 class Edit extends React.Component {
   render () {
@@ -10,6 +9,7 @@ class Edit extends React.Component {
       margin: '12px 0',
       width: '60%'
     }
+    const { cards, stalls, stallStatus } = this.props
     return (
       <Modal
         title='Edit Stall'
@@ -23,10 +23,10 @@ class Edit extends React.Component {
           <Button key='card' type='primary' size='large' onClick={() => this.props.onConfirm(this.props.data.stall, this.props.data.value)}>
             Card
           </Button>,
-          <Button key='canc' type='primary' size='large' onClick={() => this.props.onConfirm(this.props.data.stall, StallStatus.FREE)}>
+          <Button key='canc' type='primary' size='large' onClick={() => this.props.onConfirm(this.props.data.stall, stallStatus.FREE)}>
             Clear
           </Button>,
-          <Button key='lock' type='primary' size='large' onClick={() => this.props.onConfirm(this.props.data.stall, StallStatus.LOCK)}>
+          <Button key='lock' type='primary' size='large' onClick={() => this.props.onConfirm(this.props.data.stall, stallStatus.LOCK)}>
             Lock
           </Button>
         ]}
@@ -36,7 +36,7 @@ class Edit extends React.Component {
           id='stall-nr'
           style={style}
           min={1}
-          max={STALLS}
+          max={stalls}
           defaultValue={this.props.data.stall}
           value={this.props.data.stall}
           onChange={(e) => this.props.onChange(e, this.props.data.value)}
@@ -46,7 +46,7 @@ class Edit extends React.Component {
           id='card-nr'
           style={style}
           min={1}
-          max={CARDS}
+          max={cards}
           defaultValue={this.props.data.value}
           value={this.props.data.value}
           onChange={(e) => this.props.onChange(this.props.data.stall, e)}

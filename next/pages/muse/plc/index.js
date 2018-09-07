@@ -1,8 +1,9 @@
 import React from 'react'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
-import { List, Card, notification } from 'antd'
+import { List, Card } from 'antd'
 import { APS, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 
 const data = [
   {
@@ -100,7 +101,7 @@ class AppUi extends React.Component {
         this.setState({ diag: data.diag })
       }
       if (eventName === 'mesg') {
-        notification.open(data.mesg)
+        openNotification(data.mesg)
       }
       if (eventName === 'racks') {
         this.setState({

@@ -1,6 +1,7 @@
+import notification from '../notification'
+// const notification = require('../notification')
 const async = require('async')
 const http = require('http')
-const moment = require('moment')
 const snap7 = require('node-snap7')
 const s7client = new snap7.S7Client()
 const s7comm = require('../s7comm')
@@ -10,8 +11,8 @@ const utils = require('../utils')
 const WebSocket = require('ws')
 
 const PLC = {
-  ip: '140.80.49.2',
-  // ip: '192.168.59.2',
+  // ip: '140.80.49.2',
+  ip: '192.168.59.2',
   rack: 0,
   slot: 1,
   polling_time: 1000
@@ -191,14 +192,12 @@ export function s7log (log, callback) {
         date: log.date,
         device: {
           id: log.device,
-          name: s7obj.devices.find(d => d.id === log.device).name
-          // name: log.device === 0 ? 'Operator' : s7obj.devices[log.device].name
+          name: s7obj.devices.find(d => d.id === log.device).name // name: log.device === 0 ? 'Operator' : s7obj.devices[log.device].name
         },
         event: log.event,
         mode: {
           id: log.mode,
-          info: s7obj.devices.find(d => d.id === log.device).mode
-          // info: s7obj.devices[log.device].mode
+          info: s7obj.devices.find(d => d.id === log.device).mode // info: s7obj.devices[log.device].mode
         },
         operation: {
           id: log.operation,
@@ -212,44 +211,9 @@ export function s7log (log, callback) {
     }
   ], function (err, document) {
     if (err) return callback(err)
-    console.log(document)
     wss.broadcast(JSON.stringify({ mesg: notification(document) }))
     callback(null, document) // LogSchema
   })
-}
-
-function notification (document) {
-  const { alarm, card, date, device, mode, operation, stall } = document
-  var description = `${moment(date).format('YYYY-MM-DD HH:mm:ss')} `
-  switch (operation.id) {
-    case 1:
-    case 2:
-      description += `${operation.info} Id ${alarm.info}`
-      break
-    case 3:
-      description += `${operation.info} >> ${mode.info}`
-      break
-    case 4:
-      description += `${operation.info} >> ${card}`
-      break
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-      description += `${operation.info} stall ${stall} card ${card}`
-      break
-    case 10:
-    case 11:
-      description += `${operation.info} stall ${stall} card ${card}`
-      break
-    default:
-      description.substring(-1)
-      break
-  }
-  return {
-    message: device.name,
-    description: description
-  }
 }
 
 export function createApplication () {

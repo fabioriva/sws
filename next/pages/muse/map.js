@@ -1,14 +1,15 @@
 import React from 'react'
-// import fetch from 'isomorphic-unfetch'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
-import Map from 'src/components/MapList'
+import MapList from 'src/components/MapList'
 import Level from 'src/components/MapLevel'
 import Edit from 'src/components/MapEdit'
 import Occupancy from 'src/components/MapOccupancy'
-import { Row, Col, Radio, notification } from 'antd'
+import { Row, Col, Radio } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { CARDS, STALLS, STALL_STATUS } from 'src/constants/muse'
+import openNotification from 'src/lib/openNotification'
+import withAuth from 'src/lib/withAuth'
 // import checkRole from 'src/lib/checkRole'
 
 const setStallLabel = (map, filter) => {
@@ -84,7 +85,7 @@ class AppUi extends React.Component {
       }
       if (eventName === 'mesg') {
         const { mesg } = data
-        notification.open(mesg)
+        openNotification(mesg)
       }
       if (eventName === 'map') {
         // console.log(e, e.data)
@@ -194,7 +195,16 @@ class AppUi extends React.Component {
             <a href='#level-20'>[G20]</a>
             <a href='#level-25'>[G25]</a>
           </div>
-          <Map map={map} />
+          <MapList 
+            map={map}
+            openModal={this.showModal}
+          />
+          <Edit
+            data={editModal}
+            onCancel={this.handleMapCancel}
+            onChange={this.handleMapChange}
+            onConfirm={this.handleMapOk}
+          />
         </Mobile>
         <Default>
           <Row>
@@ -254,6 +264,9 @@ class AppUi extends React.Component {
                 </Radio.Group>
                 </Row>
                 <Edit
+                  cards={CARDS}
+                  stalls={STALLS}
+                  stallStatus={STALL_STATUS}
                   data={editModal}
                   onCancel={this.handleMapCancel}
                   onChange={this.handleMapChange}

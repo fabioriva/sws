@@ -1,6 +1,6 @@
 import React from 'react'
 import Head from 'next/head'
-import LoginForm from 'src/components/SigninForm'
+import LoginForm from 'src/components/LoginForm'
 
 export default class PageLogin extends React.Component {
   render () {

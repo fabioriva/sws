@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import { Avatar, List, Tooltip } from 'antd'
 
 class Byte extends Component {

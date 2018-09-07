@@ -1,23 +1,23 @@
 import cookie from 'cookie'
 import redirect from '../lib/redirect'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { navbarSetUser } from '../store'
 import { Form, Icon, Input, Button, Checkbox } from 'antd'
 
-const FormItem = Form.Item
+const dev = process.env.NODE_ENV !== 'production'
+const ROOT_URL = dev ? process.env.BACKEND_URL : 'https://www.sotefinservice.com'
 const COOKIE_MAX_AGE = 1 * 24 * 60 * 60 // 1 day
 
 class NormalLoginForm extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { message: '' }
+    this.state = {
+      message: ''
+    }
   }
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        fetch('https://www.sotefinservice.com/signin', {
+        fetch(`${ROOT_URL}/authentication`, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -28,16 +28,29 @@ class NormalLoginForm extends React.Component {
         .then(res => res.json())
 	      .then(res => {
           if (res.success) {
-            const { token, user } = res
-            console.log('From Login Form:', token, user, typeof user.roles, user.roles)
-            this.props.navbarSetUser(user)
-            document.cookie = cookie.serialize('token', token, { COOKIE_MAX_AGE })
-            document.cookie = cookie.serialize('user', JSON.stringify(user), { COOKIE_MAX_AGE })
-            document.cookie = cookie.serialize('userContext', user.roles, { COOKIE_MAX_AGE })
-            // TODO: check roles
-            redirect({}, '/muse/overview')
+            const { token, aps } = res
+            const options = { maxAge: COOKIE_MAX_AGE }
+            document.cookie = cookie.serialize('token', token, options)
+            // document.cookie = cookie.serialize('user', JSON.stringify(user), options)
+            // document.cookie = cookie.serialize('userContext', user.aps[0], options)
+            if (aps !== undefined && aps.length == 1 ) {
+              redirect({}, `/${aps[0]}/overview`)
+            } else {
+              // TODO: aps selection
+              redirect({}, `/muse/overview`)
+            }            
           } else {
-            this.setState({ message: 'Wrong username or password' })
+            this.props.form.setFields({
+              username: {
+                value: values.username,
+                errors: [new Error(res.message)]
+              },
+              password: {
+                value: '',
+                errors: [new Error(res.message)]
+              },
+            })
+            this.setState({ message: res.message })
           }
         })
       }
@@ -47,43 +60,47 @@ class NormalLoginForm extends React.Component {
     const { getFieldDecorator } = this.props.form
     return (
       <Form onSubmit={this.handleSubmit} className='login-form'>
-        <FormItem>
+        <Form.Item>
           {getFieldDecorator('username', {
             rules: [{ required: true, message: 'Please input your username!' }],
           })(
             <Input className='login-form-input' prefix={<Icon type='user' style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder='Username' />
           )}
-        </FormItem>
-        <FormItem>
+        </Form.Item>
+        <Form.Item>
           {getFieldDecorator('password', {
-            rules: [{ required: true, message: 'Please input your Password!' }],
+            rules: [{ required: true, message: 'Please input your password!' }],
           })(
             <Input className='login-form-input' prefix={<Icon type='lock' style={{ color: 'rgba(0,0,0,.25)' }} />} type='password' placeholder='Password' />
           )}
-        </FormItem>
-        <FormItem>
+        </Form.Item>
+        <Form.Item>
           {getFieldDecorator('remember', {
             valuePropName: 'checked',
             initialValue: true,
           })(
-            <Checkbox>Remember me</Checkbox>
+            <Checkbox disabled>Remember me</Checkbox>
           )}
-          <a className='login-form-forgot' href=''>Forgot password</a>
+          <a className='login-form-forgot' href='mailto:info@sotefin.ch'>Forgot password</a>
           <Button type='primary' htmlType='submit' className='login-form-button'>
             Log in
           </Button>
-          <div>Or <a href=''>register now!</a></div>
-        </FormItem>
-        <p style={{ color: 'red', fontSize: 20, textAlign: 'center' }}>{this.state.message}</p>
+          <div>Or <a href='mailto:info@sotefin.ch'>register now!</a></div>
+        </Form.Item>
+        {/* <p style={{ color: 'red', fontSize: 20, textAlign: 'center' }}>{this.state.message}</p> */}
         <style jsx global>{`
           .login-form {
-            max-width: 300px
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto!important;
+            text-align: left;
           }
           .login-form-forgot {
-            float: right
+            float: right;
           }
           .login-form-button {
-            width: 100%
+            width: 100%;
           }
         `}</style>
       </Form>
@@ -91,16 +108,4 @@ class NormalLoginForm extends React.Component {
   }
 }
 
-const WrappedNormalLoginForm = Form.create()(NormalLoginForm)
-
-// export default WrappedNormalLoginForm
-
-const mapStateToProps = ({ navbar }) => ({ navbar })
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    navbarSetUser: bindActionCreators(navbarSetUser, dispatch)
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(WrappedNormalLoginForm)
+export default Form.create()(NormalLoginForm)
