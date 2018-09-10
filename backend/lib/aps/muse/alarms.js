@@ -1,4 +1,4 @@
-const alarms = [
+export const alarms = [
   { class: 'EU', label: 'AL1', info: 'Hoisting motor time out' },
   { class: 'EU', label: 'AL2', info: 'Travelling motors time out' },
   { class: 'EU', label: 'AL3', info: 'Rotation motor time out' },
@@ -65,7 +65,6 @@ const alarms = [
   { class: 'EU', label: 'AL64', info: '' }
 ]
 
-export default alarms
 
 // var AL0 = { label: 'RDY', info: 'System Ready', class: 'RDY' }
 // // Group 1

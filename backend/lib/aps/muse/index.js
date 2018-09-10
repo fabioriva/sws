@@ -11,8 +11,7 @@ const utils = require('../utils')
 const WebSocket = require('ws')
 
 const PLC = {
-  // ip: '140.80.49.2',
-  ip: '192.168.59.2',
+  ip: '140.80.49.2',
   rack: 0,
   slot: 1,
   polling_time: 1000
@@ -186,7 +185,7 @@ export function s7log (log, callback) {
       var document = {
         alarm: {
           id: log.alarm,
-          info: log.alarm === 0 ? 'Ready' : s7obj.alarms[log.alarm - 1].info
+          info: s7obj.alarms[log.device - 1].find(a => a.id === log.alarm).info
         },
         card: log.card,
         date: log.date,
@@ -337,7 +336,7 @@ function updateAlarms (device, callback) {
         case 1:
           s7client.ReadArea(0x84, s7def.DB_ALARM_1, s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
             if (err) return cb(err)
-            utils.updateAlarms(0, s7data, s7obj.alarms, s7obj.diag.groups[0], function (res) {
+            utils.updateAlarms(0, s7data, s7obj.alarms[0], s7obj.diag.groups[0], function (res) {
               cb(null, s7obj.diag.groups[0])
             })
           })
@@ -345,7 +344,7 @@ function updateAlarms (device, callback) {
         case 2:
           s7client.ReadArea(0x84, s7def.DB_ALARM_2, s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
             if (err) return cb(err)
-            utils.updateAlarms(0, s7data, s7obj.alarms, s7obj.diag.groups[1], function (res) {
+            utils.updateAlarms(0, s7data, s7obj.alarms[1], s7obj.diag.groups[1], function (res) {
               cb(null, s7obj.diag.groups[1])
             })
           })
@@ -353,7 +352,7 @@ function updateAlarms (device, callback) {
         case 3:
           s7client.ReadArea(0x84, s7def.DB_ALARM_3, s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
             if (err) return cb(err)
-            utils.updateAlarms(0, s7data, s7obj.alarms, s7obj.diag.groups[3], function (res) {
+            utils.updateAlarms(0, s7data, s7obj.alarms[2], s7obj.diag.groups[3], function (res) {
               cb(null, s7obj.diag.groups[2])
             })
           })
@@ -361,7 +360,7 @@ function updateAlarms (device, callback) {
         case 4:
           s7client.ReadArea(0x84, s7def.DB_ALARM_4, s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
             if (err) return cb(err)
-            utils.updateAlarms(0, s7data, s7obj.alarms, s7obj.diag.groups[3], function (res) {
+            utils.updateAlarms(0, s7data, s7obj.alarms[3], s7obj.diag.groups[3], function (res) {
               cb(null, s7obj.diag.groups[3])
             })
           })

@@ -14,14 +14,48 @@ import {
   Stall
 } from '../models'
 
-var alarms = []
+var alarms1 = []
 for (let a = 0; a < 64; a++) {
-  alarms.push(new Alarm(a + 1, 1, 0))
+  alarms1.push(new Alarm(a + 1, 1, 0))
 }
-alarms.forEach((a, i) => {
+alarms1.forEach((a, i) => {
   a.label = strings.alarms1[i].label
   a._info = strings.alarms1[i].info
 })
+
+var alarms2 = []
+for (let a = 0; a < 64; a++) {
+  alarms2.push(new Alarm(a + 1, 2, 0))
+}
+alarms2.forEach((a, i) => {
+  a.label = strings.alarms2[i].label
+  a._info = strings.alarms2[i].info
+})
+
+var alarms3 = []
+for (let a = 0; a < 64; a++) {
+  alarms3.push(new Alarm(a + 1, 3, 0))
+}
+alarms3.forEach((a, i) => {
+  a.label = strings.alarms3[i].label
+  a._info = strings.alarms3[i].info
+})
+
+var alarms4 = []
+for (let a = 0; a < 64; a++) {
+  alarms4.push(new Alarm(a + 1, 4, 0))
+}
+alarms4.forEach((a, i) => {
+  a.label = strings.alarms4[i].label
+  a._info = strings.alarms4[i].info
+})
+
+var alarms = [
+  alarms1,
+  alarms2,
+  alarms3,
+  alarms4
+]
 
 var diag = {
   count: 0,
