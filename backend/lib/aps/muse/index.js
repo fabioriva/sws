@@ -185,7 +185,7 @@ export function s7log (log, callback) {
       var document = {
         alarm: {
           id: log.alarm,
-          info: s7obj.alarms[log.device - 1].find(a => a.id === log.alarm).info
+          info: log.alarm === 0 ? 'Ready' : s7obj.alarms[log.device - 1].find(a => a.id === log.alarm).info
         },
         card: log.card,
         date: log.date,
