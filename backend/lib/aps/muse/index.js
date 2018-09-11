@@ -241,12 +241,6 @@ export function createApplication () {
             cb(null, s7obj.stalls)
           })
         })
-      },
-      function (cb) {
-        updateAlarms(1, function (err, res) {
-          if (err) return cb(err)
-          cb(null, res)
-        })
       }
     ], function (err, results) {
       if (err) return s7comm.commError(err, PLC, s7client)
@@ -352,7 +346,7 @@ function updateAlarms (device, callback) {
         case 3:
           s7client.ReadArea(0x84, s7def.DB_ALARM_3, s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
             if (err) return cb(err)
-            utils.updateAlarms(0, s7data, s7obj.alarms[2], s7obj.diag.groups[3], function (res) {
+            utils.updateAlarms(0, s7data, s7obj.alarms[2], s7obj.diag.groups[2], function (res) {
               cb(null, s7obj.diag.groups[2])
             })
           })
