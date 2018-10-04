@@ -1,15 +1,17 @@
+import async from 'async'
+import http from 'http'
+import snap7 from 'node-snap7'
+import WebSocket from 'ws'
+import * as s7def from './def'
+import * as s7obj from './entities'
+import * as utils from '../utils'
+import {
+  commError,
+  commOpen
+} from '../s7comm'
 import notification from '../notification'
-// const notification = require('../notification')
-const async = require('async')
-const http = require('http')
-const snap7 = require('node-snap7')
-const s7client = new snap7.S7Client()
-const s7comm = require('../s7comm')
-const s7def = require('./def')
-const s7obj = require('./entities')
-const utils = require('../utils')
-const WebSocket = require('ws')
 
+const s7client = new snap7.S7Client()
 const PLC = {
   ip: '140.80.49.2',
   rack: 0,
@@ -82,7 +84,7 @@ wss.on('connection', function connection (ws, req) {
         buffer.writeUInt16BE(stall, 0)
         buffer.writeUInt16BE(card, 2)
         s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer, function (err) {
-          if (err) return s7comm.commError(err, PLC, s7client)
+          if (err) return commError(err, PLC, s7client)
         })
         break
       case 'overview-operation':
@@ -98,7 +100,7 @@ wss.on('connection', function connection (ws, req) {
               const buffer = Buffer.alloc(2)
               buffer.writeUInt16BE(value, 0)
               s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer, function (err) {
-                if (err) return s7comm.commError(err, PLC, s7client)
+                if (err) return commError(err, PLC, s7client)
               })
             } else {
               // error not found
@@ -111,12 +113,12 @@ wss.on('connection', function connection (ws, req) {
         switch (id) {
           case 3:
             s7client.WriteArea(0x84, s7def.DB_DATA, ((184 * 8) + 4), 1, 0x01, s7def.TRUE, function (err) {
-              if (err) return s7comm.commError(err, PLC, s7client)
+              if (err) return commError(err, PLC, s7client)
             })
             break
           case 4:
             s7client.WriteArea(0x84, s7def.DB_DATA, ((184 * 8) + 5), 1, 0x01, s7def.TRUE, function (err) {
-              if (err) return s7comm.commError(err, PLC, s7client)
+              if (err) return commError(err, PLC, s7client)
             })
             break
         }
@@ -133,6 +135,109 @@ setInterval(function ping () {
   })
 }, 3000)
 
+export function createApplication () {
+  async.retry({
+    times: 5,
+    interval: PLC.polling_time
+  }, commOpen.bind(this, PLC, s7client), function (err, isOnline) {
+    if (err) return commError(err, PLC, s7client)
+    PLC.isOnline = isOnline
+    async.series([
+      function (cb) {
+        s7client.ReadArea(0x84, s7def.DB_CARDS, s7def.DB_CARDS_INIT, s7def.DB_CARDS_LEN, 0x02, function (err, s7data) {
+          if (err) return cb(err)
+          utils.updateCards(0, s7data, s7def.CARD_LEN, s7obj.cards, function (res) {
+            cb(null, s7obj.cards)
+          })
+        })
+      },
+      function (cb) {
+        s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
+          if (err) return cb(err)
+          // utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
+          //   cb(null, s7obj.stalls)
+          // })
+          updateMap(0, s7data, s7obj.stalls, s7obj.map.statistics, function (res) {
+            cb(null, s7obj.map)
+          })
+        })
+      }
+    ], function (err, results) {
+      if (err) return commError(err, PLC, s7client)
+      wss.broadcast(JSON.stringify({ cards: results[0] }))
+      wss.broadcast(JSON.stringify({ map: results[1] }))
+    })
+    async.forever(function (next) {
+      setTimeout(function () {
+        // appEmitter.emit('comm', PLC)
+        wss.broadcast(JSON.stringify({ comm: PLC }))
+        if (PLC.isOnline) {
+          wss.broadcast(JSON.stringify({
+            diag: {
+              alarmCount: s7obj.diag.count,
+              isActive: s7obj.diag.count > 0
+            }
+          }))
+          s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
+            if (err) return commError(err, PLC, s7client)
+            async.series([
+              function (cb) {
+                utils.updateBits(s7def.DB_DATA_INIT_MB, s7data, s7obj.merkers, function (results) {
+                  cb(null, s7obj.merkers)
+                })
+              },
+              function (cb) {
+                utils.updateBits(s7def.DB_DATA_INIT_EB, s7data, s7obj.inputs, function (results) {
+                  cb(null, s7obj.inputs)
+                })
+              },
+              function (cb) {
+                utils.updateBits(s7def.DB_DATA_INIT_AB, s7data, s7obj.outputs, function (results) {
+                  cb(null, s7obj.outputs)
+                })
+              },
+              function (cb) {
+                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
+                  cb(null, s7obj.devices)
+                })
+              },
+              function (cb) {
+                utils.updateMeasures(s7def.DB_DATA_INIT_POS, s7data, s7obj.measures, function (results) {
+                  cb(null, s7obj.measures)
+                })
+              },
+              function (cb) {
+                utils.updateQueue(s7def.DB_DATA_INIT_QUEUE, s7data, s7obj.exitQueue, function (results) {
+                  cb(null, s7obj.exitQueue)
+                })
+              }
+            ], function (err, results) {
+              if (err) return commError(err, PLC, s7client)
+              // console.log(results)
+              // console.log(results[0])
+              // console.log(results[1])
+              // console.log(results[2])
+              // console.log(results[3])
+              // console.log(results[4])
+              // console.log(results[5])
+              wss.broadcast(JSON.stringify(
+                {
+                  overview: s7obj.overview,
+                  racks: s7obj.racks
+                })
+              )
+            })
+          })
+        } else {
+          // console.log('offline', PLC, Date.now())
+          PLC.isOnline = s7client.Connect()
+        }
+        next()
+      }, PLC.polling_time)
+    })
+  })
+}
+
 export function s7log (log, callback) {
   async.waterfall([
     function (cb) {
@@ -141,14 +246,14 @@ export function s7log (log, callback) {
         case 1:
         case 2:
           updateAlarms(device, function (err, res) {
-            if (err) return s7comm.commError(err, PLC, s7client)
+            if (err) return commError(err, PLC, s7client)
             wss.broadcast(JSON.stringify({ alarms: res }))
             cb(null, log)
           })
           break
         case 4:
           s7client.ReadArea(0x84, s7def.DB_CARDS, s7def.DB_CARDS_INIT, s7def.DB_CARDS_LEN, 0x02, function (err, s7data) {
-            if (err) return s7comm.commError(err, PLC, s7client)
+            if (err) return commError(err, PLC, s7client)
             utils.updateCards(0, s7data, s7def.CARD_LEN, s7obj.cards, function (res) {
               wss.broadcast(JSON.stringify({ cards: s7obj.cards }))
               cb(null, log)
@@ -160,7 +265,7 @@ export function s7log (log, callback) {
         case 7:
         case 8:
           s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
-            if (err) return s7comm.commError(err, PLC, s7client)
+            if (err) return commError(err, PLC, s7client)
             // utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
             //   wss.broadcast(JSON.stringify({ map: s7obj.map }))
             //   cb(null, log)
@@ -206,109 +311,6 @@ export function s7log (log, callback) {
     if (err) return callback(err)
     wss.broadcast(JSON.stringify({ mesg: notification(document) }))
     callback(null, document) // LogSchema
-  })
-}
-
-export function createApplication () {
-  async.retry({
-    times: 5,
-    interval: PLC.polling_time
-  }, s7comm.commOpen.bind(this, PLC, s7client), function (err, isOnline) {
-    if (err) return s7comm.commError(err, PLC, s7client)
-    PLC.isOnline = isOnline
-    async.series([
-      function (cb) {
-        s7client.ReadArea(0x84, s7def.DB_CARDS, s7def.DB_CARDS_INIT, s7def.DB_CARDS_LEN, 0x02, function (err, s7data) {
-          if (err) return cb(err)
-          utils.updateCards(0, s7data, s7def.CARD_LEN, s7obj.cards, function (res) {
-            cb(null, s7obj.cards)
-          })
-        })
-      },
-      function (cb) {
-        s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
-          if (err) return cb(err)
-          // utils.updateStalls(0, s7data, s7def.STALL_LEN, s7obj.stalls, function (res) {
-          //   cb(null, s7obj.stalls)
-          // })
-          updateMap(0, s7data, s7obj.stalls, s7obj.map.statistics, function (res) {
-            cb(null, s7obj.map)
-          })
-        })
-      }
-    ], function (err, results) {
-      if (err) return s7comm.commError(err, PLC, s7client)
-      wss.broadcast(JSON.stringify({ cards: results[0] }))
-      wss.broadcast(JSON.stringify({ map: results[1] }))
-    })
-    async.forever(function (next) {
-      setTimeout(function () {
-        // appEmitter.emit('comm', PLC)
-        wss.broadcast(JSON.stringify({ comm: PLC }))
-        if (PLC.isOnline) {
-          wss.broadcast(JSON.stringify({
-            diag: {
-              alarmCount: s7obj.diag.count,
-              isActive: s7obj.diag.count > 0
-            }
-          }))
-          s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
-            if (err) return s7comm.commError(err, PLC, s7client)
-            async.series([
-              function (cb) {
-                utils.updateBits(s7def.DB_DATA_INIT_MB, s7data, s7obj.merkers, function (results) {
-                  cb(null, s7obj.merkers)
-                })
-              },
-              function (cb) {
-                utils.updateBits(s7def.DB_DATA_INIT_EB, s7data, s7obj.inputs, function (results) {
-                  cb(null, s7obj.inputs)
-                })
-              },
-              function (cb) {
-                utils.updateBits(s7def.DB_DATA_INIT_AB, s7data, s7obj.outputs, function (results) {
-                  cb(null, s7obj.outputs)
-                })
-              },
-              function (cb) {
-                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
-                  cb(null, s7obj.devices)
-                })
-              },
-              function (cb) {
-                utils.updateMeasures(s7def.DB_DATA_INIT_POS, s7data, s7obj.measures, function (results) {
-                  cb(null, s7obj.measures)
-                })
-              },
-              function (cb) {
-                utils.updateQueue(s7def.DB_DATA_INIT_QUEUE, s7data, s7obj.exitQueue, function (results) {
-                  cb(null, s7obj.exitQueue)
-                })
-              }
-            ], function (err, results) {
-              if (err) return s7comm.commError(err, PLC, s7client)
-              // console.log(results)
-              // console.log(results[0])
-              // console.log(results[1])
-              // console.log(results[2])
-              // console.log(results[3])
-              // console.log(results[4])
-              // console.log(results[5])
-              wss.broadcast(JSON.stringify(
-                {
-                  overview: s7obj.overview,
-                  racks: s7obj.racks
-                })
-              )
-            })
-          })
-        } else {
-          // console.log('offline', PLC, Date.now())
-          PLC.isOnline = s7client.Connect()
-        }
-        next()
-      }, PLC.polling_time)
-    })
   })
 }
 
