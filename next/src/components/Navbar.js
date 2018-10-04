@@ -1,111 +1,31 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
 import cookie from 'cookie'
-// import moment from 'moment'
 import redirect from 'src/lib/redirect'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { sidebarToggle } from 'src/store'
-import { Layout, Badge, Icon, Tag, Tooltip, notification } from 'antd'
+import { Layout, Badge, Icon, Tag, Tooltip } from 'antd'
 const { Header } = Layout
 
-
-// const openNotification = (mesg) => {
-//   var message = `${mesg.device}`
-//   var description = `${moment(mesg.date).format('YYYY-MM-DD HH:mm:ss')} `
-//   switch (mesg.operationId) {
-//     case 1:
-//     case 2:
-//       description += `${mesg.operation} Id ${mesg.alarm}`
-//       break
-//     case 3:
-//       description += `${mesg.operation} >> ${mesg.mode}`
-//       break
-//     case 4:
-//       description += `${mesg.operation} >> ${mesg.card}`
-//       break
-//     case 5:
-//     case 6:
-//     case 7:
-//     case 8:
-//       description += `${mesg.operation} stall ${mesg.stall} card ${mesg.card}`
-//       break
-//     default:
-//       description.substring(-1)
-//       break
-//   }
-//   notification.open({
-//     message: message,
-//     description: description,
-//   })
-// }
-
 class Navbar extends Component {
-  // constructor (props) {
-  //   super(props)
-  //   this.state = {
-  //     comm: { isOnline: false },
-  //     diag: { alarmCount: 0 },
-  //     mesg: { log: '' }
-  //   }
-  // }
-  componentDidMount () {
-    // ws
-    // this.ws = new WebSocket('wss://www.sotefinservice.com/ws/demo')
-    // this.ws.onerror = e => console.log(e)
-    // this.ws.onmessage = e => {
-    //   const data = JSON.parse(e.data)
-    //   const eventName = Object.keys(data)[0]
-    //   // if (eventName === 'comm') {
-    //   //   this.handleComm(data)
-    //   // }
-    //   if (eventName === 'diag') {
-    //     this.handleDiag(data)
-    //   }
-    //   if (eventName === 'mesg') {
-    //     this.handleMesg(data)
-    //   }
-    // }
-  }
-  componentWillUnmount () {
-    // ws
-    // this.ws.close()
-  }
-  // handleComm = (data) => {
-  //   const { comm } = data
-  //   this.setState({
-  //     comm: comm
-  //   })
-  // }
-  // handleDiag = (data) => {
-  //   const { diag } = data
-  //   this.setState({
-  //     diag: diag
-  //   })
-  // }
-  // handleMesg = (message) => {
-  //   console.log('mesg', message)
-  //   const { mesg } = message    
-  //   openNotification(mesg)
-  // }
   signout = () => {
-    document.cookie = cookie.serialize('token', '', {
-      maxAge: 0 // 0= Delete cookie / -1= Expire the cookie immediately
-    })
-    // document.cookie = cookie.serialize('user', '', {
-    //   maxAge: 0 // 0= Delete cookie / -1= Expire the cookie immediately
-    // })
-    // document.cookie = cookie.serialize('userContext', '', {
-    //   maxAge: 0 // 0= Delete cookie / -1= Expire the cookie immediately
-    // })
+    const options = {
+      maxAge: -1 // 0 = Delete cookie / -1 = Expire the cookie immediately
+    }
+    if (process.browser) {
+      document.cookie = cookie.serialize('token', '', options)
+    }
+    // document.cookie = cookie.serialize('user', '', options)
+    // document.cookie = cookie.serialize('userContext', '', options)
     redirect({}, '/')
   }
   render () {
     const comm = this.props.comm  // this.state.comm
     const commStatus = comm.isOnline ? <Tag color='#87d068'>ONLINE</Tag> : <Tag color='#f50'>OFFLINE</Tag>
-    const commInfo = comm.isOnline ? <span>PLC {comm.ip} ONLINE</span> : <span>PLC OFFLINE</span>
+    // const commInfo = comm.isOnline ? <span>PLC {comm.ip} ONLINE</span> : <span>PLC OFFLINE</span>
     const diag = this.props.diag  // this.state.diag
-    const { user } = this.props.navbar
+    // const { user } = this.props.navbar
     const { collapsed } = this.props.sidebar
     return (
       <Header className='app-navbar'>

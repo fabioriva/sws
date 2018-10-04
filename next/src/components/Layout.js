@@ -15,8 +15,6 @@ export default class PageLayout extends React.Component {
           <title>Sotefin Web Service</title>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
           <meta charSet='utf-8' />
-          {/* <link rel='stylesheet' href='https://unpkg.com/antd@3/dist/antd.min.css' /> */}
-          <link rel='stylesheet' href='/_next/static/style.css' />
           <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' />
           <link rel='icon' type='image/png' href='https://www.sotefinservice.com/static/favicon.png' />
         </Head>

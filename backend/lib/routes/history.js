@@ -1,8 +1,9 @@
 const async = require('async')
 const moment = require('moment')
 const express = require('express')
-const router = express.Router()
 const History = require('lib/log/LogSchema')
+
+const router = express.Router()
 
 router.get('/', function (req, res) {
   res
@@ -13,18 +14,18 @@ router.get('/', function (req, res) {
 
 router.get('/query', function (req, res) {
   var { system, dateFrom, dateTo, filter } = req.query
-  console.log(system, typeof dateFrom, dateFrom, typeof dateTo, dateTo, typeof filter, filter)
-  dateFrom = dateFrom ? moment(dateFrom) : moment().add(-1, 'days')
-  dateTo = dateTo ? moment(dateTo) : moment()
-  // console.log(from, to)
+  console.log('Query Filters', system, typeof dateFrom, dateFrom, typeof dateTo, dateTo, typeof filter, filter)
+  var from = dateFrom || moment().startOf('day') // moment().subtract(1, 'days')
+  var to = dateTo || moment().endOf('day')
   var queryFilter = {
-    system: system,
+    // system: system,
     date: {
-      $gte: dateFrom ? moment(dateFrom) : moment().add(-1, 'days'),
-      $lt: dateTo ? moment(dateTo) : moment()
+      $gte: from,
+      $lt: to
     },
     operationId: filter === 'b' ? { $gte: 1, $lte: 2 } : { $ne: 0 }
   }
+  console.log(queryFilter)
   async.series([
     function (callback) {
       History.countDocuments(queryFilter, function (err, count) {
@@ -33,9 +34,13 @@ router.get('/query', function (req, res) {
       })
     },
     function (callback) {
-      History.find(queryFilter).sort({ date: -1 }).lean().exec(function (err, query) {
-      // LogSchema.find().or([{ system: 49 }, { system: 66 }]).sort({ date: -1 }).exec(function (err, query) {
+      History.find(queryFilter).bySystem(system).sort({ date: -1 }).lean().exec(function (err, query) {
         if (err) callback(err)
+        // query.map((o) => {
+        //   o.date = moment(o.date).format('YYYY-MM-DD HH:mm:ss')
+        //   // console.log(moment(o.date).format('YYYY-MM-DD HH:mm:ss'))
+        // })
+        // console.log(query)
         callback(null, query)
       })
     }
@@ -44,8 +49,8 @@ router.get('/query', function (req, res) {
     if (err) res.status(404).send(err)
     res.status(200).json({
       count: results[0],
-      dateFrom: dateFrom.format('YYYY-MM-DD HH:mm:ss'),
-      dateTo: dateTo.format('YYYY-MM-DD HH:mm:ss'),
+      dateFrom: from, // moment(from).format('YYYY-MM-DD HH:mm:ss'),
+      dateTo: to, // moment(to).format('YYYY-MM-DD HH:mm:ss'),
       query: results[1]
     })
   })

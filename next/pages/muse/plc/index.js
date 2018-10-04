@@ -77,7 +77,7 @@ const data = [
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     // store.sidebarSetMenu(5)
-    store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '5' })
+    store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '4' })
   }
   constructor (props) {
     super(props)
@@ -89,26 +89,15 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    this.ws = new WebSocket(WEBSOCK_URL)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        openNotification(data.mesg)
-      }
-      if (eventName === 'racks') {
-        this.setState({
-          isFetching: false,
-          racks: data.racks
-        })
-      }
+      Object.keys(data).forEach((key) => {
+        if (key === 'comm') this.setState({ comm: data[key] })
+        if (key === 'diag') this.setState({ diag: data[key] })
+        if (key === 'mesg') openNotification(data[key])
+      })
     }
   }
   componentWillUnmount () {

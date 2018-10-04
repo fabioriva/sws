@@ -18,11 +18,13 @@ function notification (document) {
     case 6:
     case 7:
     case 8:
-      description += `${operation.info} stall ${stall} card ${card}`
+      description += `${operation.info} card ${card} stall ${stall}`
       break
     case 10:
+      description += `${operation.info} card ${card}`
+      break
     case 11:
-      description += `${operation.info} stall ${stall} card ${card}`
+      description += `${operation.info} card ${card} stall ${stall}`
       break
     default:
       description.substring(-1)

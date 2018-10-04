@@ -1,5 +1,4 @@
 export const devices = [
-  'Operator',
   'Elevator 1 (S)',
   'Elevator 2 (N)',
   'Elevator 3 (E)',
@@ -30,7 +29,11 @@ export const operations = [
   'Shuffle out',
   '---',
   'Exit request',
-  'Entry request'
+  'Entry request',
+  '---',
+  '---',
+  '---',
+  '---'
 ]
 
 export const measures = [

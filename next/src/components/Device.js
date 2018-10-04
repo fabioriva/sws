@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Row, Col, Badge, Button, Card, Icon, Popconfirm, Radio, Tag, Tooltip } from 'antd'
+import { Button, Card, Icon, Tag, Tooltip } from 'antd'
 // import Blink from './Blink'
 // import Carousel from 'nuka-carousel'
 import classnames from 'classnames'
@@ -27,6 +27,7 @@ class Device extends Component {
   // }
   render () {
     const { device } = this.props
+    console.log(device)
     const { id, name, card, mode, operation, size, stall } = device.a
     const autTag =
       <Tooltip title='Automatic'>
@@ -143,13 +144,28 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
+              Function Mode
+            </span>
+            <p className='device-value'>
+              {mode}
+            </p>
+          </Card.Grid>
+          <Card.Grid
+            className={classnames({
+              'device-info': true,
+              'device-info-1': operation === 1,
+              'device-info-2': operation === 2,
+              'device-info-3': operation === 3
+            })}
+          >
+            <span className='device-title'>
               Card
             </span>
             <p className='device-value'>
               {card}
             </p>
           </Card.Grid>
-          {/* <Card.Grid
+          <Card.Grid
             className={classnames({
               'device-info': true,
               'device-info-1': operation === 1,
@@ -163,7 +179,7 @@ class Device extends Component {
             <p className='device-value'>
               {size}
             </p>
-          </Card.Grid> */}
+          </Card.Grid>
           <Card.Grid
             className={classnames({
               'device-info': true,

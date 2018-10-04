@@ -12,7 +12,6 @@
         }
       }
     ],
-    "transform-decorators-legacy",
     [
       "import",
       {
@@ -23,8 +22,8 @@
     [
       "transform-define",
       {
-        "process.env.BACKEND_URL": "http://192.168.200.232",
-        "process.env.WEBSOCKET_URL": "ws://192.168.200.232"
+        "process.env.BACKEND_URL": "http://192.168.20.232",
+        "process.env.WEBSOCKET_URL": "ws://192.168.20.232"
       }
     ]
   ]

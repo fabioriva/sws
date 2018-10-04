@@ -8,7 +8,7 @@
     "all": "concurrently --kill-others \"yarn api\" \"yarn dev\"",
     "api": "nodemon lib/server.js --exec babel-node --presets es2015,stage-2",
     "dev": "nodemon lib/main.js --exec babel-node --presets es2015,stage-2",
-    "gen": "babel-node lib/ws/aps/muse/generator.js --exec babel-node --presets es2015,stage-2",
+    "gen": "babel-node lib/aps/nyu/generator.js --exec babel-node --presets es2015,stage-2",
     "build": "rm -r dist && babel lib -d dist",
     "start": "NODE_ENV=production node dist/ws.js"
   },
@@ -17,7 +17,7 @@
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "moment": "^2.22.2",
-    "mongoose": "^5.2.14",
+    "mongoose": "^5.3.1",
     "node-snap7": "^1.0.1",
     "ws": "^6.0.0"
   },

@@ -3,9 +3,9 @@ import Level from './MapLevel'
 
 export default class Map extends Component {
   render () {
-    const levels = []
-    this.props.map.levels.forEach((level, i) => {
-      levels.push(
+    const levels =
+    this.props.map.levels.map((level, i) => {
+      return (
         <Level
           level={level}
           key={i}

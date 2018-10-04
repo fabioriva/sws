@@ -6,10 +6,6 @@ import { initStore } from 'src/store'
 // import {compose} from 'redux'
 // import withAuth from 'src/lib/withAuth'
 
-const dev = process.env.NODE_ENV !== 'production'
-const backendUrl = dev ? process.env.BACKEND_URL : 'https://www.sotefinservice.com'
-const websocketUrl = dev ? process.env.WEBSOCKET_URL : 'wss://www.sotefinservice.com'
-
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     // we can dispatch from here too

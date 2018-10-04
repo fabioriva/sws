@@ -209,3 +209,13 @@ export {
   updateStalls,
   updateStatistics
 }
+
+/*
+ * Websocket utilities.
+ */
+
+export function heartbeat () {
+  this.isAlive = true
+}
+
+export function noop () {}

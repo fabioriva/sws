@@ -33,13 +33,29 @@ db.once('open', function () {
   //   roles: ['service'],
   //   aps: ['muse']
   // })
+  // var user = new User({
+  //   email: 'admin@sotefinservice.com',
+  //   name: { first: 'Fabio', last: 'Riva' },
+  //   username: 'swsadmin',
+  //   password: 'h0savP6L.',
+  //   roles: ['admin'],
+  //   aps: ['demo', 'muse']
+  // })
+  // var user = new User({
+  //   email: 'bassano@sotefinservice.com',
+  //   name: { first: 'Fabio', last: 'Riva' },
+  //   username: 'sotefin@bassano',
+  //   password: 'h0savP6L.',
+  //   roles: ['admin'],
+  //   aps: ['bassano']
+  // })
   var user = new User({
-    email: 'admin@sotefinservice.com',
+    email: 'nyu@sotefinservice.com',
     name: { first: 'Fabio', last: 'Riva' },
-    username: 'swsadmin',
+    username: 'sotefin@nyu',
     password: 'h0savP6L.',
     roles: ['admin'],
-    aps: ['demo', 'muse']
+    aps: ['nyu']
   })
   user.save(function (err, user) {
     if (err) return console.error(err)

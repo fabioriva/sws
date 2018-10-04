@@ -56,25 +56,21 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    this.ws = new WebSocket(WEBSOCK_URL)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        const { mesg } = data
-        openNotification(mesg)
-      }
-      if (eventName === 'alarms') {
-        // console.log(e, e.data)
-        this.handleData(data)
-      }
+      Object.keys(data).forEach((key) => {
+        if (key === 'comm') this.setState({ comm: data[key] })
+        if (key === 'diag') this.setState({ diag: data[key] })
+        if (key === 'mesg') openNotification(data[key])
+        if (key === 'alarms') {
+          this.setState({
+            isFetching: false,
+            alarms: data[key]
+          })
+        }
+      })
     }
   }
   componentWillUnmount () {
@@ -88,8 +84,8 @@ class AppUi extends React.Component {
   }
   render () {
     const { alarms } = this.state
-    const tabEL1 = <Badge count={this.state.alarms.groups[0].count}><span style={{ padding: 12 }}>Elevator 1</span></Badge>
-    const alarmsEL1 = this.state.alarms.groups[0].active.map((a, i) => {
+    const tabEL1 = <Badge count={alarms.groups[0].count}><span style={{ padding: 12 }}>Elevator 1</span></Badge>
+    const alarmsEL1 = alarms.groups[0].active.map((a, i) => {
       return <Alarm a={a} key={i} />
     })
     const tabEL2 = <Badge count={alarms.groups[1].count}><span style={{ padding: 12 }}>Elevator 2</span></Badge>

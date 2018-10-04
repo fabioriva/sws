@@ -72,25 +72,23 @@ class AppUi extends React.Component {
     this.handleMap = this.handleMap.bind(this)
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    this.ws = new WebSocket(WEBSOCK_URL)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        const { mesg } = data
-        openNotification(mesg)
-      }
-      if (eventName === 'map') {
-        // console.log(e, e.data)
-        this.handleMap(data)
-      }
+      Object.keys(data).forEach((key) => {
+        if (key === 'comm') this.setState({ comm: data[key] })
+        if (key === 'diag') this.setState({ diag: data[key] })
+        if (key === 'mesg') openNotification(data[key])
+        if (key === 'map') {
+          const { map } = data
+          this.setState({
+            isFetching: false,
+            map: setStallLabel(map, this.state.visibilityFilter),
+            occupancy: map.statistics[0]
+          })
+        }
+      })
     }
   }
   componentWillUnmount () {

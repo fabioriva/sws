@@ -1,30 +1,31 @@
 import { notification } from 'antd'
 
 function openNotification (mesg) {
-  switch (mesg.type) {
+  const { type, message, description } = mesg
+  switch (type) {
     case 1:
       notification['error']({
-        message: mesg.message,
-        description: mesg.description
+        message: message,
+        description: description
       })
       break
     case 2:
       notification['success']({
-        message: mesg.message,
-        description: mesg.description
+        message: message,
+        description: description
       })
       break
     case 3:
     case 4:
       notification['warning']({
-        message: mesg.message,
-        description: mesg.description
+        message: message,
+        description: description
       })
       break
     default:
       notification['info']({
-        message: mesg.message,
-        description: mesg.description
+        message: message,
+        description: description
       })
   }
 }

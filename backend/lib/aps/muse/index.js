@@ -14,14 +14,14 @@ const PLC = {
   ip: '140.80.49.2',
   rack: 0,
   slot: 1,
-  polling_time: 1000
+  polling_time: 500
 }
 
 const port = parseInt(process.env.PORT, 10) || 8082
 const server = http.createServer((req, res) => {
   let page = req.url.split('/').pop()
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('X-Powered-By', 'sws')
+  res.setHeader('X-Powered-By', 'Sotefin')
   switch (page) {
     case 'alarms':
       res.writeHead(200, { 'Content-Type': 'text/json' })
@@ -70,7 +70,7 @@ wss.broadcast = function broadcast (data) {
 wss.on('connection', function connection (ws, req) {
   const ip = req.connection.remoteAddress
   ws.isAlive = true
-  ws.on('pong', heartbeat)
+  ws.on('pong', utils.heartbeat)
   console.log('muse', ip, wss.clients.size)
   ws.on('message', function incoming (message) {
     const { event, data } = JSON.parse(message)
@@ -125,17 +125,11 @@ wss.on('connection', function connection (ws, req) {
   })
 })
 
-function heartbeat () {
-  this.isAlive = true
-}
-
-function noop () {}
-
 setInterval(function ping () {
   wss.clients.forEach((ws) => {
     if (ws.isAlive === false) return ws.terminate()
     ws.isAlive = false
-    ws.ping(noop)
+    ws.ping(utils.noop)
   })
 }, 3000)
 
@@ -191,12 +185,12 @@ export function s7log (log, callback) {
         date: log.date,
         device: {
           id: log.device,
-          name: s7obj.devices.find(d => d.id === log.device).name // name: log.device === 0 ? 'Operator' : s7obj.devices[log.device].name
+          name: log.device === 0 ? 'Operator' : s7obj.devices.find(d => d.id === log.device).name
         },
         event: log.event,
         mode: {
           id: log.mode,
-          info: s7obj.devices.find(d => d.id === log.device).mode // info: s7obj.devices[log.device].mode
+          info: log.device === 0 ? '---' : s7obj.devices.find(d => d.id === log.device).mode // info: s7obj.devices[log.device].mode
         },
         operation: {
           id: log.operation,
@@ -238,20 +232,15 @@ export function createApplication () {
           //   cb(null, s7obj.stalls)
           // })
           updateMap(0, s7data, s7obj.stalls, s7obj.map.statistics, function (res) {
-            cb(null, s7obj.stalls)
+            cb(null, s7obj.map)
           })
         })
       }
     ], function (err, results) {
       if (err) return s7comm.commError(err, PLC, s7client)
-      // console.log(results[0])
-      // console.log(results[1])
-      // console.log(results[2].groups[0])
       wss.broadcast(JSON.stringify({ cards: results[0] }))
-      wss.broadcast(JSON.stringify({ map: s7obj.map }))
-      wss.broadcast(JSON.stringify({ alarms: results[2] }))
+      wss.broadcast(JSON.stringify({ map: results[1] }))
     })
-    // Main Loop
     async.forever(function (next) {
       setTimeout(function () {
         // appEmitter.emit('comm', PLC)
@@ -282,7 +271,7 @@ export function createApplication () {
                 })
               },
               function (cb) {
-                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices.slice(1), function (results) {
+                utils.updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
                   cb(null, s7obj.devices)
                 })
               },
@@ -318,7 +307,7 @@ export function createApplication () {
           PLC.isOnline = s7client.Connect()
         }
         next()
-      }, 500)
+      }, PLC.polling_time)
     })
   })
 }
