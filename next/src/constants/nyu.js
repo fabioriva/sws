@@ -1,5 +1,5 @@
 const dev = process.env.NODE_ENV !== 'production'
-export const BACKEND_URL = dev ? `${process.env.BACKEND_URL}` : 'https://www.sotefinservice.com/aps/nyu'
+export const BACKEND_URL = dev ? `${process.env.BACKEND_URL}` : 'https://www.sotefinservice.com'
 export const WEBSOCK_URL = dev ? `${process.env.WEBSOCKET_URL}/ws/nyu` : 'wss://www.sotefinservice.com/ws/nyu'
 export const APS = 'NYU&nbsp;&middot;&nbsp;Langone Medical Center&nbsp;&middot;&nbsp;New York'
 export const APS_ID = 68
