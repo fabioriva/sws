@@ -1,13 +1,13 @@
 export const devices = [
-  'Elevator (A)',
-  'Elevator (B)',
+  'Elevatore (A)',
+  'Elevatore (B)',
   'Torre (T)'
 ]
 
 export const modes = [
   '---',
   'Introduzione',
-  'Data Read',
+  'Lettura Dati',
   'Emergenza 1',
   'Emergenza 2',
   'Mappa',
@@ -18,17 +18,17 @@ export const modes = [
 
 export const operations = [
   '---',
-  'Alarm on',
-  'Alarm off',
-  'Switch function mode',
-  'Card PIN code changed',
-  'Stall in',
-  'Stall out',
-  'Shuffle in',
-  'Shuffle out',
+  'Allarme on',
+  'Allarme off',
+  'Cambio Funzione',
+  'Codice PIN tesera modificato',
+  'Ciclo deposito',
+  'Ciclo ritiro',
+  'Ciclo scambio deposito',
+  'Ciclo scambio ritiro',
   '---',
-  'Exit request',
-  'Entry request',
+  'Richiesta entrata',
+  'Richiesta uscita',
   '---',
   '---',
   '---',

@@ -15,10 +15,10 @@ router.get('/', function (req, res) {
 router.get('/query', function (req, res) {
   var { system, dateFrom, dateTo, filter } = req.query
   console.log('Query Filters', system, typeof dateFrom, dateFrom, typeof dateTo, dateTo, typeof filter, filter)
-  var from = dateFrom || moment().startOf('day') // moment().subtract(1, 'days')
-  var to = dateTo || moment().endOf('day')
+  var from = dateFrom || moment().hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
+  var to = dateTo || moment().hours(23).minutes(59).seconds(59)
   var queryFilter = {
-    // system: system,
+    system: system,
     date: {
       $gte: from,
       $lt: to
@@ -30,6 +30,7 @@ router.get('/query', function (req, res) {
     function (callback) {
       History.countDocuments(queryFilter, function (err, count) {
         if (err) callback(err)
+        console.log('count is', count)
         callback(null, count)
       })
     },

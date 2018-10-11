@@ -27,7 +27,6 @@ class Device extends Component {
   // }
   render () {
     const { device } = this.props
-    console.log(device)
     const { id, name, card, mode, operation, size, stall } = device.a
     const autTag =
       <Tooltip title='Automatic'>

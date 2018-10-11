@@ -184,11 +184,11 @@ export const s7log = (log, callback) => {
       switch (operation) {
         case 1:
         case 2:
-          // updateAlarms(device, function (err, res) {
-          //   if (err) return commError(err, PLC, s7client)
-          //   wss.broadcast(JSON.stringify({ alarms: res }))
-          //   cb(null, log)
-          // })
+          updateAlarms(device, function (err, res) {
+            if (err) return commError(err, PLC, s7client)
+            wss.broadcast(JSON.stringify({ alarms: res }))
+            cb(null, log)
+          })
           break
         case 4:
           s7client.ReadArea(0x84, s7def.DB_CARDS, s7def.DB_CARDS_INIT, s7def.DB_CARDS_LEN, 0x02, function (err, s7data) {
@@ -240,6 +240,7 @@ export const s7log = (log, callback) => {
         stall: log.stall,
         system: log.system
       }
+      console.log('bassano index.js notification', document)
       cb(null, document)
     }
   ], (err, document) => {

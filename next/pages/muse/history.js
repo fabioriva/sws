@@ -30,7 +30,9 @@ const initialState = {
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '6'})
-    const res = await fetch(`${BACKEND_URL}/aps/history/query?system=${APS_ID}`)
+    let dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
+    let dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
+    const res = await fetch(`${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
     const json = await res.json()
     return json
   }
@@ -99,10 +101,9 @@ class AppUi extends React.Component {
     })
   }
   handleConfirm = (dateFrom, dateTo, filter) => {
-    // console.log(typeof dateFrom, dateFrom, typeof dateTo, dateTo)
-    // dateFrom = moment(dateFrom).format('YYYY-MM-DD')
-    // dateTo = moment(dateTo).format('YYYY-MM-DD')
-    let uri = `${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom.toISOString()}&dateTo=${dateTo.toISOString()}&filter=${filter}`
+    dateFrom = moment(dateFrom).format('YYYY-MM-DD')
+    dateTo = moment(dateTo).format('YYYY-MM-DD')
+    let uri = `${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
     fetch(uri)
     .then(res => res.json())
     .then(res => {
@@ -134,7 +135,7 @@ class AppUi extends React.Component {
     return (
       <Layout
         aps={APS}
-        pageTitle='Operations History'
+        pageTitle='System Logs'
         sidebarMenu={SIDEBAR_MENU}
         comm={this.state.comm}
         diag={this.state.diag}

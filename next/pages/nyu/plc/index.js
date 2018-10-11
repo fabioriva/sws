@@ -8,7 +8,7 @@ import withAuth from 'src/lib/withAuth'
 const data = [
   {
     title: 'PLC I/O Rack 1',
-    description: 'System A1 digital I/O status',
+    description: 'Main digital I/O status',
     image: '/static/im155_5.png',
     link: '/nyu/plc/rack1'
   },

@@ -8,25 +8,25 @@ import withAuth from 'src/lib/withAuth'
 const data = [
   {
     title: 'PLC I/O Rack 1',
-    description: 'Elevatore A digital I/O status',
+    description: 'Elevatore A stato I/O digitali',
     image: '/static/im155_5.png',
     link: '/bassano/plc/rack1'
   },
   {
     title: 'PLC I/O Rack 2',
-    description: 'Elevatore B digital I/O status',
+    description: 'Elevatore B stato I/O digitali',
     image: '/static/im155_5.png',
     link: '/bassano/plc/rack2'
   },
   {
     title: 'PLC I/O Rack 3',
-    description: 'Torre digital I/O status',
+    description: 'Torre stato I/O digitali',
     image: '/static/im155_5.png',
     link: '/bassano/plc/rack3'
   },
   {
     title: 'PLC I/O Rack 4',
-    description: 'Torre (KKP) digital I/O status',
+    description: 'Torre (KKP) stato I/O digitali',
     image: '/static/im155_6.png',
     link: '/bassano/plc/rack4'
   }

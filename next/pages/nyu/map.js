@@ -316,8 +316,8 @@ class AppUi extends React.Component {
           //   background-color: #00FFFF;
           // }
           /* Level +1 */
-          #el-a1 { top: 65px; left: 125px; }
-          #el-b1 { top: 65px; left: 412px; }
+          #el-b1 { top: 65px; left: 125px; }
+          #el-a1 { top: 65px; left: 412px; }
           #s-1	{ top: 33px; left: 2px }
           #s-2	{ top: 2px; left: 2px }
           #s-3	{ top: 33px; left: 43px }
@@ -337,8 +337,8 @@ class AppUi extends React.Component {
           #s-17	{ top: 33px; left: 330px }
           #s-18	{ top: 2px; left: 330px }
           /* Level +2 */
-          #el-a2 { top: 65px; left: 125px; }
-          #el-b2 { top: 65px; left: 412px; }
+          #el-b2 { top: 65px; left: 125px; }
+          #el-a2 { top: 65px; left: 412px; }
           #s-19	{ top: 99px; left: 2px }
           #s-20	{ top: 33px; left: 2px }
           #s-21	{ top: 2px; left: 2px }
@@ -367,8 +367,8 @@ class AppUi extends React.Component {
           #s-44	{ top: 33px; left: 330px }
           #s-45	{ top: 2px; left: 330px }
           /* Level +3 */
-          #el-a3 { top: 98px; left: 125px; }
-          #el-b3 { top: 98px; left: 412px; }
+          #el-b3 { top: 98px; left: 125px; }
+          #el-a3 { top: 98px; left: 412px; }
           #s-46	{ top: 132px; left: 2px }
           #s-47	{ top: 66px; left: 2px }
           #s-48	{ top: 33px; left: 2px }
@@ -408,8 +408,8 @@ class AppUi extends React.Component {
           #s-82	{ top: 66px; left: 412px }
           #s-83	{ top: 33px; left: 412px }
           /* Level +4 */
-          #el-a4 { top: 98px; left: 125px; }
-          #el-b4 { top: 98px; left: 412px; }
+          #el-b4 { top: 98px; left: 125px; }
+          #el-a4 { top: 98px; left: 412px; }
           #s-84	{ top: 132px; left: 2px }
           #s-85	{ top: 66px; left: 2px }
           #s-86	{ top: 33px; left: 2px }

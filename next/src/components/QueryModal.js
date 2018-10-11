@@ -17,6 +17,9 @@ class HistoryQueryForm extends Component {
     // To disabled submit button at the beginning.
     this.props.form.validateFields()
   }
+  onChange = (date, dateString) => {
+    console.log(date, dateString)
+  }
   render () {
     const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
     // Only show error after a field is touched.
@@ -72,6 +75,7 @@ class HistoryQueryForm extends Component {
                 showTime={{ format: 'HH:mm' }}
                 format='YYYY-MM-DD HH:mm'
                 placeholder={['Start Time', 'End Time']}
+                onChange={this.onChange}
               />
             )}
           </FormItem>
