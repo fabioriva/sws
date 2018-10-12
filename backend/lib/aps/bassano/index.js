@@ -230,7 +230,7 @@ export const s7log = (log, callback) => {
         event: log.event,
         mode: {
           id: log.mode,
-          info: log.device === 0 ? '---' : s7obj.devices.find(d => d.id === log.device).mode
+          info: log.device === 0 ? '---' : s7obj.devices.find(d => d.id === log.device).mode.label
         },
         operation: {
           id: log.operation,
@@ -240,7 +240,6 @@ export const s7log = (log, callback) => {
         stall: log.stall,
         system: log.system
       }
-      console.log('bassano index.js notification', document)
       cb(null, document)
     }
   ], (err, document) => {

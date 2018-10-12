@@ -101,8 +101,8 @@ class AppUi extends React.Component {
     })
   }
   handleConfirm = (dateFrom, dateTo, filter) => {
-    dateFrom = moment(dateFrom).format('YYYY-MM-DD')
-    dateTo = moment(dateTo).format('YYYY-MM-DD')
+    dateFrom = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
+    dateTo = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
     let uri = `${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
     fetch(uri)
     .then(res => res.json())

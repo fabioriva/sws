@@ -83,7 +83,10 @@ export class Device {
     this.name = name // this.setName(id)
     this.modes = modes
     this.card = card
-    this.mode = this.setMode(mode)
+    this.mode = {
+      label: this.setMode(mode),
+      id: mode
+    }
     this.motor = motor
     this.operation = operation
     this.position = position

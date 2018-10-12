@@ -28,6 +28,7 @@ class OperationRequestForm extends Component {
     // }
     // console.log('>>>>>>', this.props.data)
     const { card, operationId, visible } = this.props.data
+    // console.log(card)
     // const formItemLayout = {
     //   labelCol: {
     //     xs: { span: 24 },
@@ -76,8 +77,8 @@ class OperationRequestForm extends Component {
               rules: [{
                 required: true,
                 type: 'integer',
-                min: 1,
-                max: 208,
+                min: card.min,
+                max: card.max,
                 message: 'Insert a valid card number !' }]
             })(
               <InputNumber

@@ -104,7 +104,10 @@ const updateDevices = (byte, data, devices, callback) => {
   for (var d = 0; d < devices.length; d++) {
     devices[d].card = BytesToInt(data[byte + 0], data[byte + 1])
     // devices[d].mode = modes[BytesToInt(data[byte + 2], data[byte + 3])]
-    devices[d].mode = devices[d].setMode(BytesToInt(data[byte + 2], data[byte + 3]))
+    devices[d].mode = {
+      label: devices[d].setMode(BytesToInt(data[byte + 2], data[byte + 3])),
+      id: BytesToInt(data[byte + 2], data[byte + 3])
+    }
     devices[d].motor = BytesToInt(data[byte + 4], data[byte + 5])
     devices[d].operation = BytesToInt(data[byte + 6], data[byte + 7])
     devices[d].position = BytesToInt(data[byte + 8], data[byte + 9])

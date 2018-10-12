@@ -33,12 +33,12 @@ class Device extends Component {
         <Tag color='#108ee9' style={{ width: 32, textAlign: 'center', color: '#fff' }}>A</Tag>
       </Tooltip>
     const manTag =
-      <Tooltip title={mode}>
+      <Tooltip title={mode.label}>
         <Tag color='#ffff00' style={{ width: 32, textAlign: 'center', color: '#000' }}>M</Tag>
       </Tooltip>
     const modeTag =
       <span>
-        { mode !== 'Automatic' ? manTag : autTag }
+        { mode.id !== 8 ? manTag : autTag }
       </span>
     // const entryIcon =
     //   <Tooltip title='Car In'>
@@ -146,7 +146,7 @@ class Device extends Component {
               Function Mode
             </span>
             <p className='device-value'>
-              {mode}
+              {mode.label}
             </p>
           </Card.Grid>
           <Card.Grid

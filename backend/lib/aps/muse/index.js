@@ -295,7 +295,7 @@ export function s7log (log, callback) {
         event: log.event,
         mode: {
           id: log.mode,
-          info: log.device === 0 ? '---' : s7obj.devices.find(d => d.id === log.device).mode // info: s7obj.devices[log.device].mode
+          info: log.device === 0 ? '---' : s7obj.devices.find(d => d.id === log.device).mode.label // info: s7obj.devices[log.device].mode
         },
         operation: {
           id: log.operation,

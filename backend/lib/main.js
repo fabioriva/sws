@@ -34,6 +34,8 @@ conn.once('open', () => {
         bassano.s7log(log, (err, res) => {
           if (err) console.log(err)
           var document = new LogSchema(res)
+          // var Log = mongoose.model('Log', LogSchema, 'bassano')
+          // var document = new Log(res)
           document.save((err, doc) => {
             if (err) throw err
             console.log('log', doc)

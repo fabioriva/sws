@@ -4,7 +4,7 @@ import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
 import { Row, Col, Modal } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
+import { APS, CARDS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -53,6 +53,8 @@ class AppUi extends React.Component {
       overview: props.overview,
       operationModal: {
         card: {
+          min: 1,
+          max: CARDS,
           value: 0
         },
         operationId: {
