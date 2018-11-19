@@ -11,7 +11,7 @@ const options = {
   autoIndex: dev,
   useNewUrlParser: true
 }
-const mongodbUri = dev ? process.env.MONGODB_URI : 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
+const mongodbUri = dev ? process.env.MONGODB_URI : 'mongodb://localhost:27017/sws' // 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
 mongoose.connect(mongodbUri, options)
 mongoose.Promise = global.Promise
 

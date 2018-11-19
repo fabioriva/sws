@@ -15,7 +15,7 @@ const options = {
   useCreateIndex: true,
   useNewUrlParser: true
 }
-const mongodbUri = dev ? 'mongodb://localhost:27017/sws' : 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
+const mongodbUri = dev ? 'mongodb://localhost:27017/sws' : 'mongodb://localhost:27017/sws' // 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
 
 mongoose.connect(mongodbUri, options)
 var db = mongoose.connection
