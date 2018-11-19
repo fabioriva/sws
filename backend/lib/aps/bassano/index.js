@@ -74,6 +74,59 @@ wss.on('connection', function connection (ws, req) {
   ws.isAlive = true
   ws.on('pong', utils.heartbeat)
   console.log('bassano', ip, wss.clients.size)
+  ws.on('message', function incoming (message) {
+    const { event, data } = JSON.parse(message)
+    console.log('received: %s', message, event, data)
+    switch (event) {
+      case 'edit-stall':
+        const { stall, card } = data
+        const buffer = Buffer.alloc(4)
+        buffer.writeUInt16BE(stall, 0)
+        buffer.writeUInt16BE(card, 2)
+        s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer, function (err) {
+          if (err) return commError(err, PLC, s7client)
+        })
+        break
+      case 'overview-operation':
+        const { operation, value } = data
+        let s = s7obj.stalls.find(s => s.status === value)
+        switch (operation) {
+          case 1: // Entry 1
+            console.log('Entry A', value)
+            break
+          case 2: // Entry 2
+            console.log('Entry B', value)
+            break
+          default:
+            if (s) {
+              const buffer = Buffer.alloc(2)
+              buffer.writeUInt16BE(value, 0)
+              s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer, function (err) {
+                if (err) return commError(err, PLC, s7client)
+              })
+            } else {
+              // error not found
+            }
+        }
+        break
+      // case 'overview-rollback':
+      //   const { id } = data
+      //   console.log(id)
+      //   switch (id) {
+      //     case 3:
+      //       s7client.WriteArea(0x84, s7def.DB_DATA, ((184 * 8) + 4), 1, 0x01, s7def.TRUE, function (err) {
+      //         if (err) return commError(err, PLC, s7client)
+      //       })
+      //       break
+      //     case 4:
+      //       s7client.WriteArea(0x84, s7def.DB_DATA, ((184 * 8) + 5), 1, 0x01, s7def.TRUE, function (err) {
+      //         if (err) return commError(err, PLC, s7client)
+      //       })
+      //       break
+      //   }
+      //   break
+    }
+  })
 })
 
 setInterval(function ping () {
@@ -170,6 +223,7 @@ export const createApplication = () => {
           })
         } else {
           PLC.isOnline = s7client.Connect()
+          utils.initDevice(s7obj.devices)
         }
         next()
       }, PLC.polling_time)

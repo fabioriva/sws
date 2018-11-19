@@ -196,10 +196,10 @@ for (let q = 0; q < s7def.QUEUE; q++) {
   exitQueue.push(new Queue(q))
 }
 
-var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'logout', 'Exit')
-var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entry')
+var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'logout', 'Uscita')
+var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entrata')
 var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollback')
-var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entry')
+var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entrata')
 var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
 
 var ELA = {

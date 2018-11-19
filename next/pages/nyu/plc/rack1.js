@@ -5,6 +5,7 @@ import List from 'src/components/PlcList'
 import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
+import { SERVICE } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -644,4 +645,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, SERVICE)

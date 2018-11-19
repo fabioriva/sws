@@ -99,6 +99,27 @@ const updateCards = (start, buffer, offset, cards, callback) => {
   }
 }
 
+// const initDevices = (devices, cb) => {
+const initDevices = (devices) => {
+  // var iterations = 0
+  for (var d = 0; d < devices.length; d++) {
+    devices[d].card = 111
+    devices[d].mode = {
+      label: devices[d].setMode(0),
+      id: 0
+    }
+    devices[d].motor = 0
+    devices[d].operation = 0
+    devices[d].position = 0
+    devices[d].size = 0
+    devices[d].stall = 0
+    devices[d].step = 0
+    // if (++iterations === devices.length) {
+    //   cb(null, iterations)
+    // }
+  }
+}
+
 const updateDevices = (byte, data, devices, callback) => {
   var iterations = 0
   for (var d = 0; d < devices.length; d++) {
@@ -203,6 +224,7 @@ export {
   BytesToLong,
   IntToBytes,
   LongToBytes,
+  initDevices,
   updateBits,
   updateAlarms,
   updateCards,

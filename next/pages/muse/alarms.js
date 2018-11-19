@@ -3,6 +3,7 @@ import fetch from 'isomorphic-unfetch'
 import Layout from 'src/components/Layout'
 import { Alert, Badge, Button, Tabs } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { SERVICE } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -125,4 +126,4 @@ class AppUi extends React.Component {
 }
 
 // export default compose(withAuth(withRedux(initStore, null)(AppUi)))
-export default withAuth(AppUi)
+export default withAuth(AppUi, SERVICE)

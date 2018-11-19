@@ -23,6 +23,6 @@ export default async (context) => {
   const json = await res.json()
   return {
     statusCode: res.status,
-    message: json
+    currentUser: json
   }
 }

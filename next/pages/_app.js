@@ -9,7 +9,7 @@ import { initStore } from 'src/store'
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     // we can dispatch from here too
-    // ctx.store.dispatch({type: 'UI_SIDEBAR_TOGGLE', status: false})
+    // ctx.store.dispatch({ type: 'UI_SIDEBAR_TOGGLE', status: false })
     return {
       pageProps: (Component.getInitialProps ? await Component.getInitialProps(ctx) : {})
     }

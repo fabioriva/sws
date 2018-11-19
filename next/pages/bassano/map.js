@@ -8,6 +8,7 @@ import { Row, Col, Radio } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/bassano'
+import { SERVICE, VALET } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -94,12 +95,13 @@ class AppUi extends React.Component {
   }
   showModal = (stall, card) => {
   
-    if (this.props.message.roles.find(e => e === 'service' || e === 'admin')) {
+    // if (this.props.currentUser.roles.find(e => e === 'service' || e === 'admin')) {
+    if (this.props.currentUser.role <= SERVICE) {
 
     this.setState({
       editModal: {
         stall: stall,
-        value: card,
+        value: stall, // card >= 1 && card <= CARDS ? card : 1,
         visible: true
       }
     })
@@ -222,7 +224,7 @@ class AppUi extends React.Component {
               />
             </Col>
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <h3>Map Occupancy</h3>
+              <h3>Occupazione mappa</h3>
               <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: '6px', margin: '16px 0', padding: '16px' }}>
                 <Occupancy data={occupancy} />
             </div>
@@ -478,4 +480,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, VALET)

@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 // import moment from 'moment'
 import { Button, Popover, Table } from 'antd'
+import intl from 'react-intl-universal'
 
 const { Column } = Table
 const ITEMS_PER_PAGE = 25
@@ -21,13 +22,13 @@ export default class History extends React.Component {
       <div>
         <div className='history-intro'>
           {/* <div>History from <strong>{moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')}</strong> to <strong>{moment(dateTo).format('YYYY-MM-DD HH:mm:ss')}</strong>. Total items <strong>{count}</strong>.</div> */}
-          <div>History from <strong>{dateFrom}</strong> to <strong>{dateTo}</strong>. Total items <strong>{count}</strong>.</div>
+          <div>{intl.getHTML('HISTORY_QUERY', {dateFrom: dateFrom, dateTo: dateTo})}. {intl.getHTML('HISTORY_ITEMS', {count: count})}.</div>
           <Button
             type='primary'
             icon='search'
             onClick={() => queryModal()}
           >
-            Query
+            {intl.get('QUERY')}
           </Button>
         </div>
         <Table
@@ -39,23 +40,23 @@ export default class History extends React.Component {
           rowClassName={(record, index) => this.rowClassname(record)}
         >
           <Column
-            title='Date'
+            title={intl.get('DATE')}
             dataIndex='logged'
             key='logged'
             // render={(text) => (moment.utc(text).format('YYYY-MM-DD HH:mm:ss'))}
           />
           <Column
-            title='Device'
+            title={intl.get('DEVICE')}
             dataIndex='device.name'
             key='device'
           />
           <Column
-            title='Mode'
+            title={intl.get('MODE')}
             dataIndex='mode.info'
             key='mode'
           />
           <Column
-            title='Operation'
+            title={intl.get('OPERATION')}
             dataIndex='operation.info'
             key='operation'
             render={(text, record, index) => (
@@ -67,20 +68,20 @@ export default class History extends React.Component {
             )}
           />
           <Column
-            title='Card'
+            title={intl.get('CARD')}
             dataIndex='card'
             key='card'
             className='col-text-align-center'
             render={(text, record) => (text === 999 ? <span>Locked</span> : text)}
           />
           <Column
-            title='Stall'
+            title={intl.get('STALL')}
             dataIndex='stall'
             key='stall'
             className='col-text-align-center'
           />
           <Column
-            title='Size'
+            title={intl.get('SIZE')}
             dataIndex='size'
             key='size'
             className='col-text-align-center'

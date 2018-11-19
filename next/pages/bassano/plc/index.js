@@ -2,6 +2,7 @@ import React from 'react'
 import Layout from 'src/components/Layout'
 import { List, Card } from 'antd'
 import { APS, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
+import { SERVICE } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -105,4 +106,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, SERVICE)

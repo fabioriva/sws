@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const compression = require('compression')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const next = require('next')
@@ -11,6 +12,7 @@ const auth = require('./routes/auth')
 
 const options = {
   autoIndex: dev,
+  useCreateIndex: true,
   useNewUrlParser: true
 }
 const mongodbUri = dev ? 'mongodb://localhost:27017/sws' : 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
@@ -24,6 +26,7 @@ db.once('open', function () {
     .then(() => {
       const server = express()
       server.use(bodyParser.json())
+      server.use(compression())
       server.use(cors())
       server.use('/', auth)
       server.get('*', (req, res) => {

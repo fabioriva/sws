@@ -4,6 +4,11 @@ const dev = process.env.NODE_ENV !== 'production'
 const mongodbUri = dev ? 'mongodb://localhost:27017/sws' : 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
 // const mongodbUri = 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
 
+const ADMIN = 0
+const SERVICE = 1
+const VALET = 2
+const USER = 3
+
 mongoose.connect(mongodbUri)
 var db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))

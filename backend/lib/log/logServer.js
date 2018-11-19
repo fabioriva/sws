@@ -7,7 +7,7 @@ class LogEmitter extends EventEmitter {}
 export const logEmitter = new LogEmitter()
 
 const dev = process.env.NODE_ENV !== 'production'
-const HOST = dev ? process.env.BACKEND_URL : '192.168.20.2'
+const HOST = dev ? process.env.BACKEND_URL : '192.168.20.3'
 const PORT = 49000
 const LOG_LEN = 32
 

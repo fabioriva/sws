@@ -4,7 +4,8 @@ import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
 import { Row, Col, Modal } from 'antd'
-import { APS, CARDS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
+import { VALET } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -214,4 +215,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, VALET)

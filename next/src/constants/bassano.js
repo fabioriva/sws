@@ -24,7 +24,7 @@ export const SIDEBAR_MENU = [
   },
   {
     href: '/bassano/cards',
-    icon: 'user',
+    icon: 'tags',
     label: 'Cards Management'
   },
   {
@@ -41,5 +41,10 @@ export const SIDEBAR_MENU = [
     href: '/bassano/history',
     icon: 'search',
     label: 'Operations History'
+  },
+  {
+    href: '/bassano/admin',
+    icon: 'user',
+    label: 'User administration'
   }
 ]

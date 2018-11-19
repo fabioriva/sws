@@ -4,8 +4,8 @@ import moment from 'moment'
 import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
 import { Table } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
-import { CARDS } from 'src/constants/muse'
+import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
+import { SERVICE } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -228,4 +228,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, SERVICE)

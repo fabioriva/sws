@@ -4,6 +4,7 @@ import thunkMiddleware from 'redux-thunk'
 
 const appInitialState = {
   navbar: {
+    locale: 'en-US',
     user: {}
   },
   sidebar: {
@@ -14,6 +15,7 @@ const appInitialState = {
 }
 
 export const actionTypes = {
+  UI_NAVBAR_SET_LOCALE: 'UI_NAVBAR_SET_LOCALE',
   UI_NAVBAR_SET_USER: 'UI_NAVBAR_SET_USER',
   UI_SIDEBAR_SET_MENU: 'UI_SIDEBAR_SET_MENU',
   UI_SIDEBAR_TOGGLE: 'UI_SIDEBAR_TOGGLE'
@@ -22,6 +24,14 @@ export const actionTypes = {
 // REDUCERS
 export const reducer = (state = appInitialState, action) => {
   switch (action.type) {
+    case actionTypes.UI_NAVBAR_SET_LOCALE:
+      // console.log('UI_NAVBAR_SET_LOCALE', action)
+      return Object.assign({}, state, {
+        navbar: {
+          ...state.navbar,
+          locale: action.locale
+        }
+      })
     case actionTypes.UI_NAVBAR_SET_USER:
       // console.log('UI_NAVBAR_SET_USER', action)
       return Object.assign({}, state, {
@@ -52,6 +62,9 @@ export const reducer = (state = appInitialState, action) => {
 }
 
 // ACTIONS
+export const navbarSetLocale = (locale) => dispatch => {
+  return dispatch({ type: actionTypes.UI_NAVBAR_SET_LOCALE, locale: locale })
+}
 export const navbarSetUser = (user) => dispatch => {
   return dispatch({ type: actionTypes.UI_NAVBAR_SET_USER, user: user })
 }
@@ -61,7 +74,6 @@ export const sidebarSetMenu = (item) => dispatch => {
 export const sidebarToggle = (status) => dispatch => {
   return dispatch({ type: actionTypes.UI_SIDEBAR_TOGGLE, status: status })
 }
-
 export const initStore = (initialState = appInitialState, options) => {
   return createStore(reducer, initialState, composeWithDevTools(applyMiddleware(thunkMiddleware)))
 }

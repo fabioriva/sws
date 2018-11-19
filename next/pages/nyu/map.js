@@ -8,6 +8,7 @@ import { Row, Col, Radio } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/nyu'
+import { SERVICE, VALET } from 'src/constants/roles'
 import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
@@ -94,12 +95,12 @@ class AppUi extends React.Component {
   }
   showModal = (stall, card) => {
   
-    if (this.props.message.roles.find(e => e === 'service' || e === 'admin')) {
-
+    // if (this.props.message.roles.find(e => e === 'service' || e === 'admin')) {
+    if (this.props.currentUser.role <= SERVICE) {
     this.setState({
       editModal: {
         stall: stall,
-        value: card,
+        value: card >= 1 && card <= CARDS ? card : 1,
         visible: true
       }
     })
@@ -454,4 +455,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, VALET)

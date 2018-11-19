@@ -3,33 +3,14 @@ import { Button, Card, Icon, Tag, Tooltip } from 'antd'
 // import Blink from './Blink'
 // import Carousel from 'nuka-carousel'
 import classnames from 'classnames'
-
-// import '../styles/Elevator.css'
-
-// const divStyle = {
-//   // background: '#FFEE00',
-//   border: '1px solid #e9e9e9',
-//   textAlign: 'center',
-//   minHeight: 38
-// }
-
-// const divRadioStyle = {
-//   border: '1px solid #e9e9e9',
-//   padding: 6
-// }
+import intl from 'react-intl-universal'
 
 class Device extends Component {
-  // onChange = (e) => {
-  //   onChangeRadio(e.target.value)
-  //   // this.setState({
-  //   //   value: e.target.value,
-  //   // })
-  // }
   render () {
     const { device } = this.props
     const { id, name, card, mode, operation, size, stall } = device.a
     const autTag =
-      <Tooltip title='Automatic'>
+      <Tooltip title={intl.get('AUT')}>
         <Tag color='#108ee9' style={{ width: 32, textAlign: 'center', color: '#fff' }}>A</Tag>
       </Tooltip>
     const manTag =
@@ -128,6 +109,7 @@ class Device extends Component {
       )
     })
     return (
+      // this.state.initDone &&
       <div>
         <Card
           title={title}
@@ -143,7 +125,7 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
-              Function Mode
+              {intl.get('MODE')}
             </span>
             <p className='device-value'>
               {mode.label}
@@ -158,7 +140,7 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
-              Card
+              {intl.get('CARD')}
             </span>
             <p className='device-value'>
               {card}
@@ -173,7 +155,7 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
-              Size
+              {intl.get('SIZE')}
             </span>
             <p className='device-value'>
               {size}
@@ -188,7 +170,7 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
-              Destination
+              {intl.get('STALL')}
             </span>
             <p className='device-value'>
               {stall}

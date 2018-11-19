@@ -6,9 +6,35 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { sidebarToggle } from 'src/store'
 import { Layout, Badge, Icon, Tag, Tooltip } from 'antd'
+import intl from 'react-intl-universal'
+import en_US from 'src/locales/en-US.json'
+import it_IT from 'src/locales/it-IT.json'
+
+const locales = {
+  'en-US': en_US, // require('src/locales/en-US.json'),
+  'it-IT': it_IT  // require('src/locales/it-IT.json')
+}
+
 const { Header } = Layout
 
 class Navbar extends Component {
+  constructor (props) {
+    super(props)
+    this.state = { initDone: false }
+    const { locale, user } = this.props.navbar
+    const currentLocale = locale
+    intl.init({
+      currentLocale,
+      locales
+      // locales: {
+      //   [currentLocale]: require(`src/locales/${currentLocale}.json`)
+      // }
+    })
+    .then(() => {
+       // After loading CLDR locale data, start to render
+       this.setState({ initDone: true })
+    })
+  }
   signout = () => {
     const options = {
       maxAge: -1 // 0 = Delete cookie / -1 = Expire the cookie immediately
@@ -23,9 +49,9 @@ class Navbar extends Component {
   render () {
     const comm = this.props.comm  // this.state.comm
     const commStatus = comm.isOnline ? <Tag color='#87d068'>ONLINE</Tag> : <Tag color='#f50'>OFFLINE</Tag>
-    // const commInfo = comm.isOnline ? <span>PLC {comm.ip} ONLINE</span> : <span>PLC OFFLINE</span>
     const diag = this.props.diag  // this.state.diag
-    // const { user } = this.props.navbar
+
+    const { user } = this.props.navbar
     const { collapsed } = this.props.sidebar
     return (
       <Header className='app-navbar'>
@@ -37,13 +63,13 @@ class Navbar extends Component {
         <div className='app-navbar-right'>
           <span className='app-navbar-element'>
             <Badge count={diag.alarmCount}>
-              <Link href='/muse/alarms'>
+              <Link href={`/${user.aps}/alarms`}>
                 <Icon className='app-navbar-icon' type='bell' />
               </Link>
             </Badge>
           </span>
           <span className='app-navbar-element'>
-            <Tooltip title={'Sign out'}>
+            <Tooltip title={`Sign out ${user.username}`}>
               <Icon className='app-navbar-icon' type='user' onClick={this.signout} />
             </Tooltip>
           </span>

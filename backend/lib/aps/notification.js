@@ -2,7 +2,8 @@ import moment from 'moment'
 
 function notification (document) {
   const { alarm, card, date, device, mode, operation, stall } = document
-  var description = `${moment(date).format('YYYY-MM-DD HH:mm:ss')} `
+  let message = `${device.name}`
+  let description = `${moment(date).format('YYYY-MM-DD HH:mm:ss')} >> `
   switch (operation.id) {
     case 1:
     case 2:
@@ -32,7 +33,7 @@ function notification (document) {
   }
   return {
     type: operation.id,
-    message: device.name,
+    message: message,
     description: description
   }
 }

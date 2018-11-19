@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Row, Col, Card, Button, Icon, Modal, Table } from 'antd'
+import intl from 'react-intl-universal'
 
 const confirm = Modal.confirm
 
@@ -7,8 +8,8 @@ export default class Queue extends Component {
   handleDelete = (card, index) => {
     console.log(card, index)
     confirm({
-      title: 'Do you want to delete this item ?',
-      content: `Deleting card ${card} from the exit queue`,
+      title: `${intl.get('DELETE_ITEM')}`,
+      content: `${intl.get('DELETE_INFO', {card: card})}`,
       onOk () {
         return new Promise((resolve, reject) => {
           setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
@@ -30,12 +31,12 @@ export default class Queue extends Component {
         icon='logout'
         onClick={() => this.props.showModal(0)}
       >
-        Exit Car
+      {intl.get('EXIT_CAR')}
       </Button>
     return (
       <div>
         <Card
-          title='Exit Queue'
+          title={intl.get('EXIT_QUEUE')}
           actions={[button]}
           style={{ width: '100%' }}
         >

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Form, Button, Input, InputNumber } from 'antd'
+import intl from 'react-intl-universal'
 
 const FormItem = Form.Item
 
@@ -48,7 +49,7 @@ class OperationRequestForm extends Component {
     return (
       <Modal
         // style={{ minWidth: 640 }}
-        title='Operation Request'
+        title={intl.get('OPERATION_REQUEST')}
         visible={visible}
         footer={[
           <Button
@@ -62,7 +63,7 @@ class OperationRequestForm extends Component {
             type='primary'
             onClick={() => this.props.onConfirm(card.value, operationId.value)}
           >
-            {operationId.value === 0 ? <span>Exit</span> : <span>Entry</span>}
+            {operationId.value === 0 ? <span>{intl.get('EXIT')}</span> : <span>{intl.get('ENTRY')}</span>}
           </Button>
         ]}
       >
@@ -70,7 +71,7 @@ class OperationRequestForm extends Component {
           <FormItem
             validateStatus={cardError ? 'error' : ''}
             help={cardError || ''}
-            label='Card Number'
+            label={intl.get('CARD_NUMBER')}
           >
             {getFieldDecorator('card', {
               // initialValue: {card},
@@ -79,11 +80,11 @@ class OperationRequestForm extends Component {
                 type: 'integer',
                 min: card.min,
                 max: card.max,
-                message: 'Insert a valid card number !' }]
+                message: `${intl.get('INSERT_VALID_CARD')}` }]
             })(
               <InputNumber
                 style={inputStyle}
-                placeholder='Insert card number here'
+                placeholder={intl.get('INSERT_CARD')}
               />
             )}
           </FormItem>

@@ -1,5 +1,5 @@
 import cookie from 'cookie'
-import redirect from '../lib/redirect'
+import redirect from 'src/lib/redirect'
 import { Form, Icon, Input, Button, Checkbox } from 'antd'
 
 const dev = process.env.NODE_ENV !== 'production'
@@ -33,12 +33,13 @@ class NormalLoginForm extends React.Component {
             document.cookie = cookie.serialize('token', token, options)
             // document.cookie = cookie.serialize('user', JSON.stringify(user), options)
             // document.cookie = cookie.serialize('userContext', user.aps[0], options)
-            if (aps !== undefined && aps.length == 1 ) {
-              redirect({}, `/${aps[0]}/overview`)
-            } else {
-              // TODO: aps selection
-              redirect({}, `/muse/overview`)
-            }            
+            // if (aps !== undefined && aps.length == 1 ) {
+            //   redirect({}, `/${aps[0]}/overview`)
+            // } else {
+            //   // TODO: aps selection
+            //   redirect({}, `/muse/overview`)
+            // }
+            redirect({}, `/${aps}/overview`)         
           } else {
             this.props.form.setFields({
               username: {

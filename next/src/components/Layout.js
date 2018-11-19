@@ -22,7 +22,7 @@ export default class PageLayout extends React.Component {
           <Layout className='app-layout'>
             <Sidebar
               // menuKey={this.props.menuKey}
-              sidebar={this.props.sidebar}
+              // sidebar={this.props.sidebar}
               sidebarMenu={this.props.sidebarMenu}
             />
             <Layout>
