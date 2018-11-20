@@ -10,7 +10,7 @@ const User = require('./User')
 //   USER
 // } = require('../src/constants/roles')
 
-const FILE = path.resolve(__dirname, 'users.json')
+const FILE = path.resolve(__dirname, '../../config/users.json')
 const mongodbUri = 'mongodb://localhost:27017/sws'
 
 const ADMIN = 0

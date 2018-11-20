@@ -14,16 +14,16 @@ router.get('/', function (req, res) {
 
 router.get('/query', function (req, res) {
   var { system, dateFrom, dateTo, filter } = req.query
-  console.log('Query Filters', system, typeof dateFrom, dateFrom, typeof dateTo, dateTo, typeof filter, filter)
+  // console.log('Query Filters', system, typeof dateFrom, dateFrom, typeof dateTo, dateTo, typeof filter, filter)
   var from = dateFrom || moment().hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
   var to = dateTo || moment().hours(23).minutes(59).seconds(59)
   var queryFilter = {
-    system: system,
-    date: {
+    'system': system,
+    'date': {
       $gte: from,
       $lt: to
     },
-    operationId: filter === 'b' ? { $gte: 1, $lte: 2 } : { $ne: 0 }
+    'operation.id': filter === 'b' ? { $gte: 1, $lte: 2 } : { $ne: 0 }
   }
   console.log(queryFilter)
   async.series([

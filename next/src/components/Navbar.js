@@ -70,7 +70,7 @@ class Navbar extends Component {
           </span>
           <span className='app-navbar-element'>
             <Tooltip title={`Sign out ${user.username}`}>
-              <Icon className='app-navbar-icon' type='user' onClick={this.signout} />
+              <Icon className='app-navbar-icon' type='logout' onClick={this.signout} />
             </Tooltip>
           </span>
           <span className='app-navbar-comm'>

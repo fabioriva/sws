@@ -1,3 +1,5 @@
+import * as roles from 'src/constants/roles'
+
 const dev = process.env.NODE_ENV !== 'production'
 export const BACKEND_URL = dev ? `${process.env.BACKEND_URL}` : 'https://www.sotefinservice.com'
 export const WEBSOCK_URL = dev ? `${process.env.WEBSOCKET_URL}/ws/nyu` : 'wss://www.sotefinservice.com/ws/nyu'
@@ -15,31 +17,37 @@ export const SIDEBAR_MENU = [
   {
     href: '/nyu/overview',
     icon: 'home',
-    label: 'Overview'
+    label: 'Overview',
+    role: roles.VALET
   },
   {
     href: '/nyu/map',
     icon: 'car',
-    label: 'System Map'
+    label: 'System Map',
+    role: roles.VALET
   },
   {
     href: '/nyu/cards',
     icon: 'user',
-    label: 'Cards Management'
+    label: 'Cards Management',
+    role: roles.SERVICE
   },
   {
     href: '/nyu/plc',
     icon: 'database',
-    label: 'PLC Digital I/O'
+    label: 'PLC Digital I/O',
+    role: roles.SERVICE
   },
   {
     href: '/nyu/alarms',
     icon: 'warning',
-    label: 'System Alarms'
+    label: 'System Alarms',
+    role: roles.SERVICE
   },
   {
     href: '/nyu/history',
     icon: 'search',
-    label: 'Operations History'
+    label: 'Operations History',
+    role: roles.SERVICE
   }
 ]

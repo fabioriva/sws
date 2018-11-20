@@ -1,13 +1,24 @@
 import React from 'react'
 import classnames from 'classnames'
 // import moment from 'moment'
-import { Button, Popover, Table } from 'antd'
+import { LocaleProvider, Button, Popover, Table } from 'antd'
+import en_US from 'antd/lib/locale-provider/en_US'
+import it_IT from 'antd/lib/locale-provider/it_IT'
 import intl from 'react-intl-universal'
 
 const { Column } = Table
 const ITEMS_PER_PAGE = 25
 
 export default class History extends React.Component {
+  getCurrentLocale = () => {
+    const { currentLocale } = intl.getInitOptions()
+    switch (currentLocale) {
+      case 'it-IT':
+        return it_IT
+      default:
+        return en_US
+    }
+  }
   rowClassname = (row) => {
     return classnames({
       'col-danger' : row.operation.id === 1,
@@ -18,7 +29,9 @@ export default class History extends React.Component {
   }
   render () {
     const { count, dateFrom, dateTo, query, queryModal } = this.props
+    const { currentLocale } = intl.getInitOptions()
     return (
+      <LocaleProvider locale={this.getCurrentLocale()}>
       <div>
         <div className='history-intro'>
           {/* <div>History from <strong>{moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')}</strong> to <strong>{moment(dateTo).format('YYYY-MM-DD HH:mm:ss')}</strong>. Total items <strong>{count}</strong>.</div> */}
@@ -124,6 +137,7 @@ export default class History extends React.Component {
           }
         `}</style>
       </div>
+      </LocaleProvider>
     )
   }
 }

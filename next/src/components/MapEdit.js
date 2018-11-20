@@ -11,6 +11,7 @@ class Edit extends React.Component {
       width: '60%'
     }
     const { cards, stalls, stallStatus, data } = this.props
+    console.log(data)
     return (
       <Modal
         title={intl.get('EDIT_STALL')}
@@ -57,6 +58,7 @@ class Edit extends React.Component {
           defaultValue={data.value}
           value={data.value}
           onChange={(e) => this.props.onChange(data.stall, e)}
+          disabled={data.isFixedMap}
         />
       </Modal>
     )

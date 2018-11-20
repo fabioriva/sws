@@ -102,9 +102,25 @@ class AppUi extends React.Component {
       editModal: {
         stall: stall,
         value: stall, // card >= 1 && card <= CARDS ? card : 1,
-        visible: true
+        visible: true,
+        isFixedMap: true // to disable input card number
       }
     })
+
+    // this.setState(prevState => ({
+    //   editModal: {
+    //       ...prevState.editModal,
+    //       stall: stall,
+    //       value: stall, // card >= 1 && card <= CARDS ? card : 1,
+    //       visible: true
+    //   }
+    // }))
+
+    // let newState = Object.assign({}, this.state);
+    // newState.editModal.stall = stall
+    // newState.editModal.value = stall
+    // newState.editModal.visible = true
+    // this.setState(newState)
 
     }
   }
@@ -176,7 +192,7 @@ class AppUi extends React.Component {
         diag={this.state.diag}
       >
         <Mobile>
-          <div id='#top'>
+          {/* <div id='#top'>
             <a href='#level-1'>[Piano 1]</a>
             <a href='#level-2'>[Piano 2]</a>
             <a href='#level-3'>[Piano 3]</a>
@@ -192,7 +208,8 @@ class AppUi extends React.Component {
             onCancel={this.handleMapCancel}
             onChange={this.handleMapChange}
             onConfirm={this.handleMapOk}
-          />
+          /> */}
+          <Occupancy data={occupancy} />
         </Mobile>
         <Default>
           <Row>
