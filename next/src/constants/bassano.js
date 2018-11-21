@@ -49,11 +49,11 @@ export const SIDEBAR_MENU = [
     icon: 'search',
     label: 'Operations History',
     role: roles.SERVICE
-  },
-  {
-    href: '/bassano/admin',
-    icon: 'user',
-    label: 'User administration',
-    role: roles.SERVICE
   }
+  // {
+  //   href: '/bassano/admin',
+  //   icon: 'user',
+  //   label: 'User administration',
+  //   role: roles.SERVICE
+  // }
 ]
