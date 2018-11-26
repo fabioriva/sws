@@ -25,16 +25,18 @@ const options = {
   useNewUrlParser: true
 }
 const mongodbUri = 'mongodb://localhost:27017/muse'
-mongoose.connect(mongodbUri, options)
-mongoose.Promise = global.Promise
-
-const conn = mongoose.connection
-conn.on('error', console.error.bind(console, 'connection error:'))
-conn.once('open', () => {
+// mongoose.connect(mongodbUri, options)
+// mongoose.Promise = global.Promise
+// const conn = mongoose.connection
+// conn.on('error', console.error.bind(console, 'connection error:'))
+// conn.once('open', () => {
+mongoose.createConnection(mongodbUri, options).then(conn => {
+  var Log = conn.model('Log', LogSchema)
+  var Diag = conn.model('Diag', DiagSchema)
   /**
    * http API
    */
-  const server = http(LogSchema, s7obj)
+  const server = http(Log, s7obj)
   server.listen(s7def.HTTP_PORT)
   /**
    * websocket
@@ -109,7 +111,7 @@ conn.once('open', () => {
           break
         case 'diag-enable':
           console.log('diag-enable', data)
-          DiagSchema.find({ alarmId: data._id }).exec(function (err, data) {
+          Diag.find({ alarmId: data._id }).exec(function (err, data) {
             if (err) console.log(err)
             if (data.length > 0) {
               console.log(data[0].alarmId, typeof data[0].s7data, data[0].s7data)
@@ -209,12 +211,12 @@ conn.once('open', () => {
    * S7 log
    */
   museEmitter.on('data', (s7log) => {
-    var document = new LogSchema()
-    document.$s7log = s7log // access in pre save hook as this.$s7log
-    document.$s7obj = s7obj // access in pre save hook as this.$s7obj
-    document.save((err, doc) => {
-      console.log(doc)
+    var log = new Log()
+    log.$s7log = s7log // access in pre save hook as this.$s7log
+    log.$s7obj = s7obj // access in pre save hook as this.$s7obj
+    log.save((err, doc) => {
       if (err) throw err
+      museEmitter.emit('logger', doc)
       updateLog(s7log, s7client, (err, res) => {
         if (err) return commError(err, s7def.PLC, s7client)
         // console.log(res)
@@ -223,23 +225,37 @@ conn.once('open', () => {
       })
       updateDiag(doc, s7client, (err, res) => {
         if (err) return commError(err, s7def.PLC, s7client)
-        // console.log('diag', res)
+        var diag = new Diag({
+          alarmId: doc._id,
+          s7data: res[0],
+          s7map: res[1]
+        })
+        diag.save((err, doc) => {
+          if (err) throw err
+          console.log('diag', doc)
+        })
       })
     })
   })
 })
 
-function updateDiag (doc, s7client, cb) {
-  s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
-    if (err) return cb(err)
-    var diag = new DiagSchema({
-      alarmId: doc._id,
-      s7data: s7data
-    })
-    diag.save((err, doc) => {
-      if (err) return cb(err)
-      cb(null, doc)
-    })
+function updateDiag (doc, s7client, callback) {
+  async.series([
+    function (cb) {
+      s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
+        if (err) return cb(err)
+        cb(null, s7data)
+      })
+    },
+    function (cb) {
+      s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
+        if (err) return cb(err)
+        cb(null, s7data)
+      })
+    }
+  ], function (err, results) {
+    if (err) return callback(err)
+    callback(null, results)
   })
 }
 

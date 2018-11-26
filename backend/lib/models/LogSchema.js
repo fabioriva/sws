@@ -55,4 +55,6 @@ LogSchema.query.bySystem = function (system, cb) {
   return this.find({ system: system }, cb)
 }
 
-module.exports = mongoose.model('Log', LogSchema)
+// module.exports = mongoose.model('Log', LogSchema)
+
+module.exports = LogSchema

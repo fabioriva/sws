@@ -92,12 +92,15 @@ class AppUi extends React.Component {
         }
       })
     })
-    // this.setState({
-    //   queryModal: {
-    //     visible: false
-    //   }
-    // })
-    // this.historyQuery({ itemsPerPage: ITEMS_PER_PAGE, currentPage: 1, dateFrom: dateFrom.toDate(), dateTo: dateTo.toDate(), filter: filter })
+  }
+  enableDiag = (alarm) => {
+    console.log('enableDiag', alarm)
+    this.ws.send(
+      JSON.stringify({
+        event: 'diag-enable',
+        data: alarm
+      })
+    )
   }
   render () {
     const { count, dateFrom, dateTo, query, queryModal } = this.state

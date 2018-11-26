@@ -7,8 +7,11 @@ const DiagSchema = Schema({
     type: Schema.Types.ObjectId,
     required: true
   },
-  s7data: Buffer
+  s7data: Buffer,
+  s7map: Buffer
 
 }, { collection: 'diagnostic' })
 
-module.exports = mongoose.model('Diag', DiagSchema)
+// module.exports = mongoose.model('Diag', DiagSchema)
+
+module.exports = DiagSchema
