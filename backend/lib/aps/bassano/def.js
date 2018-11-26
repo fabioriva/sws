@@ -1,6 +1,6 @@
 export const HTTP_PORT = 8081
 export const PLC = {
-  ip: '192.168.20.55',
+  ip: '192.168.53.2',
   rack: 0,
   slot: 1,
   polling_time: 500
