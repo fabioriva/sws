@@ -221,20 +221,22 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
         if (err) return commError(err, s7def.PLC, s7client)
         // console.log(res)
         wss.broadcast(JSON.stringify(res))
-        wss.broadcast(JSON.stringify({ mesg: notification(document) }))
+        wss.broadcast(JSON.stringify({ mesg: notification(log) }))
       })
-      updateDiag(doc, s7client, (err, res) => {
-        if (err) return commError(err, s7def.PLC, s7client)
-        var diag = new Diag({
-          alarmId: doc._id,
-          s7data: res[0],
-          s7map: res[1]
+      if (s7log.operation === 1) {
+        updateDiag(doc, s7client, (err, res) => {
+          if (err) return commError(err, s7def.PLC, s7client)
+          var diag = new Diag({
+            alarmId: doc._id,
+            s7data: res[0],
+            s7map: res[1]
+          })
+          diag.save((err, doc) => {
+            if (err) throw err
+            console.log('diag', doc)
+          })
         })
-        diag.save((err, doc) => {
-          if (err) throw err
-          console.log('diag', doc)
-        })
-      })
+      }
     })
   })
 })
