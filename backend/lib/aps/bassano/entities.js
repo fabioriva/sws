@@ -66,7 +66,8 @@ export var diag = {
       count: 0,
       active: []
     }
-  ]
+  ],
+  isActive: false
 }
 
 /*

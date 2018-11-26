@@ -11,7 +11,6 @@ class Edit extends React.Component {
       width: '60%'
     }
     const { cards, stalls, stallStatus, data } = this.props
-    console.log(data)
     return (
       <Modal
         title={intl.get('EDIT_STALL')}

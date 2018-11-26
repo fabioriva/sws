@@ -9,7 +9,6 @@ import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/muse'
 import { SERVICE, VALET } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 // import checkRole from 'src/lib/checkRole'
 
@@ -55,12 +54,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       map: props.map,
       occupancy: this.props.occupancy,
       visibilityFilter: 'SHOW_NUMBERS',
@@ -78,9 +71,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'map') {
           const { map } = data
           this.setState({
@@ -156,7 +146,6 @@ class AppUi extends React.Component {
         }
       })
     )
-    // ipcRenderer.send('write-stall', { stall: stall, card: card })
   }
   onRadioChange = (e) => {
     console.log('onRadioChange', e.target.value)
@@ -183,8 +172,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Map'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <Mobile>
           <div id='#top'>

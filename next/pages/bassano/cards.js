@@ -6,7 +6,6 @@ import Edit from 'src/components/CardEdit'
 import { Table } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const columns = [
@@ -44,12 +43,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       cards: props.cards,
       editModal: {
         card: {
@@ -74,9 +67,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'cards') {
           this.setState({
             isFetching: false,
@@ -183,8 +173,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Tessere RFID'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <span />
         <Table

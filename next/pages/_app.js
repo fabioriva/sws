@@ -8,8 +8,7 @@ import { initStore } from 'src/store'
 
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
-    // we can dispatch from here too
-    // ctx.store.dispatch({ type: 'UI_SIDEBAR_TOGGLE', status: false })
+    console.log(ctx.pathname)
     return {
       pageProps: (Component.getInitialProps ? await Component.getInitialProps(ctx) : {})
     }
@@ -26,5 +25,5 @@ class MyApp extends App {
   }
 }
 
-// export default compose(withAuth(withRedux(initStore)(MyApp)))
 export default withRedux(initStore)(MyApp)
+// export default compose(withAuth(withRedux(initStore)(MyApp)))

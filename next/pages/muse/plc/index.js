@@ -3,7 +3,6 @@ import Layout from 'src/components/Layout'
 import { List, Card } from 'antd'
 import { APS, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const data = [
@@ -84,22 +83,12 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: { isOnline: false },
-      diag: { alarmCount: 0 },
       racks: props.racks
     }
   }
   componentDidMount () {
     this.ws = new WebSocket(WEBSOCK_URL)
     this.ws.onerror = e => console.log(e)
-    this.ws.onmessage = e => {
-      const data = JSON.parse(e.data)
-      Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
-      })
-    }
   }
   componentWillUnmount () {
     this.ws.close()
@@ -110,8 +99,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='PLC Digital I/O'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         {/* <List
           itemLayout='horizontal'

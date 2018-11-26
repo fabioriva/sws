@@ -6,7 +6,6 @@ import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
@@ -23,8 +22,8 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: { isOnline: false },
-      diag: { alarmCount: 0 },
+      // comm: { isOnline: false },
+      // diag: { alarmCount: 0 },
       racks: props.racks
     }
   }
@@ -34,9 +33,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'racks') {
           this.setState({
             isFetching: false,
@@ -56,8 +52,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle={`PLC Digital I/O - ${rack.title}`}
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <Mobile>
           <List rack={rack} />

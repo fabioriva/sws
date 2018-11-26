@@ -4,7 +4,6 @@ import Layout from 'src/components/Layout'
 import { Alert, Badge, Button, Tabs } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const Alarm = (props) => {
@@ -47,12 +46,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       alarms: props.alarms
     }
   }
@@ -62,9 +55,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'alarms') {
           this.setState({
             isFetching: false,
@@ -106,8 +96,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='System Alarms'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <Tabs type='card'>
           <Tabs.TabPane tab={tabEL1} key='1'>{alarmsEL1.length > 0 ? alarmsEL1 : <Ready label='Elevator 1' />}</Tabs.TabPane>

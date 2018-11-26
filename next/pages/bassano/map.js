@@ -1,6 +1,6 @@
 import React from 'react'
 import Layout from 'src/components/Layout'
-import MapList from 'src/components/MapList'
+// import MapList from 'src/components/MapList'
 import Level from 'src/components/MapLevel'
 import Edit from 'src/components/MapEdit'
 import Occupancy from 'src/components/MapOccupancy'
@@ -9,7 +9,6 @@ import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/bassano'
 import { SERVICE, VALET } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const setStallLabel = (map, filter) => {
@@ -54,12 +53,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       map: props.map,
       occupancy: this.props.occupancy,
       visibilityFilter: 'SHOW_NUMBERS',
@@ -76,9 +69,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'map') {
           const { map } = data
           this.setState({
@@ -94,34 +84,16 @@ class AppUi extends React.Component {
     this.ws.close()
   }
   showModal = (stall, card) => {
-  
     // if (this.props.currentUser.roles.find(e => e === 'service' || e === 'admin')) {
     if (this.props.currentUser.role <= SERVICE) {
-
-    this.setState({
-      editModal: {
-        stall: stall,
-        value: stall, // card >= 1 && card <= CARDS ? card : 1,
-        visible: true,
-        isFixedMap: true // to disable input card number
-      }
-    })
-
-    // this.setState(prevState => ({
-    //   editModal: {
-    //       ...prevState.editModal,
-    //       stall: stall,
-    //       value: stall, // card >= 1 && card <= CARDS ? card : 1,
-    //       visible: true
-    //   }
-    // }))
-
-    // let newState = Object.assign({}, this.state);
-    // newState.editModal.stall = stall
-    // newState.editModal.value = stall
-    // newState.editModal.visible = true
-    // this.setState(newState)
-
+      this.setState({
+        editModal: {
+          stall: stall,
+          value: stall, // card >= 1 && card <= CARDS ? card : 1,
+          visible: true,
+          isFixedMap: true // to disable input card number
+        }
+      })
     }
   }
   handleMapCancel = (e) => {
@@ -161,7 +133,6 @@ class AppUi extends React.Component {
         }
       })
     )
-    // ipcRenderer.send('write-stall', { stall: stall, card: card })
   }
   onRadioChange = (e) => {
     console.log('onRadioChange', e.target.value)
@@ -188,8 +159,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Mappa'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <Mobile>
           {/* <div id='#top'>

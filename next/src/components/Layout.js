@@ -27,8 +27,7 @@ export default class PageLayout extends React.Component {
             />
             <Layout>
               <Navbar
-                comm={this.props.comm}
-                diag={this.props.diag}
+                socket={this.props.socket}
               />
               <Content className='app-container'>
                 <div className='app-title'>

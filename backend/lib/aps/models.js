@@ -78,7 +78,7 @@ export class Card {
 }
 
 export class Device {
-  constructor (id, name, modes, card, mode, motor, operation, position, size, stall, step) {
+  constructor (id, name, modes, card = 0, mode = 0, motor = 0, operation = 0, position = 0, size = 0, stall = 0, step = 0) {
     this.id = id
     this.name = name // this.setName(id)
     this.modes = modes
@@ -103,8 +103,10 @@ export class Device {
 }
 
 export class Measure {
-  constructor (id) {
+  constructor (id, destination = 0, position = 0) {
     this.name = id // this.setName(id)
+    this.destination = destination
+    this.position = position
   }
   // setName (id) {
   //   return id < strings.measures.length ? strings.measures[id] : '---'
@@ -119,8 +121,10 @@ export class Operation {
 }
 
 export class Queue {
-  constructor (id) {
+  constructor (id, card = 0, stall = 0) {
     this.id = id + 1
+    this.card = card
+    this.stall = stall
   }
 }
 

@@ -13,7 +13,6 @@ class OperationRequestForm extends Component {
   componentDidMount () {
     // To disabled submit button at the beginning.
     this.props.form.validateFields()
-
     console.log('componentDidMount', hasErrors(this.props.form.getFieldsError()))
   }
   render () {

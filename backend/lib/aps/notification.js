@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-function notification (document) {
+export default function notification (document) {
   const { alarm, card, date, device, mode, operation, stall } = document
   let message = `${device.name}`
   let description = `${moment(date).format('YYYY-MM-DD HH:mm:ss')} >> `
@@ -37,5 +37,3 @@ function notification (document) {
     description: description
   }
 }
-
-export default notification

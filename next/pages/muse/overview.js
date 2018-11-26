@@ -6,7 +6,6 @@ import Operation from 'src/components/OperationModal'
 import { Row, Col, Modal } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
 import { VALET } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 function confirm (system, ws) {
@@ -45,12 +44,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       overview: props.overview,
       operationModal: {
         card: {
@@ -71,9 +64,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'overview') {
           this.setState({
             isFetching: false,
@@ -89,11 +79,6 @@ class AppUi extends React.Component {
   showOperationModal = (operationId) => {
     console.log(operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: operationId, // 0=Exit, 1=Entry 1, 2=Entry 2
-      //   visible: true
-      // }
       operationModal: {
         card: {
           value: 0
@@ -107,11 +92,6 @@ class AppUi extends React.Component {
   }
   handleCancel = (e) => {
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -134,11 +114,6 @@ class AppUi extends React.Component {
   handleConfirm = (card, operationId) => {
     console.log('handleConfirm', card, operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -169,8 +144,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Overview'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <Row gutter={16}>
           <Col  xs={24} sm={24} md={14} lg={18} xl={18}>

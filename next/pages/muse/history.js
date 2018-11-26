@@ -6,7 +6,6 @@ import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
 import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const initialState = {
@@ -33,7 +32,8 @@ class AppUi extends React.Component {
     store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '6'})
     let dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
     let dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
-    const res = await fetch(`${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
+    // const res = await fetch(`${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
+    const res = await fetch(`${BACKEND_URL}/aps/muse/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
     const json = await res.json()
     return json
   }
@@ -41,12 +41,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       count: props.count,
       dateFrom: props.dateFrom,
       dateTo: props.dateTo,
@@ -65,14 +59,14 @@ class AppUi extends React.Component {
   componentDidMount () {
     this.ws = new WebSocket(WEBSOCK_URL)
     this.ws.onerror = e => console.log(e)
-    this.ws.onmessage = e => {
-      const data = JSON.parse(e.data)
-      Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
-      })
-    }
+    // this.ws.onmessage = e => {
+    //   const data = JSON.parse(e.data)
+    //   Object.keys(data).forEach((key) => {
+    //     if (key === 'comm') this.setState({ comm: data[key] })
+    //     if (key === 'diag') this.setState({ diag: data[key] })
+    //     if (key === 'mesg') openNotification(data[key])
+    //   })
+    // }
   }
   componentWillUnmount () {
     this.ws.close()
@@ -104,7 +98,8 @@ class AppUi extends React.Component {
   handleConfirm = (dateFrom, dateTo, filter) => {
     dateFrom = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
     dateTo = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
-    let uri = `${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
+    // let uri = `${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
+    let uri = `${BACKEND_URL}/aps/muse/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
     fetch(uri)
     .then(res => res.json())
     .then(res => {
@@ -138,8 +133,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='System Logs'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <History
           count={count}

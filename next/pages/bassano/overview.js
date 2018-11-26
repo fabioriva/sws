@@ -3,36 +3,10 @@ import Layout from 'src/components/Layout'
 import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
-
-// import { connect } from 'react-redux'
-
-import { Row, Col, Modal } from 'antd'
+import { Row, Col } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/bassano'
 import { VALET } from 'src/constants/roles'
-
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
-
-function confirm (system, ws) {
-  Modal.confirm({
-    title: `Elevator ${system} over-width detection at G0`,
-    content: 'Confirm to reject the vehicle to exit ?',
-    onOk() {
-      ws.send(
-        JSON.stringify({
-          event: 'overview-rollback',
-          data: {
-            id: system
-          }
-        })
-      )
-      return new Promise((resolve, reject) => {
-        setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
-      })
-    },
-    onCancel() {},
-  })
-}
 
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
@@ -49,12 +23,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       overview: props.overview,
       operationModal: {
         card: {
@@ -75,9 +43,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'overview') {
           this.setState({
             isFetching: false,
@@ -91,13 +56,7 @@ class AppUi extends React.Component {
     this.ws.close()
   }
   showOperationModal = (operationId) => {
-    console.log(operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: operationId, // 0=Exit, 1=Entry 1, 2=Entry 2
-      //   visible: true
-      // }
       operationModal: {
         card: {
           value: 0
@@ -111,11 +70,6 @@ class AppUi extends React.Component {
   }
   handleCancel = (e) => {
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -128,7 +82,6 @@ class AppUi extends React.Component {
     })
   }
   handleChange = (fields) => {
-    console.log('handleChange', fields)
     this.setState({
       operationModal: {
         ...this.state.operationModal, ...fields
@@ -138,11 +91,6 @@ class AppUi extends React.Component {
   handleConfirm = (card, operationId) => {
     console.log('handleConfirm', card, operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -163,37 +111,27 @@ class AppUi extends React.Component {
       })
     )
   }
-  handleRollback = (system) => {
-    confirm(system, this.ws)
-  }
   render () {
-    // const { locale } = this.props.navbar
-    // console.log(this.props.navbar)
     const { devices, exitQueue } = this.state.overview
     return (
       <Layout
         aps={APS}
         pageTitle='Operazioni'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={WEBSOCK_URL}
       >
         <Row gutter={16}>
           <Col  xs={24} sm={24} md={14} lg={18} xl={18}>
             <Row type='flex' justify='center' align='top' gutter={16}>
               <Col xs={24} sm={24} md={24} lg={10} xl={8}>
                 <Device
-                  // locale={locale}
                   device={devices[0]}
-                  // action={this.handleRollback}
                   action={this.showOperationModal}
                 />
               </Col>
               <Col xs={24} sm={24} md={24} lg={10} xl={8}>
                 <Device 
-                  // locale={locale}
                   device={devices[1]}
-                  // action={this.handleRollback}
                   action={this.showOperationModal}
                 />
               </Col>
@@ -201,7 +139,6 @@ class AppUi extends React.Component {
             <Row type='flex' justify='center' align='middle' gutter={16}>
               <Col xs={24} sm={24} md={24} lg={10} xl={8}>
                 <Device
-                  // locale={locale}
                   device={devices[2]}
                 />
               </Col>
@@ -228,4 +165,3 @@ class AppUi extends React.Component {
 }
 
 export default withAuth(AppUi, VALET)
-// export default connect(state => state)(withAuth(AppUi, ROLE_OVERVIEW))

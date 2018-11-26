@@ -8,7 +8,8 @@ import intl from 'react-intl-universal'
 class Device extends Component {
   render () {
     const { device } = this.props
-    const { id, name, card, mode, operation, size, stall } = device.a
+    const { id, name, card, mode, operation, size, stall, step } = device.a
+    const stepTag = mode.id === 8 && <Tag color='green'>{step}</Tag>
     const autTag =
       <Tooltip title={intl.get('AUT')}>
         <Tag color='#108ee9' style={{ width: 32, textAlign: 'center', color: '#fff' }}>A</Tag>
@@ -17,10 +18,7 @@ class Device extends Component {
       <Tooltip title={mode.label}>
         <Tag color='#ffff00' style={{ width: 32, textAlign: 'center', color: '#000' }}>M</Tag>
       </Tooltip>
-    const modeTag =
-      <span>
-        { mode.id !== 8 ? manTag : autTag }
-      </span>
+    const modeTag = mode.id !== 8 ? manTag : autTag
     // const entryIcon =
     //   <Tooltip title='Car In'>
     //     <Icon type='swap-right' style={{ color: '#000000', marginLeft: 6 }} />
@@ -36,6 +34,7 @@ class Device extends Component {
     const title = <span>{name}</span>
     const extra =
       <div>
+        { stepTag }
         { modeTag }
         {/* { operation === 1 ? entryIcon : operation === 2 ? exitIcon : operation === 3 ? shuffleIcon : null } */}
         <Tooltip title={device.c[2].status ? 'Alarm Lamp' : 'Alarm Lamp'}>

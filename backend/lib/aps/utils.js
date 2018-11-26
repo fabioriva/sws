@@ -1,5 +1,5 @@
+import async from 'async'
 import moment from 'moment'
-// import * as s7def from './def'
 
 const BytesToInt = (b1, b2) => {
   return (b1 << 8) | b2
@@ -99,27 +99,6 @@ const updateCards = (start, buffer, offset, cards, callback) => {
   }
 }
 
-// const initDevices = (devices, cb) => {
-const initDevices = (devices) => {
-  // var iterations = 0
-  for (var d = 0; d < devices.length; d++) {
-    devices[d].card = 111
-    devices[d].mode = {
-      label: devices[d].setMode(0),
-      id: 0
-    }
-    devices[d].motor = 0
-    devices[d].operation = 0
-    devices[d].position = 0
-    devices[d].size = 0
-    devices[d].stall = 0
-    devices[d].step = 0
-    // if (++iterations === devices.length) {
-    //   cb(null, iterations)
-    // }
-  }
-}
-
 const updateDevices = (byte, data, devices, callback) => {
   var iterations = 0
   for (var d = 0; d < devices.length; d++) {
@@ -167,6 +146,44 @@ const updateQueue = (byte, data, queue, callback) => {
       callback(null, iterations)
     }
   }
+}
+
+function updateData (s7data, s7def, s7obj, callback) {
+  async.series([
+    function (cb) {
+      updateBits(s7def.DB_DATA_INIT_MB, s7data, s7obj.merkers, function (results) {
+        cb(null, s7obj.merkers)
+      })
+    },
+    function (cb) {
+      updateBits(s7def.DB_DATA_INIT_EB, s7data, s7obj.inputs, function (results) {
+        cb(null, s7obj.inputs)
+      })
+    },
+    function (cb) {
+      updateBits(s7def.DB_DATA_INIT_AB, s7data, s7obj.outputs, function (results) {
+        cb(null, s7obj.outputs)
+      })
+    },
+    function (cb) {
+      updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
+        cb(null, s7obj.devices)
+      })
+    },
+    function (cb) {
+      updateMeasures(s7def.DB_DATA_INIT_POS, s7data, s7obj.measures, function (results) {
+        cb(null, s7obj.measures)
+      })
+    },
+    function (cb) {
+      updateQueue(s7def.DB_DATA_INIT_QUEUE, s7data, s7obj.exitQueue, function (results) {
+        cb(null, s7obj.exitQueue)
+      })
+    }
+  ], function (err, results) {
+    if (err) return callback(err)
+    callback(null, results)
+  })
 }
 
 const updateStalls = (start, buffer, offset, stalls, callback) => {
@@ -219,20 +236,41 @@ function mapCount (stalls, data, size, stallStatus) {
   }
 }
 
+function updateMap (start, buffer, s7def, stalls, statistics, callback) {
+  async.waterfall([
+    function (cb) {
+      updateStalls(start, buffer, s7def.STALL_LEN, stalls, function (err, results) {
+        if (err) return cb(err)
+        cb(null, stalls)
+      })
+    },
+    function (stalls, cb) {
+      updateStatistics(stalls, statistics, s7def.StallStatus, function (err, results) {
+        if (err) return cb(err)
+        cb(null, results)
+      })
+    }
+  ], (err, results) => {
+    if (err) return callback(err)
+    callback(null, results)
+  })
+}
+
 export {
   BytesToInt,
   BytesToLong,
   IntToBytes,
   LongToBytes,
-  initDevices,
-  updateBits,
+  // updateBits,
   updateAlarms,
   updateCards,
-  updateDevices,
-  updateMeasures,
-  updateQueue,
-  updateStalls,
-  updateStatistics
+  // updateDevices,
+  // updateMeasures,
+  // updateQueue,
+  updateData,
+  // updateStalls,
+  // updateStatistics
+  updateMap
 }
 
 /*
