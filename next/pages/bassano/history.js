@@ -5,27 +5,8 @@ import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
 import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
-import { SERVICE } from 'src/constants/roles'
+import { ADMIN, SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
-
-const initialState = {
-  isFetching: true,
-  comm: {
-    isOnline: false
-  },
-  diag: {
-    alarmCount: 0
-  },
-  queryModal: {
-    range: {
-      value: []
-    },
-    filter: {
-      value: 'a'
-    },
-    visible: false
-  }
-}
 
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
@@ -129,6 +110,10 @@ class AppUi extends React.Component {
   }
   render () {
     const { count, dateFrom, dateTo, query, queryModal } = this.state
+    const diag = {
+      enabled: this.props.currentUser.role <= ADMIN,
+      enableDiag: this.enableDiag
+    }
     return (
       <Layout
         aps={APS}
@@ -142,7 +127,7 @@ class AppUi extends React.Component {
           dateTo={dateTo}
           query={query}
           queryModal={this.showModal}
-          enableDiag={this.enableDiag}
+          diagnostic={diag}
           
         />
         <Query

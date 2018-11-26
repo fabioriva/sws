@@ -9,14 +9,14 @@ class Device extends Component {
   render () {
     const { device } = this.props
     const { id, name, card, mode, operation, size, stall, step } = device.a
-    const stepTag = mode.id === 8 && <Tag color='green'>{step}</Tag>
+    const stepTag = mode.id === 8 && <Tag color='geekblue'>{step}</Tag>
     const autTag =
       <Tooltip title={intl.get('AUT')}>
-        <Tag color='#108ee9' style={{ width: 32, textAlign: 'center', color: '#fff' }}>A</Tag>
+        <Tag color='#108ee9' style={{ color: '#fff' }}>A</Tag>
       </Tooltip>
     const manTag =
       <Tooltip title={mode.label}>
-        <Tag color='#ffff00' style={{ width: 32, textAlign: 'center', color: '#000' }}>M</Tag>
+        <Tag color='#ffff00' style={{ color: '#000' }}>M</Tag>
       </Tooltip>
     const modeTag = mode.id !== 8 ? manTag : autTag
     // const entryIcon =

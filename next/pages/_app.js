@@ -8,7 +8,7 @@ import { initStore } from 'src/store'
 
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
-    console.log(ctx.pathname)
+    // console.log(ctx.pathname)
     return {
       pageProps: (Component.getInitialProps ? await Component.getInitialProps(ctx) : {})
     }

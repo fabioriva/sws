@@ -38,6 +38,7 @@ export default class History extends React.Component {
         <Button
           type='danger'
           onClick={() => this.enableDiag(record)}
+          disabled={!this.props.diagnostic.enabled}
         >
           Activate Diagnostic
         </Button>
@@ -47,7 +48,7 @@ export default class History extends React.Component {
   enableDiag = (record) => {
     this.setState({ visible: false })
     message.success(`Diagnostic activated. ${record._id}`)
-    this.props.enableDiag !== undefined && this.props.enableDiag(record)
+    this.props.diagnostic.enableDiag !== undefined && this.props.diagnostic.enableDiag(record)
   }
   // handleVisibleChange = (visible) => {
   //   this.setState({ visible })

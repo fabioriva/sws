@@ -5,27 +5,8 @@ import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
 import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
-import { SERVICE } from 'src/constants/roles'
+import { ADMIN, SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
-
-const initialState = {
-  isFetching: true,
-  comm: {
-    isOnline: false
-  },
-  diag: {
-    alarmCount: 0
-  },
-  queryModal: {
-    range: {
-      value: []
-    },
-    filter: {
-      value: 'a'
-    },
-    visible: false
-  }
-}
 
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
@@ -59,14 +40,6 @@ class AppUi extends React.Component {
   componentDidMount () {
     this.ws = new WebSocket(WEBSOCK_URL)
     this.ws.onerror = e => console.log(e)
-    // this.ws.onmessage = e => {
-    //   const data = JSON.parse(e.data)
-    //   Object.keys(data).forEach((key) => {
-    //     if (key === 'comm') this.setState({ comm: data[key] })
-    //     if (key === 'diag') this.setState({ diag: data[key] })
-    //     if (key === 'mesg') openNotification(data[key])
-    //   })
-    // }
   }
   componentWillUnmount () {
     this.ws.close()
@@ -128,6 +101,10 @@ class AppUi extends React.Component {
   }
   render () {
     const { count, dateFrom, dateTo, query, queryModal } = this.state
+    const diag = {
+      enabled: this.props.currentUser.role <= ADMIN,
+      enableDiag: this.enableDiag
+    }
     return (
       <Layout
         aps={APS}
@@ -141,6 +118,7 @@ class AppUi extends React.Component {
           dateTo={dateTo}
           query={query}
           queryModal={this.showModal}
+          diagnostic={diag}
           
         />
         <Query
