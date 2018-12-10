@@ -1,4 +1,5 @@
 import net from 'net'
+import pino from 'pino'
 import Log from 'lib/models/LogS7'
 import * as aps from 'lib/aps/def'
 import { bassanoEmitter } from 'lib/aps/bassano'
@@ -9,7 +10,13 @@ const HOST = dev ? process.env.BACKEND_URL : '192.168.20.3'
 const PORT = 49000
 const LOG_LEN = 32
 
-const logger = require('pino')()
+const log = (aps, mesg) => `[${aps}] ${mesg}`
+const logger = pino({
+  prettyPrint: {
+    colorize: true,
+    translateTime: 'yyyy-mm-dd HH:MM:ss.l o'
+  }
+})
 const server = net.createServer(function (socket) {
   let client = `${socket.remoteAddress}:${socket.remotePort}`
   socket.on('error', function (e) {
@@ -32,10 +39,14 @@ const server = net.createServer(function (socket) {
           break
         case aps.BOSTON:
           break
+        case aps.DONINI:
+          break
         case aps.MUSE:
           museEmitter.emit('data', log)
           break
         case aps.NYU:
+          break
+        case aps.WASHINGTON_BLVD:
           break
       }
     }
@@ -43,5 +54,5 @@ const server = net.createServer(function (socket) {
 })
 server.listen(PORT, HOST)
 
-bassanoEmitter.on('logger', (mesg) => logger.info('bassano %s', mesg))
-museEmitter.on('logger', (mesg) => logger.info('muse %s', mesg))
+bassanoEmitter.on('logger', mesg => logger.info(log('bassano', mesg)))
+museEmitter.on('logger', mesg => logger.info(log('muse', mesg)))

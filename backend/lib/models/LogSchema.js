@@ -28,7 +28,9 @@ const LogSchema = mongoose.Schema({
   size: Number,
   stall: Number,
   system: Number
-}, { collection: 'history' })
+}, {
+  collection: 'history'
+})
 
 LogSchema.pre('save', function (next) {
   var s7log = this.$s7log
@@ -51,10 +53,23 @@ LogSchema.pre('save', function (next) {
   next()
 })
 
+// LogSchema.options.toObject = LogSchema.options.toObject || {}
+LogSchema.options.toObject = {
+  transform: function (doc, ret, options) {
+    // ret.id = ret._id
+    ret.alarm = doc.alarm.info
+    ret.device = doc.device.name
+    ret.mode = doc.mode.info
+    ret.operation = doc.operation.info
+    delete ret.date
+    delete ret._id
+    delete ret.__v
+    return ret
+  }
+}
+
 LogSchema.query.bySystem = function (system, cb) {
   return this.find({ system: system }, cb)
 }
-
-// module.exports = mongoose.model('Log', LogSchema)
 
 module.exports = LogSchema

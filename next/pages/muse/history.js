@@ -37,13 +37,6 @@ class AppUi extends React.Component {
       }
     }
   }
-  componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
-    this.ws.onerror = e => console.log(e)
-  }
-  componentWillUnmount () {
-    this.ws.close()
-  }
   showModal = () => {
     this.setState({
       queryModal: {
@@ -57,8 +50,18 @@ class AppUi extends React.Component {
       }
     })
   }
-  handleCancel = (state = initialState, e) => {
-    this.setState(initialState)
+  handleCancel = (e) => {
+    this.setState({
+      queryModal: {
+        range: {
+          value: []
+        },
+        filter: {
+          value: 'a'
+        },
+        visible: false
+      }
+    })
     console.log('>>>>>', this.state)
   }
   handleChange = (fields) => {
@@ -113,7 +116,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='System Logs'
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <History
           count={count}

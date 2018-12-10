@@ -6,10 +6,23 @@ import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
+import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
-  static async getInitialProps () {
+  static async getInitialProps (ctx) {
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/bassano/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        racks: json.racks
+      }
+    }
+    // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/bassano/racks`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
@@ -28,11 +41,12 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    const { diagnostic } = this.props
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      Object.keys(data).forEach((key) => {
+      Object.keys(!diagnostic && data).forEach((key) => {
         if (key === 'racks') {
           this.setState({
             isFetching: false,
@@ -52,7 +66,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle={`PLC Digital I/O - ${rack.title}`}
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Mobile>
           <List rack={rack} />

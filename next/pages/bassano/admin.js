@@ -25,20 +25,20 @@ class AppUi extends React.Component {
   //     }
   //   }
   // }
-  componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
-    this.ws.onerror = e => console.log(e)
-  }
-  componentWillUnmount () {
-    this.ws.close()
-  }
+  // componentDidMount () {
+  //   this.ws = new WebSocket(WEBSOCK_URL)
+  //   this.ws.onerror = e => console.log(e)
+  // }
+  // componentWillUnmount () {
+  //   this.ws.close()
+  // }
   render () {
     return (
       <Layout
         aps={APS}
         pageTitle='Amministrazione utente'
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <ChangePassword />
       </Layout>

@@ -4,13 +4,13 @@ import cookie from 'cookie'
 import redirect from 'src/lib/redirect'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import NavbarComm from './NavbarComm'
-import { sidebarToggle } from 'src/store'
-import { Layout, Badge, Icon, Tag, Tooltip } from 'antd'
+import { navbarSetDiag, sidebarToggle } from 'src/store'
+import { Alert, Layout, Badge, Icon, Tag, Tooltip } from 'antd'
+import openNotification from 'src/lib/openNotification'
+// i18n
 import intl from 'react-intl-universal'
 import en_US from 'src/locales/en-US.json'
 import it_IT from 'src/locales/it-IT.json'
-import openNotification from 'src/lib/openNotification'
 
 const locales = {
   'en-US': en_US, // require('src/locales/en-US.json'),
@@ -18,6 +18,34 @@ const locales = {
 }
 
 const { Header } = Layout
+
+const Comm = (props) => {
+  return (
+    <Header
+      className='app-comm'
+    >
+      <div className='bar-comm' />
+      <style jsx global>{`
+        .app-comm {
+          background: #fff!important;
+          height: 3px;
+        }
+        .bar-comm {
+          background: #87d068;
+          height: 3px;
+          width: ${props.percent}%;
+        }
+      `}</style>
+    </Header>
+  )
+}
+
+const Diagnostic = (props) => {
+  const message = `Diagnostic is active for alarm id ${props.message}`
+  return (
+    <Alert style={{ margin: '6px 12px 0 12px' }} message={message} type='error' closeText='Close Diagnostic' onClose={props.onClose} showIcon />
+  )
+}
 
 class Navbar extends Component {
   constructor (props) {
@@ -30,20 +58,15 @@ class Navbar extends Component {
         alarmCount: 0
       },
       initDone: false,
-      percent: 0
+      navbarComm: 0
     }
-    const { locale, user } = this.props.navbar
-    const currentLocale = locale
+    const currentLocale = this.props.navbar.user.locale
     intl.init({
       currentLocale,
       locales
-      // locales: {
-      //   [currentLocale]: require(`src/locales/${currentLocale}.json`)
-      // }
     })
     .then(() => {
-       // After loading CLDR locale data, start to render
-       this.setState({ initDone: true })
+       this.setState({ initDone: true }) // After loading CLDR locale data, start to render
     })
   }
   componentDidMount () {
@@ -56,11 +79,11 @@ class Navbar extends Component {
         if (key === 'diag') this.setState({ diag: data[key] })
         if (key === 'mesg') openNotification(data[key])
         if (key === 'comm') {
-          this.state.percent < 100
-          ?
-          this.setState({ percent: this.state.percent + 10 })
-          :
-          this.setState({ percent: 0 })
+          this.setState((state) => {
+            return {
+              navbarComm: state.comm.isOnline && state.navbarComm < 100 ? state.navbarComm + 10 : 0
+            }
+          })
         }
       })
     }
@@ -68,29 +91,20 @@ class Navbar extends Component {
   componentWillUnmount () {
     this.ws.close()
   }
-  disableDiag = () => {
-    this.ws.send(
-      JSON.stringify({
-        event: 'diag-disable'
-      })
-    )
+  handleClose = () => {
+    this.props.navbarSetDiag(false)
+    if (process.browser) {
+      document.cookie = cookie.serialize('diagnostic', '', { maxAge: -1 }) // 0 = Delete cookie / -1 = Expire the cookie immediately
+      window.location.href = this.props.navbar.user.pathname // reload page in the browser
+    }
   }
   signout = () => {
-    const options = {
-      maxAge: -1 // 0 = Delete cookie / -1 = Expire the cookie immediately
-    }
-    if (process.browser) {
-      document.cookie = cookie.serialize('token', '', options)
-    }
-    // document.cookie = cookie.serialize('user', '', options)
-    // document.cookie = cookie.serialize('userContext', '', options)
-    redirect({}, '/')
+    redirect({}, '/') // token cookie expires in /
   }
   render () {
     const comm = this.state.comm
     const commStatus = comm.isOnline ? <Tag color='#87d068'>ONLINE</Tag> : <Tag color='#f50'>OFFLINE</Tag>
     const diag = this.state.diag
-
     const { user } = this.props.navbar
     const { collapsed } = this.props.sidebar
     return (
@@ -102,10 +116,10 @@ class Navbar extends Component {
             onClick={() => this.props.sidebarToggle(!collapsed)}
           />
           <div className='app-navbar-right'>
-            { diag.isActive &&
+            { this.props.navbar.diag &&
             <span className='app-navbar-element'>
-              <Tooltip title={`Deactivate Diagnostic`}>
-                <Icon className='app-navbar-icon' type='thunderbolt' onClick={this.disableDiag} />
+              <Tooltip title='Diagnostic is active'>
+                <Icon className='app-navbar-icon' type='thunderbolt' />
               </Tooltip>
             </span>
             }
@@ -126,11 +140,16 @@ class Navbar extends Component {
             </span>
           </div>
         </Header>
-        <NavbarComm percent={this.state.percent}/>
+        <Comm
+          percent={this.state.navbarComm}
+        />
+        {
+          this.props.navbar.diag && <Diagnostic message={this.props.navbar.diag} onClose={this.handleClose} />
+        }
         <style jsx global>{`
           .ant-layout-header {
             padding: 0 12px 0 0!important;
-            background: ${ diag.isActive ? '#ffff00' : '#ffffff' }!important;
+            background: '#ffffff' // ${ this.props.navbar.diag ? '#fff1f0' : '#ffffff' }!important;
             position: relative!important;
           }
           .app-navbar {
@@ -174,6 +193,7 @@ const mapStateToProps = ({ navbar, sidebar }) => ({ navbar, sidebar })
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch),
     sidebarToggle: bindActionCreators(sidebarToggle, dispatch)
   }
 }

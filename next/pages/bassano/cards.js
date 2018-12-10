@@ -62,7 +62,7 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -173,7 +173,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Tessere RFID'
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <span />
         <Table

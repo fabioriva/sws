@@ -3,7 +3,7 @@ export const PLC = {
   ip: '140.80.49.2',
   rack: 0,
   slot: 1,
-  polling_time: 500
+  polling_time: 300
 }
 
 export const FALSE = Buffer.alloc(1, 0, 'hex')

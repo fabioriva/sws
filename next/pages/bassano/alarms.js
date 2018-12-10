@@ -50,7 +50,7 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -86,7 +86,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Allarmi del sistema'
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Tabs type='card'>
           <Tabs.TabPane tab={tabA} key='1'>{alarmsA.length > 0 ? alarmsA : <Ready label='Elevatore A' />}</Tabs.TabPane>

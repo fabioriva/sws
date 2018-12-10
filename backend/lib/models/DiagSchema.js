@@ -12,6 +12,4 @@ const DiagSchema = Schema({
 
 }, { collection: 'diagnostic' })
 
-// module.exports = mongoose.model('Diag', DiagSchema)
-
 module.exports = DiagSchema

@@ -6,17 +6,30 @@ import Operation from 'src/components/OperationModal'
 import { Row, Col } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/bassano'
 import { VALET } from 'src/constants/roles'
+import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
+  static async getInitialProps (ctx) {
+    ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/bassano/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        overview: json.overview
+      }
+    }
+    // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/bassano/overview`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
       statusCode,
-      overview: json  // json.data.overview
+      overview: json
     }
   }
   constructor (props) {
@@ -38,12 +51,13 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    const { diagnostic } = this.props
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'overview') {
+        if (!diagnostic && key === 'overview') {
           this.setState({
             isFetching: false,
             overview: data[key]
@@ -113,12 +127,13 @@ class AppUi extends React.Component {
   }
   render () {
     const { devices, exitQueue } = this.state.overview
+    const { diagnostic } = this.props
     return (
       <Layout
         aps={APS}
         pageTitle='Operazioni'
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Row gutter={16}>
           <Col  xs={24} sm={24} md={14} lg={18} xl={18}>

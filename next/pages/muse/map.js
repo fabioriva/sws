@@ -1,6 +1,6 @@
 import React from 'react'
 import Layout from 'src/components/Layout'
-import MapList from 'src/components/MapList'
+// import MapList from 'src/components/MapList'
 import Level from 'src/components/MapLevel'
 import Edit from 'src/components/MapEdit'
 import Occupancy from 'src/components/MapOccupancy'
@@ -9,8 +9,8 @@ import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/muse'
 import { SERVICE, VALET } from 'src/constants/roles'
+import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
-// import checkRole from 'src/lib/checkRole'
 
 const setStallLabel = (map, filter) => {
   switch (filter) {
@@ -38,8 +38,21 @@ const setStallLabel = (map, filter) => {
 }
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '2'})
+  static async getInitialProps (ctx) {
+    ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '2'})
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/muse/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        map: setStallLabel(json.map, 'SHOW_NUMBERS'),
+        occupancy: json.map.statistics[0]
+      }
+    }
+    // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/muse/map`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
@@ -66,7 +79,7 @@ class AppUi extends React.Component {
     this.handleMap = this.handleMap.bind(this)
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -172,10 +185,10 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Map'
         sidebarMenu={SIDEBAR_MENU}
-        socket={WEBSOCK_URL}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Mobile>
-          <div id='#top'>
+          {/* <div id='#top'>
             <a href='#level-1'>[G1]</a>
             <a href='#level-5'>[G5]</a>
             <a href='#level-10'>[G10]</a>
@@ -192,7 +205,8 @@ class AppUi extends React.Component {
             onCancel={this.handleMapCancel}
             onChange={this.handleMapChange}
             onConfirm={this.handleMapOk}
-          />
+          /> */}
+          <Occupancy data={occupancy} />
         </Mobile>
         <Default>
           <Row>

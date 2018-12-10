@@ -1,13 +1,6 @@
-const MUSE = 61
-const BASSANO = 66
-const DONINI = 67
-const NYU = 68
-const BOSTON = 76
-
-export {
-  BASSANO,
-  BOSTON,
-  DONINI,
-  MUSE,
-  NYU
-}
+export const MUSE = 61
+export const BASSANO = 66
+export const DONINI = 67
+export const NYU = 68
+export const BOSTON = 76
+export const WASHINGTON_BLVD = 69
