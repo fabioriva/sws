@@ -1,16 +1,18 @@
 import React from 'react'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
 import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
-import { Row, Col, Modal, notification } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { Row, Col, Modal } from 'antd'
+import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
+import { VALET } from 'src/constants/roles'
+import parseCookies from 'src/lib/parseCookies'
+import withAuth from 'src/lib/withAuth'
 
 function confirm (system, ws) {
   Modal.confirm({
-    title: 'Do you want to delete these items?',
-    content: 'When clicked the OK button, this dialog will be closed after 1 second',
+    title: `Elevator ${system} over-width detection at G0`,
+    content: 'Confirm to reject the vehicle to exit ?',
     onOk() {
       ws.send(
         JSON.stringify({
@@ -29,8 +31,20 @@ function confirm (system, ws) {
 }
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
+  static async getInitialProps (ctx) {
+    ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/muse/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        overview: json.overview
+      }
+    }
+    // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/muse/overview`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
@@ -43,15 +57,11 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       overview: props.overview,
       operationModal: {
         card: {
+          min: 1,
+          max: CARDS,
           value: 0
         },
         operationId: {
@@ -62,27 +72,19 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    const { diagnostic } = this.props
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        const { mesg } = data
-        notification.open(mesg)
-      }
-      if (eventName === 'overview') {
-        this.setState({
-          isFetching: false,
-          overview: data.overview
-        })
-      }
+      Object.keys(data).forEach((key) => {
+        if (!diagnostic && key === 'overview') {
+          this.setState({
+            isFetching: false,
+            overview: data[key]
+          })
+        }
+      })
     }
   }
   componentWillUnmount () {
@@ -91,11 +93,6 @@ class AppUi extends React.Component {
   showOperationModal = (operationId) => {
     console.log(operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: operationId, // 0=Exit, 1=Entry 1, 2=Entry 2
-      //   visible: true
-      // }
       operationModal: {
         card: {
           value: 0
@@ -109,11 +106,6 @@ class AppUi extends React.Component {
   }
   handleCancel = (e) => {
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -136,11 +128,6 @@ class AppUi extends React.Component {
   handleConfirm = (card, operationId) => {
     console.log('handleConfirm', card, operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -155,23 +142,13 @@ class AppUi extends React.Component {
       JSON.stringify({
         event: 'overview-operation',
         data: {
-          id: operationId,
+          operation: operationId,
           value: card
         }
       })
     )
   }
   handleRollback = (system) => {
-    this.ws.send(
-      JSON.stringify({
-        event: 'overview-rollback',
-        data: {
-          id: system
-        }
-      })
-    )
-  }
-  handleRollbackModal = (system) => {
     confirm(system, this.ws)
   }
   render () {
@@ -181,8 +158,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Overview'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Row gutter={16}>
           <Col  xs={24} sm={24} md={14} lg={18} xl={18}>
@@ -204,7 +180,7 @@ class AppUi extends React.Component {
               <Col xs={24} sm={24} md={24} lg={10} xl={8}>
                 <Device
                   device={devices[3]}
-                  action={this.handleRollbackModal}
+                  action={this.handleRollback}
                 />
               </Col>
             </Row>
@@ -227,4 +203,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, VALET)

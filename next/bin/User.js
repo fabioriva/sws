@@ -10,11 +10,15 @@ const UserSchema = new Schema({
   password: { type: String, required: true },
   loginAttempts: { type: Number, required: true, default: 0 },
   lockUntil: { type: Number },
+  isFirstLogin: { type: Boolean, default: true },
   lastLogin: { type: Date, default: Date.now },
-  email: { type: String, validate: [validatePresenceOf, 'an email is required'], index: { unique: true } },
+  email: { type: String, validate: [validatePresenceOf, 'an email is required'] }, // index: { unique: true } },
   name: { first: String, last: String },
-  roles: Array,
-  aps: Array
+  role: { type: Number, required: true },
+  aps: { type: String, required: true },
+  // roles: { type: Array, required: true },
+  // aps: { type: Array, required: true },
+  locales: { type: Array, required: true }
 }, { collection: 'users' })
 
 UserSchema.virtual('isLocked').get(function () {
@@ -35,6 +39,21 @@ UserSchema.pre('save', function (next) {
   })
 })
 
+// UserSchema.pre('updateOne', function (next) {
+//   console.log('pre updateOne')
+//   next()
+//   // var user = this
+//   // if (!user.isModified('password')) return next()
+//   // bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
+//   //   if (err) return next(err)
+//   //   bcrypt.hash(user.password, salt, (err, hash) => {
+//   //     if (err) return next(err)
+//   //     user.password = hash
+//   //     next()
+//   //   })
+//   // })
+// })
+
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
     if (err) return cb(err)
@@ -45,7 +64,7 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
 UserSchema.methods.incLoginAttempts = function (cb) {
   // if we have a previous lock that has expired, restart at 1
   if (this.lockUntil && this.lockUntil < Date.now()) {
-    return this.update({
+    return this.updateOne({
       $set: { loginAttempts: 1 },
       $unset: { lockUntil: 1 }
     }, cb)
@@ -56,7 +75,7 @@ UserSchema.methods.incLoginAttempts = function (cb) {
   if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
     updates.$set = { lockUntil: Date.now() + LOCK_TIME }
   }
-  return this.update(updates, cb)
+  return this.updateOne(updates, cb)
 }
 
 // expose enum on the model, and provide an internal convenience reference
@@ -93,7 +112,40 @@ UserSchema.statics.getAuthenticated = function (username, password, cb) {
           $set: { loginAttempts: 0, lastLogin: Date.now() },
           $unset: { lockUntil: 1 }
         }
-        return user.update(updates, function (err) {
+        return user.updateOne(updates, function (err) {
+          if (err) return cb(err)
+          return cb(null, user)
+        })
+      }
+      // password is incorrect, so increment login attempts before responding
+      user.incLoginAttempts(function (err) {
+        if (err) return cb(err)
+        return cb(null, null, reasons.PASSWORD_INCORRECT)
+      })
+    })
+  })
+}
+
+UserSchema.statics.changePassword = function (username, oldPassword, newPassword, confirmPassword, cb) {
+  // console.log('from change password', username, oldPassword, newPassword, confirmPassword)
+  this.findOne({ username: username }, function (err, user) {
+    if (err) return cb(err)
+    // make sure the user exists
+    if (!user) {
+      return cb(null, null, reasons.NOT_FOUND)
+    }
+    // test for a matching password
+    user.comparePassword(oldPassword, function (err, isMatch) {
+      if (err) return cb(err)
+      // check if the password was a match
+      if (isMatch) {
+        // if there's no lock or failed attempts, just return the user
+        if (!user.loginAttempts && !user.lockUntil) return cb(null, user)
+        // reset attempts and lock info
+        user.loginAttempts = 0
+        user.lastLogin = Date.now()
+        user.password = newPassword
+        return user.save(function (err, user) {
           if (err) return cb(err)
           return cb(null, user)
         })

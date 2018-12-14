@@ -3,7 +3,7 @@ import {
   BITS
 } from './def'
 
-const FILE = 'lib/ws/aps/muse/strings_.js'
+const FILE = 'lib/aps/muse/strings_.js'
 
 generateBitsInfo('inputs1', 'E', 0, 5)
 generateBitsInfo('inputs2', 'E', 100, 107)

@@ -1,5 +1,5 @@
+import async from 'async'
 import moment from 'moment'
-// import * as s7def from './def'
 
 const BytesToInt = (b1, b2) => {
   return (b1 << 8) | b2
@@ -104,7 +104,10 @@ const updateDevices = (byte, data, devices, callback) => {
   for (var d = 0; d < devices.length; d++) {
     devices[d].card = BytesToInt(data[byte + 0], data[byte + 1])
     // devices[d].mode = modes[BytesToInt(data[byte + 2], data[byte + 3])]
-    devices[d].mode = devices[d].setMode(BytesToInt(data[byte + 2], data[byte + 3]))
+    devices[d].mode = {
+      label: devices[d].setMode(BytesToInt(data[byte + 2], data[byte + 3])),
+      id: BytesToInt(data[byte + 2], data[byte + 3])
+    }
     devices[d].motor = BytesToInt(data[byte + 4], data[byte + 5])
     devices[d].operation = BytesToInt(data[byte + 6], data[byte + 7])
     devices[d].position = BytesToInt(data[byte + 8], data[byte + 9])
@@ -145,6 +148,44 @@ const updateQueue = (byte, data, queue, callback) => {
   }
 }
 
+function updateData (s7data, s7def, s7obj, callback) {
+  async.series([
+    function (cb) {
+      updateBits(s7def.DB_DATA_INIT_MB, s7data, s7obj.merkers, function (results) {
+        cb(null, s7obj.merkers)
+      })
+    },
+    function (cb) {
+      updateBits(s7def.DB_DATA_INIT_EB, s7data, s7obj.inputs, function (results) {
+        cb(null, s7obj.inputs)
+      })
+    },
+    function (cb) {
+      updateBits(s7def.DB_DATA_INIT_AB, s7data, s7obj.outputs, function (results) {
+        cb(null, s7obj.outputs)
+      })
+    },
+    function (cb) {
+      updateDevices(s7def.DB_DATA_INIT_DEVICE, s7data, s7obj.devices, function (results) {
+        cb(null, s7obj.devices)
+      })
+    },
+    function (cb) {
+      updateMeasures(s7def.DB_DATA_INIT_POS, s7data, s7obj.measures, function (results) {
+        cb(null, s7obj.measures)
+      })
+    },
+    function (cb) {
+      updateQueue(s7def.DB_DATA_INIT_QUEUE, s7data, s7obj.exitQueue, function (results) {
+        cb(null, s7obj.exitQueue)
+      })
+    }
+  ], function (err, results) {
+    if (err) return callback(err)
+    callback(null, results)
+  })
+}
+
 const updateStalls = (start, buffer, offset, stalls, callback) => {
   const OFFSET = offset // s7def.STALL_LEN
   var byte = 0
@@ -164,16 +205,80 @@ const updateStalls = (start, buffer, offset, stalls, callback) => {
   }
 }
 
+var updateStatistics = (stalls, statistics, stallStatus, callback) => {
+  var iterations = 0
+  for (var s = 0; s < statistics.length; s++) {
+    mapCount(stalls, statistics[s], s, stallStatus)
+    if (++iterations === statistics.length) {
+      // console.log(iterations, statistics)
+      callback(null, iterations)
+    }
+  }
+}
+
+function mapCount (stalls, data, size, stallStatus) {
+  data[0].value = data[1].value = data[2].value = 0
+  for (var s = 0; s < stalls.length; s++) {
+    if (size === 0 || stalls[s].size === size) {
+      switch (stalls[s].status) {
+        case 0 :
+          ++data[0].value
+          break
+        case stallStatus.LOCK :
+          ++data[2].value
+          break
+        default :
+          ++data[1].value
+          break
+      }
+      // ++data.total
+    }
+  }
+}
+
+function updateMap (start, buffer, s7def, stalls, statistics, callback) {
+  async.waterfall([
+    function (cb) {
+      updateStalls(start, buffer, s7def.STALL_LEN, stalls, function (err, results) {
+        if (err) return cb(err)
+        cb(null, stalls)
+      })
+    },
+    function (stalls, cb) {
+      updateStatistics(stalls, statistics, s7def.StallStatus, function (err, results) {
+        if (err) return cb(err)
+        cb(null, results)
+      })
+    }
+  ], (err, results) => {
+    if (err) return callback(err)
+    callback(null, results)
+  })
+}
+
 export {
   BytesToInt,
   BytesToLong,
   IntToBytes,
   LongToBytes,
-  updateBits,
+  // updateBits,
   updateAlarms,
   updateCards,
-  updateDevices,
-  updateMeasures,
-  updateQueue,
-  updateStalls
+  // updateDevices,
+  // updateMeasures,
+  // updateQueue,
+  updateData,
+  // updateStalls,
+  // updateStatistics
+  updateMap
 }
+
+/*
+ * Websocket utilities.
+ */
+
+export function heartbeat () {
+  this.isAlive = true
+}
+
+export function noop () {}

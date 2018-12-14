@@ -1,9 +1,10 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
-import { Alert, Badge, Button, Tabs, notification } from 'antd'
+import { Alert, Badge, Button, Tabs } from 'antd'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { SERVICE } from 'src/constants/roles'
+import withAuth from 'src/lib/withAuth'
 
 const Alarm = (props) => {
   const { a } = props
@@ -45,35 +46,22 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       alarms: props.alarms
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        const { mesg } = data
-        notification.open(mesg)
-      }
-      if (eventName === 'alarms') {
-        // console.log(e, e.data)
-        this.handleData(data)
-      }
+      Object.keys(data).forEach((key) => {
+        if (key === 'alarms') {
+          this.setState({
+            isFetching: false,
+            alarms: data[key]
+          })
+        }
+      })
     }
   }
   componentWillUnmount () {
@@ -87,8 +75,8 @@ class AppUi extends React.Component {
   }
   render () {
     const { alarms } = this.state
-    const tabEL1 = <Badge count={this.state.alarms.groups[0].count}><span style={{ padding: 12 }}>Elevator 1</span></Badge>
-    const alarmsEL1 = this.state.alarms.groups[0].active.map((a, i) => {
+    const tabEL1 = <Badge count={alarms.groups[0].count}><span style={{ padding: 12 }}>Elevator 1</span></Badge>
+    const alarmsEL1 = alarms.groups[0].active.map((a, i) => {
       return <Alarm a={a} key={i} />
     })
     const tabEL2 = <Badge count={alarms.groups[1].count}><span style={{ padding: 12 }}>Elevator 2</span></Badge>
@@ -108,8 +96,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='System Alarms'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Tabs type='card'>
           <Tabs.TabPane tab={tabEL1} key='1'>{alarmsEL1.length > 0 ? alarmsEL1 : <Ready label='Elevator 1' />}</Tabs.TabPane>
@@ -128,4 +115,4 @@ class AppUi extends React.Component {
 }
 
 // export default compose(withAuth(withRedux(initStore, null)(AppUi)))
-export default withAuth(AppUi)
+export default withAuth(AppUi, SERVICE)

@@ -1,23 +1,24 @@
 import React from 'react'
 import Error from 'next/error'
-import checkLoggedIn from '../lib/checkLoggedIn'
+import checkLoggedIn from 'src/lib/checkLoggedIn'
+
 /*
  * Higher order component that passes `getInitialProps` through
  * to the child component
  */
 
-const WithAuth = (Child) => {
+const WithAuth = (Child, pageRole) => {
   return class extends React.Component {
     static async getInitialProps (ctx) {
-      let { statusCode, message } = await checkLoggedIn(ctx)
+      // check if logged
+      const { statusCode, currentUser } = await checkLoggedIn(ctx)
       if (statusCode === 401) return { statusCode: statusCode }
-      // if (Child.getInitialProps) {
-      //   return Child.getInitialProps(ctx)
-      // }
-      // return {}
+      // check user role against page role
+      if (currentUser.role === undefined || currentUser.role > pageRole) return { statusCode: 401 }
+      ctx.store.dispatch({ type: 'UI_NAVBAR_SET_USER', user: { ...currentUser, pathname: ctx.pathname } })
       return {
         ...(Child.getInitialProps ? await Child.getInitialProps(ctx) : {}),
-        message
+        currentUser
       }
     }
     render () {
@@ -30,17 +31,3 @@ const WithAuth = (Child) => {
 }
 
 export default WithAuth
-
-// const withAuth = Child => {
-//   var WithAuth = props => <Child {...props} />
-//   WithAuth.getInitialProps = async ctx => {
-//     let { statusCode, message } = await checkLoggedIn(ctx)
-//     return {
-//       ...(Child.getInitialProps ? await Child.getInitialProps(ctx) : {}),
-//       message
-//     }
-//   }
-//   return WithAuth
-// }
-
-// export default withAuth

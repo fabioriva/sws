@@ -57,9 +57,8 @@ export class Alarm {
 }
 
 export class Button {
-  constructor (merker, action, icon, label) {
+  constructor (merker, icon, label) {
     this.merker = merker
-    this.action = action
     this.icon = icon
     this.label = label
   }
@@ -78,20 +77,16 @@ export class Card {
   }
 }
 
-export class Operation {
-  constructor (id, info) {
-    this.id = id
-    this.info = info
-  }
-}
-
 export class Device {
-  constructor (id, name, modes, card, mode, motor, operation, position, size, stall, step) {
+  constructor (id, name, modes, card = 0, mode = 0, motor = 0, operation = 0, position = 0, size = 0, stall = 0, step = 0) {
     this.id = id
     this.name = name // this.setName(id)
     this.modes = modes
     this.card = card
-    this.mode = this.setMode(mode)
+    this.mode = {
+      label: this.setMode(mode),
+      id: mode
+    }
     this.motor = motor
     this.operation = operation
     this.position = position
@@ -108,17 +103,28 @@ export class Device {
 }
 
 export class Measure {
-  constructor (id) {
+  constructor (id, destination = 0, position = 0) {
     this.name = id // this.setName(id)
+    this.destination = destination
+    this.position = position
   }
   // setName (id) {
   //   return id < strings.measures.length ? strings.measures[id] : '---'
   // }
 }
 
+export class Operation {
+  constructor (id, info) {
+    this.id = id
+    this.info = info
+  }
+}
+
 export class Queue {
-  constructor (id) {
+  constructor (id, card = 0, stall = 0) {
     this.id = id + 1
+    this.card = card
+    this.stall = stall
   }
 }
 

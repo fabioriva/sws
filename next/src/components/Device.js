@@ -1,45 +1,24 @@
 import React, { Component } from 'react'
-import { Row, Col, Badge, Button, Card, Icon, Popconfirm, Radio, Tag, Tooltip } from 'antd'
+import { Button, Card, Icon, Tag, Tooltip } from 'antd'
 // import Blink from './Blink'
 // import Carousel from 'nuka-carousel'
 import classnames from 'classnames'
-
-// import '../styles/Elevator.css'
-
-// const divStyle = {
-//   // background: '#FFEE00',
-//   border: '1px solid #e9e9e9',
-//   textAlign: 'center',
-//   minHeight: 38
-// }
-
-// const divRadioStyle = {
-//   border: '1px solid #e9e9e9',
-//   padding: 6
-// }
+import intl from 'react-intl-universal'
 
 class Device extends Component {
-  // onChange = (e) => {
-  //   onChangeRadio(e.target.value)
-  //   // this.setState({
-  //   //   value: e.target.value,
-  //   // })
-  // }
   render () {
     const { device } = this.props
-    const { id, name, card, mode, operation, size, stall } = device.a
+    const { id, name, card, mode, operation, size, stall, step } = device.a
+    const stepTag = mode.id === 8 && <Tag color='geekblue'>{step}</Tag>
     const autTag =
-      <Tooltip title='Automatic'>
-        <Tag color='#108ee9' style={{ width: 32, textAlign: 'center', color: '#fff' }}>A</Tag>
+      <Tooltip title={intl.get('AUT')}>
+        <Tag color='#108ee9' style={{ color: '#fff' }}>A</Tag>
       </Tooltip>
     const manTag =
-      <Tooltip title={mode}>
-        <Tag color='#ffff00' style={{ width: 32, textAlign: 'center', color: '#000' }}>M</Tag>
+      <Tooltip title={mode.label}>
+        <Tag color='#ffff00' style={{ color: '#000' }}>M</Tag>
       </Tooltip>
-    const modeTag =
-      <span>
-        { mode !== 'Automatic' ? manTag : autTag }
-      </span>
+    const modeTag = mode.id !== 8 ? manTag : autTag
     // const entryIcon =
     //   <Tooltip title='Car In'>
     //     <Icon type='swap-right' style={{ color: '#000000', marginLeft: 6 }} />
@@ -55,6 +34,7 @@ class Device extends Component {
     const title = <span>{name}</span>
     const extra =
       <div>
+        { stepTag }
         { modeTag }
         {/* { operation === 1 ? entryIcon : operation === 2 ? exitIcon : operation === 3 ? shuffleIcon : null } */}
         <Tooltip title={device.c[2].status ? 'Alarm Lamp' : 'Alarm Lamp'}>
@@ -93,33 +73,18 @@ class Device extends Component {
       </div>
     const buttons = []
     device.d.forEach((b, i) => {
-      const { merker, action, icon } = b
-      if (action === 'popconfirm') {
-        buttons.push(
-          <Popconfirm title='Are you sure delete this task?' onConfirm={() => this.props.action(id)} okText='Yes' cancelText='No'>
-            <Button
-              type='primary'
-              disabled={!merker.status}
-              icon={icon !== undefined && icon}
-              key={i}
-            >
-              {b.label}
-            </Button>
-          </Popconfirm>
-        )
-      } else {
-        buttons.push(
-          <Button
-            type='primary'
-            disabled={!merker.status}
-            icon={icon !== undefined && icon}
-            key={i}
-            onClick={() => this.props.action(id)}
-          >
-            {b.label}
-          </Button>
-        )
-      }
+      const { merker, icon } = b
+      buttons.push(
+        <Button
+          type='primary'
+          disabled={!merker.status}
+          icon={icon !== undefined && icon}
+          key={i}
+          onClick={() => this.props.action !== undefined && this.props.action(id)}
+        >
+          {b.label}
+        </Button>
+      )
     })
     const pos = []
     device.b.forEach((b, i) => {
@@ -143,6 +108,7 @@ class Device extends Component {
       )
     })
     return (
+      // this.state.initDone &&
       <div>
         <Card
           title={title}
@@ -158,27 +124,12 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
-              Card
+              {intl.get('MODE')}
             </span>
             <p className='device-value'>
-              {card}
+              {mode.label}
             </p>
           </Card.Grid>
-          {/* <Card.Grid
-            className={classnames({
-              'device-info': true,
-              'device-info-1': operation === 1,
-              'device-info-2': operation === 2,
-              'device-info-3': operation === 3
-            })}
-          >
-            <span className='device-title'>
-              Size
-            </span>
-            <p className='device-value'>
-              {size}
-            </p>
-          </Card.Grid> */}
           <Card.Grid
             className={classnames({
               'device-info': true,
@@ -188,7 +139,37 @@ class Device extends Component {
             })}
           >
             <span className='device-title'>
-              Destination
+              {intl.get('CARD')}
+            </span>
+            <p className='device-value'>
+              {card}
+            </p>
+          </Card.Grid>
+          <Card.Grid
+            className={classnames({
+              'device-info': true,
+              'device-info-1': operation === 1,
+              'device-info-2': operation === 2,
+              'device-info-3': operation === 3
+            })}
+          >
+            <span className='device-title'>
+              {intl.get('SIZE')}
+            </span>
+            <p className='device-value'>
+              {size}
+            </p>
+          </Card.Grid>
+          <Card.Grid
+            className={classnames({
+              'device-info': true,
+              'device-info-1': operation === 1,
+              'device-info-2': operation === 2,
+              'device-info-3': operation === 3
+            })}
+          >
+            <span className='device-title'>
+              {intl.get('STALL')}
             </span>
             <p className='device-value'>
               {stall}

@@ -10,7 +10,9 @@ const { Sider } = Layout
 class Sidebar extends Component {
   render () {
     const { activeItem, collapsed, collapsedWidth } = this.props.sidebar
+    const { user } = this.props.navbar
     const menu = this.props.sidebarMenu.map((item, key) =>
+      user.role <= item.role &&
       <Menu.Item key={(key + 1)}>
         <Link href={item.href}>
           <a>
@@ -66,7 +68,7 @@ class Sidebar extends Component {
   }
 }
 
-const mapStateToProps = ({ sidebar }) => ({ sidebar })
+const mapStateToProps = ({ navbar, sidebar }) => ({ navbar, sidebar })
 
 const mapDispatchToProps = (dispatch) => {
   return {

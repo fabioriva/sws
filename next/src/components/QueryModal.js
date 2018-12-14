@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 // import { connect } from 'react-redux'
 import { Modal, Form, Button, DatePicker, Radio } from 'antd'
 // import moment from 'moment'
+import intl from 'react-intl-universal'
 
 const FormItem = Form.Item
 const RadioGroup = Radio.Group
@@ -16,6 +17,9 @@ class HistoryQueryForm extends Component {
   componentDidMount () {
     // To disabled submit button at the beginning.
     this.props.form.validateFields()
+  }
+  onChange = (date, dateString) => {
+    console.log(date, dateString)
   }
   render () {
     const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
@@ -45,7 +49,7 @@ class HistoryQueryForm extends Component {
     return (
       <Modal
         style={{ minWidth: 640 }}
-        title='Query Filter'
+        title={intl.get('QUERY_FILTERS')}
         visible={visible}
         footer={[
           <Button
@@ -58,31 +62,32 @@ class HistoryQueryForm extends Component {
             disabled={hasErrors(getFieldsError())}
             onClick={() => this.props.onConfirm(range.value[0], range.value[1], filter.value)}
           >
-            Confirm request
+            {intl.get('CONFIRM')}
           </Button>
         ]}
       >
         <Form layout='vertical'>
           <FormItem
             {...formItemLayout}
-            label='From Date - To Date'
+            label={intl.get('FROM_TO')}
           >
             {getFieldDecorator('range', rangeConfig)(
               <RangePicker
                 showTime={{ format: 'HH:mm' }}
                 format='YYYY-MM-DD HH:mm'
-                placeholder={['Start Time', 'End Time']}
+                placeholder={[intl.get('START'), intl.get('END')]}
+                onChange={this.onChange}
               />
             )}
           </FormItem>
           <FormItem
             {...formItemLayout}
-            label='Filters'
+            label={intl.get('FILTERS')}
           >
             {getFieldDecorator('filter')(
               <RadioGroup>
-                <Radio value='a'>All</Radio>
-                <Radio value='b'>Alarms</Radio>
+                <Radio value='a'>{intl.get('ALL')}</Radio>
+                <Radio value='b'>{intl.get('ALARMS')}</Radio>
               </RadioGroup>
             )}
           </FormItem>

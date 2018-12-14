@@ -14,14 +14,48 @@ import {
   Stall
 } from '../models'
 
-var alarms = []
+var alarms1 = []
 for (let a = 0; a < 64; a++) {
-  alarms.push(new Alarm(a + 1, 1, 0))
+  alarms1.push(new Alarm(a + 1, 1, 0))
 }
-alarms.forEach((a, i) => {
+alarms1.forEach((a, i) => {
   a.label = strings.alarms1[i].label
   a._info = strings.alarms1[i].info
 })
+
+var alarms2 = []
+for (let a = 0; a < 64; a++) {
+  alarms2.push(new Alarm(a + 1, 2, 0))
+}
+alarms2.forEach((a, i) => {
+  a.label = strings.alarms2[i].label
+  a._info = strings.alarms2[i].info
+})
+
+var alarms3 = []
+for (let a = 0; a < 64; a++) {
+  alarms3.push(new Alarm(a + 1, 3, 0))
+}
+alarms3.forEach((a, i) => {
+  a.label = strings.alarms3[i].label
+  a._info = strings.alarms3[i].info
+})
+
+var alarms4 = []
+for (let a = 0; a < 64; a++) {
+  alarms4.push(new Alarm(a + 1, 4, 0))
+}
+alarms4.forEach((a, i) => {
+  a.label = strings.alarms4[i].label
+  a._info = strings.alarms4[i].info
+})
+
+var alarms = [
+  alarms1,
+  alarms2,
+  alarms3,
+  alarms4
+]
 
 var diag = {
   count: 0,
@@ -219,7 +253,7 @@ for (let c = 0; c < s7def.CARDS; c++) {
 
 var devices = []
 for (let d = 0; d < s7def.DEVICES; d++) {
-  devices.push(new Device((d + 1), strings.devices[d], strings.modes))
+  devices.push(new Device(d + 1, strings.devices[d], strings.modes))
 }
 
 var measures = []
@@ -229,7 +263,7 @@ for (let d = 0; d < s7def.MEASURES; d++) {
 
 var operations = []
 for (let o = 0; o < s7def.OPERATIONS; o++) {
-  operations.push(new Operation(0, strings.operations[o]))
+  operations.push(new Operation(o, strings.operations[o]))
 }
 
 var exitQueue = []
@@ -237,13 +271,13 @@ for (let q = 0; q < s7def.QUEUE; q++) {
   exitQueue.push(new Queue(q))
 }
 
-var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'modal', 'logout', 'Exit')
-var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'modal', 'login', 'Entry')
-var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'modal', 'rollback', 'Rollback')
-var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'modal', 'login', 'Entry')
-var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'modal', 'rollback', 'Rollback')
-var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'popconfirm', 'rollback', 'Rollback')
-var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'modal', 'rollback', 'Rollback')
+var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'logout', 'Exit')
+var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entry')
+var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollback')
+var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entry')
+var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
+var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'rollback', 'Rollback')
+var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'rollback', 'Rollback')
 
 var EL1 = {
   a: devices[0],
@@ -308,8 +342,6 @@ var overview = {
   }
 }
 
-// console.log(overview.devices[0])
-
 var TYPE_0 = [
   {
     name: 'Free',
@@ -361,6 +393,12 @@ for (let s = 0; s < s7def.STALLS; s++) {
 }
 
 var map = {
+  limits: {
+    minCard: 1,
+    maxCard: s7def.CARDS,
+    minStall: 1,
+    maxStall: s7def.STALLS
+  },
   statistics: [
     TYPE_0,
     TYPE_1,
@@ -647,7 +685,7 @@ const rack2 = {
     },
     {
       nr: '2',
-      type: '6ES7 521-1BH01-0AB0',
+      type: '6ES7 521-1BL00-0AB0',
       bytes: [
         {
           label: 'EB104',
@@ -773,7 +811,7 @@ const rack4 = {
     },
     {
       nr: '2',
-      type: '6ES7 521-1BH01-0AB0',
+      type: '6ES7 521-1BL00-0AB0',
       bytes: [
         {
           label: 'EB204',

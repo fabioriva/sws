@@ -1,141 +1,155 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
 import cookie from 'cookie'
-// import moment from 'moment'
 import redirect from 'src/lib/redirect'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { sidebarToggle } from 'src/store'
-import { Layout, Badge, Icon, Tag, Tooltip, notification } from 'antd'
+import { navbarSetDiag, sidebarToggle } from 'src/store'
+import { Alert, Layout, Badge, Icon, Tag, Tooltip } from 'antd'
+import openNotification from 'src/lib/openNotification'
+// i18n
+import intl from 'react-intl-universal'
+import en_US from 'src/locales/en-US.json'
+import it_IT from 'src/locales/it-IT.json'
+
+const locales = {
+  'en-US': en_US, // require('src/locales/en-US.json'),
+  'it-IT': it_IT  // require('src/locales/it-IT.json')
+}
+
 const { Header } = Layout
 
+const Comm = (props) => {
+  return (
+    <Header
+      className='app-comm'
+    >
+      <div className='bar-comm' />
+      <style jsx global>{`
+        .app-comm {
+          background: #fff!important;
+          height: 3px;
+        }
+        .bar-comm {
+          background: #87d068;
+          height: 3px;
+          width: ${props.percent}%;
+        }
+      `}</style>
+    </Header>
+  )
+}
 
-// const openNotification = (mesg) => {
-//   var message = `${mesg.device}`
-//   var description = `${moment(mesg.date).format('YYYY-MM-DD HH:mm:ss')} `
-//   switch (mesg.operationId) {
-//     case 1:
-//     case 2:
-//       description += `${mesg.operation} Id ${mesg.alarm}`
-//       break
-//     case 3:
-//       description += `${mesg.operation} >> ${mesg.mode}`
-//       break
-//     case 4:
-//       description += `${mesg.operation} >> ${mesg.card}`
-//       break
-//     case 5:
-//     case 6:
-//     case 7:
-//     case 8:
-//       description += `${mesg.operation} stall ${mesg.stall} card ${mesg.card}`
-//       break
-//     default:
-//       description.substring(-1)
-//       break
-//   }
-//   notification.open({
-//     message: message,
-//     description: description,
-//   })
-// }
+const Diagnostic = (props) => {
+  const message = `Diagnostic is active for alarm id ${props.message}`
+  return (
+    <Alert style={{ margin: '6px 12px 0 12px' }} message={message} type='error' closeText='Close Diagnostic' onClose={props.onClose} showIcon />
+  )
+}
 
 class Navbar extends Component {
-  // constructor (props) {
-  //   super(props)
-  //   this.state = {
-  //     comm: { isOnline: false },
-  //     diag: { alarmCount: 0 },
-  //     mesg: { log: '' }
-  //   }
-  // }
+  constructor (props) {
+    super(props)
+    this.state = {
+      comm: {
+        isOnline: false
+      },
+      diag: {
+        alarmCount: 0
+      },
+      initDone: false,
+      navbarComm: 0
+    }
+    const currentLocale = this.props.navbar.user.locale
+    intl.init({
+      currentLocale,
+      locales
+    })
+    .then(() => {
+       this.setState({ initDone: true }) // After loading CLDR locale data, start to render
+    })
+  }
   componentDidMount () {
-    // ws
-    // this.ws = new WebSocket('wss://www.sotefinservice.com/ws/demo')
-    // this.ws.onerror = e => console.log(e)
-    // this.ws.onmessage = e => {
-    //   const data = JSON.parse(e.data)
-    //   const eventName = Object.keys(data)[0]
-    //   // if (eventName === 'comm') {
-    //   //   this.handleComm(data)
-    //   // }
-    //   if (eventName === 'diag') {
-    //     this.handleDiag(data)
-    //   }
-    //   if (eventName === 'mesg') {
-    //     this.handleMesg(data)
-    //   }
-    // }
+    this.ws = new WebSocket(this.props.socket)
+    this.ws.onerror = e => console.log(e)
+    this.ws.onmessage = e => {
+      const data = JSON.parse(e.data)
+      Object.keys(data).forEach((key) => {
+        if (key === 'comm') this.setState({ comm: data[key] })
+        if (key === 'diag') this.setState({ diag: data[key] })
+        if (key === 'mesg') openNotification(data[key])
+        if (key === 'comm') {
+          this.setState((state) => {
+            return {
+              navbarComm: state.comm.isOnline && state.navbarComm < 100 ? state.navbarComm + 10 : 0
+            }
+          })
+        }
+      })
+    }
   }
   componentWillUnmount () {
-    // ws
-    // this.ws.close()
+    this.ws.close()
   }
-  // handleComm = (data) => {
-  //   const { comm } = data
-  //   this.setState({
-  //     comm: comm
-  //   })
-  // }
-  // handleDiag = (data) => {
-  //   const { diag } = data
-  //   this.setState({
-  //     diag: diag
-  //   })
-  // }
-  // handleMesg = (message) => {
-  //   console.log('mesg', message)
-  //   const { mesg } = message    
-  //   openNotification(mesg)
-  // }
+  handleClose = () => {
+    this.props.navbarSetDiag(false)
+    if (process.browser) {
+      document.cookie = cookie.serialize('diagnostic', '', { maxAge: -1 }) // 0 = Delete cookie / -1 = Expire the cookie immediately
+      window.location.href = this.props.navbar.user.pathname // reload page in the browser
+    }
+  }
   signout = () => {
-    document.cookie = cookie.serialize('token', '', {
-      maxAge: 0 // 0= Delete cookie / -1= Expire the cookie immediately
-    })
-    // document.cookie = cookie.serialize('user', '', {
-    //   maxAge: 0 // 0= Delete cookie / -1= Expire the cookie immediately
-    // })
-    // document.cookie = cookie.serialize('userContext', '', {
-    //   maxAge: 0 // 0= Delete cookie / -1= Expire the cookie immediately
-    // })
-    redirect({}, '/')
+    redirect({}, '/') // token cookie expires in /
   }
   render () {
-    const comm = this.props.comm  // this.state.comm
+    const comm = this.state.comm
     const commStatus = comm.isOnline ? <Tag color='#87d068'>ONLINE</Tag> : <Tag color='#f50'>OFFLINE</Tag>
-    const commInfo = comm.isOnline ? <span>PLC {comm.ip} ONLINE</span> : <span>PLC OFFLINE</span>
-    const diag = this.props.diag  // this.state.diag
+    const diag = this.state.diag
     const { user } = this.props.navbar
     const { collapsed } = this.props.sidebar
     return (
-      <Header className='app-navbar'>
-        <Icon
-          className='app-navbar-trigger'
-          type={collapsed ? 'menu-unfold' : 'menu-fold'}
-          onClick={() => this.props.sidebarToggle(!collapsed)}
+      <div>
+        <Header className='app-navbar'>
+          <Icon
+            className='app-navbar-trigger'
+            type={collapsed ? 'menu-unfold' : 'menu-fold'}
+            onClick={() => this.props.sidebarToggle(!collapsed)}
+          />
+          <div className='app-navbar-right'>
+            { this.props.navbar.diag &&
+            <span className='app-navbar-element'>
+              <Tooltip title='Diagnostic is active'>
+                <Icon className='app-navbar-icon' type='thunderbolt' />
+              </Tooltip>
+            </span>
+            }
+            <span className='app-navbar-element'>
+              <Badge count={diag.alarmCount}>
+                <Link href={`/${user.aps}/alarms`}>
+                  <Icon className='app-navbar-icon' type='bell' />
+                </Link>
+              </Badge>
+            </span>
+            <span className='app-navbar-element'>
+              <Tooltip title={`Sign out ${user.username}`}>
+                <Icon className='app-navbar-icon' type='user' onClick={this.signout} />
+              </Tooltip>
+            </span>
+            <span className='app-navbar-comm'>
+              { commStatus }
+            </span>
+          </div>
+        </Header>
+        <Comm
+          percent={this.state.navbarComm}
         />
-        <div className='app-navbar-right'>
-          <span className='app-navbar-element'>
-            <Badge count={diag.alarmCount}>
-              <Link href='/muse/alarms'>
-                <Icon className='app-navbar-icon' type='bell' />
-              </Link>
-            </Badge>
-          </span>
-          <span className='app-navbar-element'>
-            <Tooltip title={'Sign out'}>
-              <Icon className='app-navbar-icon' type='user' onClick={this.signout} />
-            </Tooltip>
-          </span>
-          <span className='app-navbar-comm'>
-            { commStatus }
-          </span>
-        </div>
+        {
+          this.props.navbar.diag && <Diagnostic message={this.props.navbar.diag} onClose={this.handleClose} />
+        }
         <style jsx global>{`
           .ant-layout-header {
             padding: 0 12px 0 0!important;
-            background: #fff!important;
-            // box-shadow: 0 2px 4px #fcfbfb!important;
+            background: '#ffffff' // ${ this.props.navbar.diag ? '#fff1f0' : '#ffffff' }!important;
             position: relative!important;
           }
           .app-navbar {
@@ -170,7 +184,7 @@ class Navbar extends Component {
             transition: color .3s;
           }
         `}</style>
-      </Header>
+      </div>
     )
   }
 }
@@ -179,6 +193,7 @@ const mapStateToProps = ({ navbar, sidebar }) => ({ navbar, sidebar })
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch),
     sidebarToggle: bindActionCreators(sidebarToggle, dispatch)
   }
 }

@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 /*
  * Fuck yeah, blink tag!
@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 class Blink extends Component {
   constructor (props) {
     super(props)
-    this.state = {visible: true}
+    this.state = { visible: true }
   }
   blink () {
     if (!this._ismounted) return

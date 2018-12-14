@@ -1,8 +1,14 @@
 import React from 'react'
 import Head from 'next/head'
-import LoginForm from 'src/components/SigninForm'
+import LoginForm from 'src/components/LoginForm'
+import cookie from 'cookie'
 
 export default class PageLogin extends React.Component {
+  componentDidMount () {
+    if (process.browser) {
+      document.cookie = cookie.serialize('token', '', { maxAge: -1 })
+    }
+  }
   render () {
     return (
       <div>

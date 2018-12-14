@@ -1,11 +1,12 @@
 import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
-import { Table, notification } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { Table } from 'antd'
+import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
+import { SERVICE } from 'src/constants/roles'
+import withAuth from 'src/lib/withAuth'
 
 const columns = [
   {
@@ -42,12 +43,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       cards: props.cards,
       editModal: {
         card: {
@@ -67,25 +62,18 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        const { mesg } = data
-        notification.open(mesg)
-      }
-      if (eventName === 'cards') {
-        // console.log(e, e.data)
-        this.handleData(data)
-      }
+      Object.keys(data).forEach((key) => {
+        if (key === 'cards') {
+          this.setState({
+            isFetching: false,
+            cards: data[key]
+          })
+        }
+      })
     }
   }
   componentWillUnmount () {
@@ -191,8 +179,7 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Users'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <span />
         <Table
@@ -210,6 +197,7 @@ class AppUi extends React.Component {
           }
         />
         <Edit
+          cards={CARDS}
           data={editModal}
           onCancel={this.handleCancel}
           onChange={this.handleChange}
@@ -229,4 +217,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuth(AppUi, SERVICE)

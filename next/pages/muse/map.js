@@ -1,51 +1,40 @@
 import React from 'react'
-// import fetch from 'isomorphic-unfetch'
-import withAuth from 'src/lib/withAuth'
 import Layout from 'src/components/Layout'
-import Map from 'src/components/MapList'
+// import MapList from 'src/components/MapList'
 import Level from 'src/components/MapLevel'
 import Edit from 'src/components/MapEdit'
 import Occupancy from 'src/components/MapOccupancy'
-import { Row, Col, Radio, notification } from 'antd'
+import { Row, Col, Radio } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
-// import checkRole from 'src/lib/checkRole'
-
-const setStallLabel = (map, filter) => {
-  switch (filter) {
-    case 'SHOW_NUMBERS':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.nr })
-        return l
-      })
-      return map
-    case 'SHOW_CARDS':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.status })
-        return l
-      })
-      return map
-    case 'SHOW_SIZES':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.size })
-        return l
-      })
-      return map
-    default:
-      return map
-  }
-}
+import { CARDS, STALLS, STALL_STATUS } from 'src/constants/muse'
+import { SERVICE, VALET } from 'src/constants/roles'
+import parseCookies from 'src/lib/parseCookies'
+import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '2'})
+  static async getInitialProps (ctx) {
+    ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '2'})
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/muse/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        map: json.map,
+        occupancy: json.map.statistics[0]
+      }
+    }
+    // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/muse/map`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     const map = json  // JSON.parse(json)
     return {
       statusCode,
-      map: setStallLabel(map, 'SHOW_NUMBERS'),
+      map: map,
       occupancy: map.statistics[0]
     }
   }
@@ -53,12 +42,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       map: props.map,
       occupancy: this.props.occupancy,
       visibilityFilter: 'SHOW_NUMBERS',
@@ -68,50 +51,37 @@ class AppUi extends React.Component {
         visible: false
       }
     }
-    this.handleMap = this.handleMap.bind(this)
   }
   componentDidMount () {
-    this.ws = new WebSocket(`${WEBSOCK_URL}/ws/muse`)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
-      const eventName = Object.keys(data)[0]
-      if (eventName === 'comm') {
-        this.setState({ comm: data.comm })
-      }
-      if (eventName === 'diag') {
-        this.setState({ diag: data.diag })
-      }
-      if (eventName === 'mesg') {
-        const { mesg } = data
-        notification.open(mesg)
-      }
-      if (eventName === 'map') {
-        // console.log(e, e.data)
-        this.handleMap(data)
-      }
+      Object.keys(data).forEach((key) => {
+        if (key === 'map') {
+          const { map } = data
+          this.setState({
+            isFetching: false,
+            map: map,
+            occupancy: map.statistics[0]
+          })
+        }
+      })
     }
   }
   componentWillUnmount () {
     this.ws.close()
   }
-  handleMap (data) {
-    const { map } = data
-    console.log(map, this.state.visibilityFilter)
-    this.setState({
-      isFetching: false,
-      map: setStallLabel(map, this.state.visibilityFilter)
-    })
-  }
   // Map Modal
   showModal = (stall, card) => {
   
-    if (this.props.message.roles.find(e => e === 'service' || e === 'admin')) {
+    // if (this.props.message.roles.find(e => e === 'service' || e === 'admin')) {
+    if (this.props.currentUser.role <= SERVICE) {
 
     this.setState({
       editModal: {
         stall: stall,
-        value: card,
+        value: card >= 1 && card <= CARDS ? card : 1,
         visible: true
       }
     })
@@ -155,13 +125,11 @@ class AppUi extends React.Component {
         }
       })
     )
-    // ipcRenderer.send('write-stall', { stall: stall, card: card })
   }
   onRadioChange = (e) => {
     console.log('onRadioChange', e.target.value)
     this.setState({
-      visibilityFilter: e.target.value,
-      map: setStallLabel(this.state.map, e.target.value)
+      visibilityFilter: e.target.value
     })
   }
   render () {
@@ -172,6 +140,7 @@ class AppUi extends React.Component {
         <Level
           level={l}
           key={i}
+          stallStatus={STALL_STATUS}
           visibilityFilter={visibilityFilter}
           openModal={this.showModal}
         />
@@ -182,11 +151,10 @@ class AppUi extends React.Component {
         aps={APS}
         pageTitle='Map'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Mobile>
-          <div id='#top'>
+          {/* <div id='#top'>
             <a href='#level-1'>[G1]</a>
             <a href='#level-5'>[G5]</a>
             <a href='#level-10'>[G10]</a>
@@ -194,7 +162,17 @@ class AppUi extends React.Component {
             <a href='#level-20'>[G20]</a>
             <a href='#level-25'>[G25]</a>
           </div>
-          <Map map={map} />
+          <MapList 
+            map={map}
+            openModal={this.showModal}
+          />
+          <Edit
+            data={editModal}
+            onCancel={this.handleMapCancel}
+            onChange={this.handleMapChange}
+            onConfirm={this.handleMapOk}
+          /> */}
+          <Occupancy data={occupancy} />
         </Mobile>
         <Default>
           <Row>
@@ -254,6 +232,9 @@ class AppUi extends React.Component {
                 </Radio.Group>
                 </Row>
                 <Edit
+                  cards={CARDS}
+                  stalls={STALLS}
+                  stallStatus={STALL_STATUS}
                   data={editModal}
                   onCancel={this.handleMapCancel}
                   onChange={this.handleMapChange}
@@ -574,4 +555,4 @@ class AppUi extends React.Component {
 }
 
 // export default compose(withAuth(withRedux(initStore, null)(AppUi)))
-export default withAuth(AppUi)
+export default withAuth(AppUi, VALET)

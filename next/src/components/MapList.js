@@ -1,10 +1,14 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import classnames from 'classnames'
 import { Avatar, Icon, List } from 'antd'
 
 const IconText = (props) => (
   <span>
-    <Icon type={props.type} style={{ marginRight: 8 }} />
+    <Icon
+      type={props.type}
+      style={{ marginRight: 8 }}
+      onClick={props.action}
+    />
     {props.text}
   </span>
 )
@@ -16,31 +20,37 @@ class Level extends Component {
   }
   handleClick (stall, card) {
     console.log(stall, card)
-    // this.props.openModal(stall, card)
+    this.props.openModal(stall, card)
   }
   renderList (item) {
     // console.log(item)
     const title = <span>Stall {item.nr}</span>
-    const description = item.card === 0 ? (
+    const description = item.status === 0 ? (
       <span>Stall is vacant</span>
-    ) : item.card === 999 ? <span>This stall is locked since {item.date}</span> : <span>This stall is busy since {item.date}</span>
+    ) : item.status === 999 ? <span>This stall is locked since {item.date}</span> : <span>This stall is busy since {item.date}</span>
     return (
       <List.Item
-        actions={[<IconText type='edit' text='Edit' />]}
+        actions={[
+          <IconText
+            type='edit'
+            text='Edit'
+            action={() => this.handleClick(item.nr, item.status)}
+          />
+        ]}
       >
         <List.Item.Meta
           avatar={
             <Avatar
               style={{ fontWeight: 'bold' }}
               className={classnames({
-                's-busy': item.card !== 0,
-                's-free': item.card === 0,
-                's-lock': item.card === 999,
-                's-papa': item.card === 997,
-                's-rsvd': item.card === 998
+                's-busy': item.status !== 0,
+                's-free': item.status === 0,
+                's-lock': item.status === 999,
+                's-papa': item.status === 997,
+                's-rsvd': item.status === 998
               })}
             >
-              {item.card === 999 ? <span>LCK</span> : item.card}
+              {item.status === 999 ? <span>LCK</span> : item.status}
             </Avatar>
           }
           title={title}
