@@ -40,7 +40,7 @@ export default class Stall extends Component {
           })}
           id={'s-' + stall.nr}
         >
-          <span className='st' onClick={() => this.handleClick(stall.nr, stall.status)}>{stall.label}{label}</span>
+          <span className='st' onClick={() => this.handleClick(stall.nr, stall.status)}>{label}</span>
         </div>
       </Tooltip>
     )
