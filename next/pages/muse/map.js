@@ -12,31 +12,6 @@ import { SERVICE, VALET } from 'src/constants/roles'
 import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
 
-const setStallLabel = (map, filter) => {
-  switch (filter) {
-    case 'SHOW_NUMBERS':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.nr })
-        return l
-      })
-      return map
-    case 'SHOW_CARDS':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.status })
-        return l
-      })
-      return map
-    case 'SHOW_SIZES':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.size })
-        return l
-      })
-      return map
-    default:
-      return map
-  }
-}
-
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
     ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '2'})
@@ -48,7 +23,7 @@ class AppUi extends React.Component {
       const json = await res.json()
       return {
         diagnostic: diagnostic,
-        map: setStallLabel(json.map, 'SHOW_NUMBERS'),
+        map: json.map,
         occupancy: json.map.statistics[0]
       }
     }
@@ -59,7 +34,7 @@ class AppUi extends React.Component {
     const map = json  // JSON.parse(json)
     return {
       statusCode,
-      map: setStallLabel(map, 'SHOW_NUMBERS'),
+      map: map,
       occupancy: map.statistics[0]
     }
   }
@@ -76,7 +51,6 @@ class AppUi extends React.Component {
         visible: false
       }
     }
-    this.handleMap = this.handleMap.bind(this)
   }
   componentDidMount () {
     this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
@@ -88,7 +62,7 @@ class AppUi extends React.Component {
           const { map } = data
           this.setState({
             isFetching: false,
-            map: setStallLabel(map, this.state.visibilityFilter),
+            map: map,
             occupancy: map.statistics[0]
           })
         }
@@ -97,14 +71,6 @@ class AppUi extends React.Component {
   }
   componentWillUnmount () {
     this.ws.close()
-  }
-  handleMap (data) {
-    const { map } = data
-    this.setState({
-      isFetching: false,
-      map: setStallLabel(map, this.state.visibilityFilter),
-      occupancy: map.statistics[0]
-    })
   }
   // Map Modal
   showModal = (stall, card) => {
@@ -163,8 +129,7 @@ class AppUi extends React.Component {
   onRadioChange = (e) => {
     console.log('onRadioChange', e.target.value)
     this.setState({
-      visibilityFilter: e.target.value,
-      map: setStallLabel(this.state.map, e.target.value)
+      visibilityFilter: e.target.value
     })
   }
   render () {
@@ -175,6 +140,7 @@ class AppUi extends React.Component {
         <Level
           level={l}
           key={i}
+          stallStatus={STALL_STATUS}
           visibilityFilter={visibilityFilter}
           openModal={this.showModal}
         />

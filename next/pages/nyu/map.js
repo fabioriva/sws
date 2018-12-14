@@ -12,30 +12,30 @@ import { SERVICE, VALET } from 'src/constants/roles'
 import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
 
-const setStallLabel = (map, filter) => {
-  switch (filter) {
-    case 'SHOW_NUMBERS':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.nr })
-        return l
-      })
-      return map
-    case 'SHOW_CARDS':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.status })
-        return l
-      })
-      return map
-    case 'SHOW_SIZES':
-      map.levels.forEach(l => {
-        l.stalls.forEach(s => { s.label = s.size })
-        return l
-      })
-      return map
-    default:
-      return map
-  }
-}
+// const setStallLabel = (map, filter) => {
+//   switch (filter) {
+//     case 'SHOW_NUMBERS':
+//       map.levels.forEach(l => {
+//         l.stalls.forEach(s => { s.label = s.nr })
+//         return l
+//       })
+//       return map
+//     case 'SHOW_CARDS':
+//       map.levels.forEach(l => {
+//         l.stalls.forEach(s => { s.label = s.status })
+//         return l
+//       })
+//       return map
+//     case 'SHOW_SIZES':
+//       map.levels.forEach(l => {
+//         l.stalls.forEach(s => { s.label = s.size })
+//         return l
+//       })
+//       return map
+//     default:
+//       return map
+//   }
+// }
 
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
@@ -48,7 +48,7 @@ class AppUi extends React.Component {
       const json = await res.json()
       return {
         diagnostic: diagnostic,
-        map: setStallLabel(json.map, 'SHOW_NUMBERS'),
+        map: json.map, // setStallLabel(json.map, 'SHOW_NUMBERS'),
         occupancy: json.map.statistics[0]
       }
     }
@@ -59,7 +59,7 @@ class AppUi extends React.Component {
     const map = json  // JSON.parse(json)
     return {
       statusCode,
-      map: setStallLabel(map, 'SHOW_NUMBERS'),
+      map: map, // setStallLabel(map, 'SHOW_NUMBERS'),
       occupancy: map.statistics[0]
     }
   }
@@ -91,7 +91,7 @@ class AppUi extends React.Component {
           const { map } = data
           this.setState({
             isFetching: false,
-            map: setStallLabel(map, this.state.visibilityFilter),
+            map: map, // setStallLabel(map, this.state.visibilityFilter),
             occupancy: map.statistics[0]
           })
         }
@@ -157,7 +157,7 @@ class AppUi extends React.Component {
     console.log('onRadioChange', e.target.value)
     this.setState({
       visibilityFilter: e.target.value,
-      map: setStallLabel(this.state.map, e.target.value)
+      // map: setStallLabel(this.state.map, e.target.value)
     })
   }
   render () {
@@ -168,6 +168,7 @@ class AppUi extends React.Component {
         <Level
           level={l}
           key={i}
+          stallStatus={STALL_STATUS}
           visibilityFilter={visibilityFilter}
           openModal={this.showModal}
         />

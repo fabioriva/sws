@@ -8,6 +8,10 @@ export const APS_ID = 68
 export const APS_TITLE = 'NYU&nbsp;&middot;&nbsp;Langone Medical Center&nbsp;&middot;&nbsp;New York'
 export const CARDS = 119
 export const STALLS = 121
+export const STALL_SIZES = {
+  TYPE_01: 1,
+  TYPE_02: 2
+}
 export const STALL_STATUS = {
   FREE: 0,
   PAPA: 997, // 65533

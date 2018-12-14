@@ -19,6 +19,7 @@ export default class Level extends Component {
           stall={stall}
           key={i}
           side={this.props.side}
+          stallStatus={this.props.stallStatus}
           visibilityFilter={this.props.visibilityFilter}
           openModal={this.props.openModal}
         />
