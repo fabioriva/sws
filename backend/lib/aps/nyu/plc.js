@@ -73,30 +73,6 @@ async.retry({
       }
       next()
     })
-    // setTimeout(function () {
-    //   s7Emitter.emit('ch2', JSON.stringify({ comm: s7def.PLC }))
-    //   if (s7def.PLC.isOnline) {
-    //     s7Emitter.emit('ch2', JSON.stringify({
-    //       diag: {
-    //         alarmCount: s7obj.diag.count,
-    //         isActive: s7obj.diag.count > 0
-    //       }
-    //     }))
-    //     s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
-    //       if (err) return commError(err, s7def.PLC, s7client)
-    //       utils.updateData(s7data, s7def, s7obj, function (err, res) {
-    //         if (err) throw err
-    //         s7Emitter.emit('ch1', JSON.stringify({
-    //           overview: s7obj.overview,
-    //           racks: s7obj.racks
-    //         }))
-    //       })
-    //     })
-    //   } else {
-    //     s7def.PLC.isOnline = s7client.Connect()
-    //   }
-    //   next()
-    // }, s7def.PLC.polling_time)
   })
 })
 
@@ -179,14 +155,6 @@ function updateAlarms (device, s7client, callback) {
             if (err) return cb(err)
             utils.updateAlarms(0, s7data, s7obj.alarms[1], s7obj.diag.groups[1], function (res) {
               cb(null, s7obj.diag.groups[1])
-            })
-          })
-          break
-        case 3:
-          s7client.ReadArea(0x84, s7def.DB_ALARM_3, s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
-            if (err) return cb(err)
-            utils.updateAlarms(0, s7data, s7obj.alarms[2], s7obj.diag.groups[2], function (res) {
-              cb(null, s7obj.diag.groups[2])
             })
           })
           break

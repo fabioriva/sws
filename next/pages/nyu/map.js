@@ -1,15 +1,15 @@
 import React from 'react'
 import Layout from 'src/components/Layout'
-import MapList from 'src/components/MapList'
+// import MapList from 'src/components/MapList'
 import Level from 'src/components/MapLevel'
 import Edit from 'src/components/MapEdit'
 import Occupancy from 'src/components/MapOccupancy'
 import { Row, Col, Radio } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/nyu'
 import { SERVICE, VALET } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
+import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
 
 const setStallLabel = (map, filter) => {
@@ -38,9 +38,22 @@ const setStallLabel = (map, filter) => {
 }
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '2' })
-    const res = await fetch(`${BACKEND_URL}/aps/nyu/map`)
+  static async getInitialProps (ctx) {
+    ctx.store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '2' })
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        map: setStallLabel(json.map, 'SHOW_NUMBERS'),
+        occupancy: json.map.statistics[0]
+      }
+    }
+    // if diagnostic is not active fetch data
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/map`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     const map = json  // JSON.parse(json)
@@ -54,12 +67,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       map: props.map,
       occupancy: this.props.occupancy,
       visibilityFilter: 'SHOW_NUMBERS',
@@ -71,7 +78,8 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    const { diagnostic } = this.props
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -79,7 +87,7 @@ class AppUi extends React.Component {
         if (key === 'comm') this.setState({ comm: data[key] })
         if (key === 'diag') this.setState({ diag: data[key] })
         if (key === 'mesg') openNotification(data[key])
-        if (key === 'map') {
+        if (!diagnostic && key === 'map') {
           const { map } = data
           this.setState({
             isFetching: false,
@@ -144,7 +152,6 @@ class AppUi extends React.Component {
         }
       })
     )
-    // ipcRenderer.send('write-stall', { stall: stall, card: card })
   }
   onRadioChange = (e) => {
     console.log('onRadioChange', e.target.value)
@@ -168,14 +175,13 @@ class AppUi extends React.Component {
     })
     return (
       <Layout
-        aps={APS}
-        pageTitle='Mappa'
+        aps={APS_TITLE}
+        pageTitle='System Map'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Mobile>
-          <div id='#top'>
+          {/* <div id='#top'>
             <a href='#level-1'>[Piano 1]</a>
             <a href='#level-2'>[Piano 2]</a>
             <a href='#level-3'>[Piano 3]</a>
@@ -191,7 +197,8 @@ class AppUi extends React.Component {
             onCancel={this.handleMapCancel}
             onChange={this.handleMapChange}
             onConfirm={this.handleMapOk}
-          />
+          /> */}
+          <Occupancy data={occupancy} />
         </Mobile>
         <Default>
           <Row>

@@ -127,7 +127,6 @@ class AppUi extends React.Component {
   }
   render () {
     const { devices, exitQueue } = this.state.overview
-    const { diagnostic } = this.props
     return (
       <Layout
         aps={APS}

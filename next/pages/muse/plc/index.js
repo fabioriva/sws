@@ -93,7 +93,7 @@ const Et200sLink = (props) => (
       as={`/muse/rack/${props.rackNumber + 1}`}
       href={`/muse/plc/et200s?rackNumber=${props.rackNumber}&title=${props.title}`}
     >
-      <a>Rack {props.title}</a>
+      <a>{props.title}</a>
     </Link>
   </li>
 )

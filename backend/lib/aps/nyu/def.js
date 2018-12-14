@@ -1,3 +1,11 @@
+export const APS = 'nyu'
+export const HTTP_PORT = 8083
+export const PLC = {
+  ip: '192.168.55.2',
+  rack: 0,
+  slot: 1,
+  polling_time: 300
+}
 export const FALSE = Buffer.alloc(1, 0, 'hex')
 export const TRUE = Buffer.alloc(1, 1, 'hex')
 export const BITS = 8

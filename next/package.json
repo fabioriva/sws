@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
-    "start": "NODE_ENV=production pm2 start server.js"
+    "start": "NODE_ENV=production node server.js",
+    "pm2": "NODE_ENV=production pm2 start server.js"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
@@ -20,14 +21,14 @@
     "express": "^4.16.4",
     "isomorphic-unfetch": "^3.0.0",
     "jsonwebtoken": "^8.4.0",
-    "moment": "^2.22.2",
-    "mongoose": "^5.3.15",
+    "moment": "^2.23.0",
+    "mongoose": "^5.3.16",
     "next": "^7.0.2",
     "next-redux-wrapper": "^2.1.0",
     "prop-types": "^15.6.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-intl-universal": "^1.15.3",
+    "react-intl-universal": "^1.15.4",
     "react-redux": "^5.1.1",
     "react-responsive": "^6.0.1",
     "recharts": "^1.4.1",

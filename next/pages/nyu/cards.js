@@ -4,9 +4,8 @@ import moment from 'moment'
 import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
 import { Table } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/nyu'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/nyu'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const columns = [
@@ -32,7 +31,7 @@ const columns = [
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '3'})
-    const res = await fetch(`${BACKEND_URL}/aps/nyu/cards`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/cards`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -44,12 +43,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       cards: props.cards,
       editModal: {
         card: {
@@ -69,7 +62,7 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -88,12 +81,6 @@ class AppUi extends React.Component {
   }
   componentWillUnmount () {
     this.ws.close()
-  }
-  handleData = (data) => {
-    this.setState({
-      isFetching: false,
-      cards: data.cards
-    })
   }
   showModal = (card, code, timeFrom, timeTo) => {
     console.log(typeof timeFrom, timeFrom, typeof timeTo, timeTo)
@@ -186,11 +173,10 @@ class AppUi extends React.Component {
     const { cards, editModal } = this.state
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Users'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <span />
         <Table

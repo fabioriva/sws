@@ -2,9 +2,8 @@ import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import Layout from 'src/components/Layout'
 import { Alert, Badge, Button, Tabs } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
 import { SERVICE } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
 import withAuth from 'src/lib/withAuth'
 
 const Alarm = (props) => {
@@ -35,7 +34,7 @@ const Ready = (props) => {
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '5'})
-    const res = await fetch(`${BACKEND_URL}/aps/nyu/alarms`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/alarms`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -47,17 +46,11 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       alarms: props.alarms
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -95,11 +88,10 @@ class AppUi extends React.Component {
     })
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='System Alarms'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Tabs type='card'>
           <Tabs.TabPane tab={tabEL1} key='1'>{alarmsEL1.length > 0 ? alarmsEL1 : <Ready label='System 1' />}</Tabs.TabPane>

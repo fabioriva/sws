@@ -3,37 +3,28 @@ import Layout from 'src/components/Layout'
 import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
-import { Row, Col, Modal } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/nyu'
+import { Row, Col } from 'antd'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/nyu'
 import { VALET } from 'src/constants/roles'
-import openNotification from 'src/lib/openNotification'
+import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
 
-function confirm (system, ws) {
-  Modal.confirm({
-    title: `Elevator ${system} over-width detection at G0`,
-    content: 'Confirm to reject the vehicle to exit ?',
-    onOk() {
-      ws.send(
-        JSON.stringify({
-          event: 'overview-rollback',
-          data: {
-            id: system
-          }
-        })
-      )
-      return new Promise((resolve, reject) => {
-        setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
-      })
-    },
-    onCancel() {},
-  })
-}
-
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
-    const res = await fetch(`${BACKEND_URL}/aps/nyu/overview`)
+  static async getInitialProps (ctx) {
+    ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
+    // check if diagnostic is active
+    const { diagnostic } = parseCookies(ctx)
+    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    if (diagnostic) {
+      const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
+      const json = await res.json()
+      return {
+        diagnostic: diagnostic,
+        overview: json.overview
+      }
+    }
+    // if diagnostic is not active fetch data
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/overview`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -45,12 +36,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      comm: {
-        isOnline: false
-      },
-      diag: {
-        alarmCount: 0
-      },
       overview: props.overview,
       operationModal: {
         card: {
@@ -66,7 +51,8 @@ class AppUi extends React.Component {
     }
   }
   componentDidMount () {
-    this.ws = new WebSocket(WEBSOCK_URL)
+    const { diagnostic } = this.props
+    this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
     this.ws.onerror = e => console.log(e)
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
@@ -74,7 +60,7 @@ class AppUi extends React.Component {
         if (key === 'comm') this.setState({ comm: data[key] })
         if (key === 'diag') this.setState({ diag: data[key] })
         if (key === 'mesg') openNotification(data[key])
-        if (key === 'overview') {
+        if (!diagnostic && key === 'overview') {
           this.setState({
             isFetching: false,
             overview: data[key]
@@ -89,11 +75,6 @@ class AppUi extends React.Component {
   showOperationModal = (operationId) => {
     console.log(operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: operationId, // 0=Exit, 1=Entry 1, 2=Entry 2
-      //   visible: true
-      // }
       operationModal: {
         card: {
           value: 0
@@ -107,11 +88,6 @@ class AppUi extends React.Component {
   }
   handleCancel = (e) => {
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -134,11 +110,6 @@ class AppUi extends React.Component {
   handleConfirm = (card, operationId) => {
     console.log('handleConfirm', card, operationId)
     this.setState({
-      // operationModal: {
-      //   card: 0,
-      //   operationId: 0,
-      //   visible: false
-      // }
       operationModal: {
         card: {
           value: 0
@@ -166,11 +137,10 @@ class AppUi extends React.Component {
     const { devices, exitQueue } = this.state.overview
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Operations'
         sidebarMenu={SIDEBAR_MENU}
-        comm={this.state.comm}
-        diag={this.state.diag}
+        socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Row gutter={16}>
           <Col  xs={24} sm={24} md={14} lg={18} xl={18}>
