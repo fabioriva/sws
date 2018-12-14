@@ -1,6 +1,10 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import cookie from 'cookie'
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
+import { navbarSetDiag } from 'src/store'
 import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
@@ -136,4 +140,11 @@ class AppUi extends React.Component {
 }
 
 // export default compose(withAuth(withRedux(initStore, null)(AppUi)))
-export default withAuth(AppUi, SERVICE)
+// export default withAuth(AppUi, SERVICE)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch)
+  }
+}
+
+export default connect(state => state, mapDispatchToProps)(withAuth(AppUi, SERVICE))
