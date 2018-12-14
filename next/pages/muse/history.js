@@ -96,7 +96,7 @@ class AppUi extends React.Component {
       })
     })
   }
-  enableDiag = (alarm) => {
+  enableDiag = async (alarm) => {
     this.props.navbarSetDiag(alarm._id)
     const COOKIE_MAX_AGE = 1 * 24 * 60 * 60 // 1 day
     const options = { maxAge: COOKIE_MAX_AGE }
