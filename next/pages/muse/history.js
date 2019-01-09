@@ -8,7 +8,7 @@ import { navbarSetDiag } from 'src/store'
 import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
-import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { APS, APS_TITLE, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { ADMIN, SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 
@@ -18,7 +18,7 @@ class AppUi extends React.Component {
     let dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
     let dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
     // const res = await fetch(`${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
-    const res = await fetch(`${BACKEND_URL}/aps/muse/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
     const json = await res.json()
     return json
   }
@@ -79,7 +79,7 @@ class AppUi extends React.Component {
     dateFrom = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
     dateTo = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
     // let uri = `${BACKEND_URL}/aps/history/query?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
-    let uri = `${BACKEND_URL}/aps/muse/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
+    let uri = `${BACKEND_URL}/aps/${APS}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
     fetch(uri)
     .then(res => res.json())
     .then(res => {
@@ -114,7 +114,7 @@ class AppUi extends React.Component {
     }
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='System Logs'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}

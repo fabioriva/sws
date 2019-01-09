@@ -3,35 +3,15 @@ import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
 import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
-import { Table } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
+import List from 'src/components/CardList'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
-
-const columns = [
-  {
-    title: 'Number',
-    dataIndex: 'nr',
-    key: 'nr'
-  }, {
-    title: 'PIN Code',
-    dataIndex: 'code',
-    key: 'code'
-  }, {
-    title: 'Valid From',
-    dataIndex: 'from',
-    key: 'from'
-  }, {
-    title: 'Valid To',
-    dataIndex: 'to',
-    key: 'to'
-  }
-]
 
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '3'})
-    const res = await fetch(`${BACKEND_URL}/aps/muse/cards`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/cards`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -78,12 +58,6 @@ class AppUi extends React.Component {
   }
   componentWillUnmount () {
     this.ws.close()
-  }
-  handleData = (data) => {
-    this.setState({
-      isFetching: false,
-      cards: data.cards
-    })
   }
   showModal = (card, code, timeFrom, timeTo) => {
     console.log(typeof timeFrom, timeFrom, typeof timeTo, timeTo)
@@ -176,25 +150,14 @@ class AppUi extends React.Component {
     const { cards, editModal } = this.state
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Users'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}
       >
-        <span />
-        <Table
-          dataSource={cards}
-          columns={columns}
-          bordered
-          size='small'
-          pagination={{ defaultPageSize: 20 }}
-          rowKey='nr'
-          onRow={(record) => {
-            return {
-                onClick: () => this.showModal(record.nr, record.code, record.from, record.to)
-              }
-            }
-          }
+        <List
+          cards={cards}
+          showModal={this.showModal}
         />
         <Edit
           cards={CARDS}

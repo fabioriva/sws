@@ -1,9 +1,10 @@
 import React from 'react'
-import Link from 'next/link'
 import Layout from 'src/components/Layout'
 import { List } from 'antd'
 import { APS, APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
 import { SERVICE } from 'src/constants/roles'
+import Et200mLink from 'src/components/Et200mLink'
+import Et200sLink from 'src/components/Et200sLink'
 import withAuth from 'src/lib/withAuth'
 
 const data = [
@@ -39,31 +40,18 @@ const data = [
   }
 ]
 
-const Et200mLink = (props) => (
-  <li>
-    <Link
-      as={`/${APS}/rack/${props.rackNumber + 1}`}
-      href={`/${APS}/plc/et200m?rackNumber=${props.rackNumber}&title=${props.title}`}
-    >
-      <a>{props.title}</a>
-    </Link>
-  </li>
-)
-
-const Et200sLink = (props) => (
-  <li>
-    <Link
-      as={`/${APS}/rack/${props.rackNumber + 1}`}
-      href={`/${APS}/plc/et200s?rackNumber=${props.rackNumber}&title=${props.title}`}
-    >
-      <a>{props.title}</a>
-    </Link>
-  </li>
-)
-
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '4' })
+  }
+  renderLink = (item, key) => {
+    return (
+      item.type === 'm'
+      ?
+      <Et200mLink aps={APS} rackNumber={key} title={item.title} />
+      :
+      <Et200sLink aps={APS} rackNumber={key} title={item.title} />
+    )
   }
   render () {
     return (
@@ -83,7 +71,7 @@ class AppUi extends React.Component {
             <List.Item>
               <List.Item.Meta
                 avatar={<img src={item.image} alt='rack' width='85%' height='85%' />}
-                title={item.type === 'm' ? <Et200mLink rackNumber={key} title={item.title} /> : <Et200sLink rackNumber={key} title={item.title} />}
+                title={this.renderLink(item, key)}
                 description={item.description}
               />
             </List.Item>

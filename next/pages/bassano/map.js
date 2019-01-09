@@ -6,7 +6,7 @@ import Edit from 'src/components/MapEdit'
 import Occupancy from 'src/components/MapOccupancy'
 import { Row, Col, Radio } from 'antd'
 import { Mobile, Default } from 'src/constants/mediaQueries'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/bassano'
 import { SERVICE, VALET } from 'src/constants/roles'
 import parseCookies from 'src/lib/parseCookies'
@@ -19,7 +19,7 @@ class AppUi extends React.Component {
     const { diagnostic } = parseCookies(ctx)
     ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
     if (diagnostic) {
-      const res = await fetch(`${BACKEND_URL}/aps/bassano/diagnostic?id=${diagnostic}`)
+      const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
       const json = await res.json()
       return {
         diagnostic: diagnostic,
@@ -28,7 +28,7 @@ class AppUi extends React.Component {
       }
     }
     // if diagnostic is not active fetch data
-    const res = await fetch(`${BACKEND_URL}/aps/bassano/map`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/map`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     const map = json  // JSON.parse(json)
@@ -146,7 +146,7 @@ class AppUi extends React.Component {
     })
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Mappa'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}

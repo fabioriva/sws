@@ -77,7 +77,7 @@ class CardEditForm extends React.Component {
       >
         <Form layout='horizontal' onSubmit={this.handleSubmit}>
           <FormItem
-            validateStatus={cardError ? 'error' : ''}
+            validateStatus={cardError ? 'error' : 'success'}
             help={cardError || ''}
             label='Card number'
           >
@@ -98,7 +98,7 @@ class CardEditForm extends React.Component {
             )}
           </FormItem>
           <FormItem
-            validateStatus={codeError ? 'error' : ''}
+            validateStatus={codeError ? 'error' : 'success'}
             help={codeError || ''}
             label='Card PIN code'
           >
@@ -118,7 +118,7 @@ class CardEditForm extends React.Component {
             )}
           </FormItem>
           <FormItem
-            validateStatus={timeFromError ? 'error' : ''}
+            validateStatus={timeFromError ? 'error' : 'success'}
             help={timeFromError || ''}
             label='From Time'
           >
@@ -132,7 +132,7 @@ class CardEditForm extends React.Component {
             )}
           </FormItem>
           <FormItem
-            validateStatus={timeToError ? 'error' : ''}
+            validateStatus={timeToError ? 'error' : 'success'}
             help={timeToError || ''}
             label='To Time'
           >

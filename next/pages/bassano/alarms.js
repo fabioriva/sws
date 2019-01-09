@@ -2,7 +2,7 @@ import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import Layout from 'src/components/Layout'
 import { Alert, Badge, Button, Tabs } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 
@@ -34,7 +34,7 @@ const Ready = (props) => {
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
     store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '5' })
-    const res = await fetch(`${BACKEND_URL}/aps/bassano/alarms`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/alarms`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -83,7 +83,7 @@ class AppUi extends React.Component {
     })
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Allarmi del sistema'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}

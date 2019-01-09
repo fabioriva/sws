@@ -448,7 +448,7 @@ const rack1 = {
     },
     {
       nr: '4',
-      type: '6ES7 521-1Bl00-0AB0',
+      type: '6ES7 521-1BL00-0AB0',
       bytes: [
         {
           label: 'EB14',

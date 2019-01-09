@@ -8,7 +8,7 @@ import { navbarSetDiag } from 'src/store'
 import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
-import { APS, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
+import { APS, APS_TITLE, APS_ID, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { ADMIN, SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 
@@ -17,7 +17,7 @@ class AppUi extends React.Component {
     store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '6' })
     let dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
     let dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
-    const res = await fetch(`${BACKEND_URL}/aps/bassano/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
     const json = await res.json()
     return json
   }
@@ -77,7 +77,7 @@ class AppUi extends React.Component {
   handleConfirm = (dateFrom, dateTo, filter) => {
     dateFrom = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
     dateTo = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
-    let uri = `${BACKEND_URL}/aps/bassano/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
+    let uri = `${BACKEND_URL}/aps/${APS}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&filter=${filter}`
     fetch(uri)
     .then(res => res.json())
     .then(res => {
@@ -112,7 +112,7 @@ class AppUi extends React.Component {
     }
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Storico delle operazioni'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}

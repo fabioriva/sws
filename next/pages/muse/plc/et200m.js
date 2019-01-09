@@ -7,7 +7,7 @@ import Layout from 'src/components/Layout'
 import List from 'src/components/PlcList'
 import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
 import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
@@ -18,7 +18,7 @@ class AppUi extends React.Component {
     const { diagnostic } = parseCookies(ctx)
     ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
     if (diagnostic) {
-      const res = await fetch(`${BACKEND_URL}/aps/muse/diagnostic?id=${diagnostic}`)
+      const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
       const json = await res.json()
       return {
         diagnostic: diagnostic,
@@ -26,7 +26,7 @@ class AppUi extends React.Component {
       }
     }
     // if diagnostic is not active fetch data
-    const res = await fetch(`${BACKEND_URL}/aps/muse/racks`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/racks`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -65,17 +65,17 @@ class AppUi extends React.Component {
     const rack = this.state.racks[rackNumber]
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle={`PLC Digital I/O - ${rack.title}`}
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Mobile>
-          <Link href='/muse/plc'><a>[Back]</a></Link>
+          <Link href={`/${APS}/plc`}><a>[Back]</a></Link>
           <List rack={rack} />
         </Mobile>
         <Default>
-          <Link href='/muse/plc'><a>[Back]</a></Link>
+          <Link href={`/${APS}/plc`}><a>[Back]</a></Link>
           <Rack rack={rack} />
         </Default>
         <style jsx global>{`

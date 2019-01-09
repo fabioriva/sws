@@ -22,7 +22,7 @@ export default class PageLogin extends React.Component {
         </Head>
         <div className='text-center'>
           <div className='app'>
-            <h1>&#x1F680;&nbsp;<span className='app-title'>Sotefin Web Service</span></h1>
+            <h1>&#x1F680;&nbsp;<span className='app-title'><span className='color-1'>S</span>otefin&nbsp;<span className='color-2'>W</span>eb&nbsp;<span className='color-3'>S</span>ervice</span></h1>
             <h4 className='text-muted'>The future of automated parking systems servicing</h4>
           </div>
           <LoginForm />
@@ -57,6 +57,15 @@ export default class PageLogin extends React.Component {
             font-family: 'Roboto', sans-serif;
             font-size: 33px;
             font-weight: 400!important;
+          }
+          .color-1 {
+            color: #ffa500;
+          }
+          .color-2 {
+            color: #ffa500;
+          }
+          .color-3 {
+            color: #ffa500;
           }
         `}</style>
       </div>

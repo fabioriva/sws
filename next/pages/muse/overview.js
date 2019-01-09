@@ -4,7 +4,7 @@ import Device from 'src/components/Device'
 import Queue from 'src/components/ExitQueue'
 import Operation from 'src/components/OperationModal'
 import { Row, Col, Modal } from 'antd'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/muse'
 import { VALET } from 'src/constants/roles'
 import parseCookies from 'src/lib/parseCookies'
 import withAuth from 'src/lib/withAuth'
@@ -37,7 +37,7 @@ class AppUi extends React.Component {
     const { diagnostic } = parseCookies(ctx)
     ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
     if (diagnostic) {
-      const res = await fetch(`${BACKEND_URL}/aps/muse/diagnostic?id=${diagnostic}`)
+      const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
       const json = await res.json()
       return {
         diagnostic: diagnostic,
@@ -45,7 +45,7 @@ class AppUi extends React.Component {
       }
     }
     // if diagnostic is not active fetch data
-    const res = await fetch(`${BACKEND_URL}/aps/muse/overview`)
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/overview`)
     const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
@@ -155,7 +155,7 @@ class AppUi extends React.Component {
     const { devices, exitQueue } = this.state.overview
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Overview'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}

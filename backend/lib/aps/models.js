@@ -1,3 +1,4 @@
+// import moment from 'moment'
 // import * as strings from './strings'
 
 class Bit {
@@ -68,8 +69,8 @@ export class Card {
   constructor (nr, code, from, to) {
     this.nr = nr
     this.code = code
-    this.from = from || new Date()
-    this.to = to || new Date()
+    this.from = from // || moment().hours(0).minutes(0).seconds(0)
+    this.to = to // || moment().hours(23).minutes(59).seconds(59)
     this.rand = this.getRandomIntInclusive(256, 4095).toString(16).toUpperCase()
   }
   getRandomIntInclusive (min, max) {
@@ -132,7 +133,7 @@ export class Stall {
   constructor (nr, status, date, size) {
     this.nr = nr
     this.status = status
-    this.date = date || new Date()
+    this.date = date // || moment().format('YYYY-MM-DD HH:mm:ss')
     this.size = size
   }
 }

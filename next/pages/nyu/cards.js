@@ -3,30 +3,10 @@ import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
 import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
-import { Table } from 'antd'
+import List from 'src/components/CardList'
 import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/nyu'
 import { SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
-
-const columns = [
-  {
-    title: 'Number',
-    dataIndex: 'nr',
-    key: 'nr'
-  }, {
-    title: 'PIN Code',
-    dataIndex: 'code',
-    key: 'code'
-  }, {
-    title: 'Valid From',
-    dataIndex: 'from',
-    key: 'from'
-  }, {
-    title: 'Valid To',
-    dataIndex: 'to',
-    key: 'to'
-  }
-]
 
 class AppUi extends React.Component {
   static async getInitialProps ({ store }) {
@@ -67,9 +47,6 @@ class AppUi extends React.Component {
     this.ws.onmessage = e => {
       const data = JSON.parse(e.data)
       Object.keys(data).forEach((key) => {
-        if (key === 'comm') this.setState({ comm: data[key] })
-        if (key === 'diag') this.setState({ diag: data[key] })
-        if (key === 'mesg') openNotification(data[key])
         if (key === 'cards') {
           this.setState({
             isFetching: false,
@@ -178,20 +155,9 @@ class AppUi extends React.Component {
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}
       >
-        <span />
-        <Table
-          dataSource={cards}
-          columns={columns}
-          bordered
-          size='small'
-          pagination={{ defaultPageSize: 20 }}
-          rowKey='nr'
-          onRow={(record) => {
-            return {
-                onClick: () => this.showModal(record.nr, record.code, record.from, record.to)
-              }
-            }
-          }
+        <List
+          cards={cards}
+          showModal={this.showModal}
         />
         <Edit
           cards={CARDS}
