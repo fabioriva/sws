@@ -31,6 +31,7 @@ db.once('open', function () {
     aps('/bassano', server, app)
     aps('/muse', server, app)
     aps('/nyu', server, app)
+    aps('/trumpeldor', server, app)
     server.get('*', (req, res) => {
       return handle(req, res)
     })

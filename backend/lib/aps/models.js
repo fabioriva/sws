@@ -1,4 +1,5 @@
-// import moment from 'moment'
+import moment from 'moment'
+import * as utils from './utils'
 // import * as strings from './strings'
 
 class Bit {
@@ -76,6 +77,12 @@ export class Card {
   getRandomIntInclusive (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
   }
+  update (code, from, to) {
+    console.log(code, from, to)
+    this.code = code
+    this.from = moment(utils.getPLCDateTime(0, from)).format('HH:mm:ss')
+    this.to = moment(utils.getPLCDateTime(0, to)).format('HH:mm:ss')
+  }
 }
 
 export class Device {
@@ -135,5 +142,12 @@ export class Stall {
     this.status = status
     this.date = date // || moment().format('YYYY-MM-DD HH:mm:ss')
     this.size = size
+  }
+  update (status, days, msec, size) {
+    // console.log(status, days, msec, size)
+    this.status = status
+    this.date = moment(utils.getPLCDateTime(days, msec)).format('YYYY-MM-DD HH:mm:ss')
+    this.size = size
+    console.log(this.nr, this.status, this.date, this.size)
   }
 }

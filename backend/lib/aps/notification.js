@@ -34,6 +34,8 @@ export default function notification (document) {
   return {
     type: operation.id,
     message: message,
-    description: description
+    description: description,
+    card: card,
+    stall: stall
   }
 }
