@@ -78,8 +78,7 @@ export class Card {
     return Math.floor(Math.random() * (max - min + 1)) + min
   }
   update (code, from, to) {
-    console.log(code, from, to)
-    this.code = code
+    this.code = code.toString(16).toUpperCase()
     this.from = moment(utils.getPLCDateTime(0, from)).format('HH:mm:ss')
     this.to = moment(utils.getPLCDateTime(0, to)).format('HH:mm:ss')
   }
@@ -148,6 +147,6 @@ export class Stall {
     this.status = status
     this.date = moment(utils.getPLCDateTime(days, msec)).format('YYYY-MM-DD HH:mm:ss')
     this.size = size
-    console.log(this.nr, this.status, this.date, this.size)
+    // console.log(this.nr, this.status, this.date, this.size)
   }
 }
