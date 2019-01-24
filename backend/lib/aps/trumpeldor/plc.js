@@ -18,6 +18,7 @@ const wait = ms => new Promise((resolve) => setTimeout(resolve, ms))
  * S7 comm
  */
 const s7client = new snap7.S7Client()
+
 async.retry({
   times: 5,
   interval: s7def.PLC.polling_time

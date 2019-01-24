@@ -239,12 +239,12 @@ function mapCount (stalls, data, size, stallStatus) {
 function updateMap (start, buffer, s7def, stalls, statistics, callback) {
   async.waterfall([
     function (cb) {
-      stalls.forEach((e, i) => e.update(buffer.readInt16BE(i * s7def.STALL_LEN), buffer.readInt16BE((i * s7def.STALL_LEN) + 2), buffer.readInt32BE((i * s7def.STALL_LEN) + 4), buffer.readInt16BE((i * s7def.STALL_LEN) + 8)))
-      cb(null, stalls)
-    //   updateStalls(start, buffer, s7def.STALL_LEN, stalls, function (err, results) {
-    //     if (err) return cb(err)
-    //     cb(null, stalls)
-    //   })
+      // stalls.forEach((e, i) => e.update(buffer.readInt16BE(i * s7def.STALL_LEN), buffer.readInt16BE((i * s7def.STALL_LEN) + 2), buffer.readInt32BE((i * s7def.STALL_LEN) + 4), buffer.readInt16BE((i * s7def.STALL_LEN) + 8)))
+      // cb(null, stalls)
+      updateStalls(start, buffer, s7def.STALL_LEN, stalls, function (err, results) {
+        if (err) return cb(err)
+        cb(null, stalls)
+      })
     },
     function (stalls, cb) {
       updateStatistics(stalls, statistics, s7def.StallStatus, function (err, results) {
