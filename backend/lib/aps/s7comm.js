@@ -117,8 +117,8 @@ function updateAlarms (device, s7client, s7def, s7obj, callback) {
     function (cb) {
       s7client.ReadArea(0x84, s7def.DBS_ALARM[device], s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
         if (err) return cb(err)
-        utils.updateAlarms(0, s7data, s7obj.alarms[0], s7obj.diag.groups[0], function (res) {
-          cb(null, s7obj.diag.groups[0])
+        utils.updateAlarms(0, s7data, s7obj.alarms[device - 1], s7obj.diag.groups[device - 1], function (res) {
+          cb(null, s7obj.diag.groups[device - 1])
         })
       })
     },
