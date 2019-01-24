@@ -5,7 +5,6 @@ import * as utils from './utils'
 // const wait = ms => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const comm = (s7def, s7obj, s7Emitter) => {
-  // const { ip, rack, slot } = s7def.PLC
   const s7client = new snap7.S7Client()
   async.retry({
     times: 5,
@@ -16,19 +15,16 @@ export const comm = (s7def, s7obj, s7Emitter) => {
     s7client.ReadArea(0x84, s7def.DB_CARDS, s7def.DB_CARDS_INIT, s7def.DB_CARDS_LEN, 0x02, function (err, s7data) {
       if (err) return commError(err, s7def.PLC, s7client)
       utils.updateCards(0, s7data, s7def.CARD_LEN, s7obj.cards, function (res) {
-        // console.log(s7obj.cards)
         s7Emitter.emit('ch1', JSON.stringify({ cards: s7obj.cards }))
       })
     })
     s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
       if (err) return commError(err, s7def.PLC, s7client)
       utils.updateMap(0, s7data, s7def, s7obj.stalls, s7obj.map.statistics, function (res) {
-        // console.log(s7obj.map)
         s7Emitter.emit('ch1', JSON.stringify({ map: s7obj.map }))
       })
     })
     setInterval(() => {
-      // console.log(s7def.PLC)
       s7Emitter.emit('ch2', JSON.stringify({ comm: s7def.PLC }))
       if (s7def.PLC.isOnline) {
         s7Emitter.emit('ch2', JSON.stringify({
@@ -140,7 +136,8 @@ function updateAlarms (device, s7client, s7def, s7obj, callback) {
 }
 
 const commOpen = (plc, s7client, callback) => {
-  s7client.ConnectTo(plc.ip, plc.rack, plc.slot, function (err) {
+  const { ip, rack, slot } = plc
+  s7client.ConnectTo(ip, rack, slot, function (err) {
     if (err) return callback(err)
     callback(err, true)
   })
@@ -155,7 +152,7 @@ const commError = (err, plc, s7client) => {
   return err
 }
 
-export {
-  commError,
-  commOpen
-}
+// export {
+//   commError,
+//   commOpen
+// }

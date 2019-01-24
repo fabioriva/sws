@@ -5,7 +5,6 @@ import uuid from 'uuid/v4'
 import WebSocket from 'ws'
 import * as s7def from './def'
 import * as s7obj from './entities'
-// import * as s7plc from './plc'
 import * as utils from '../utils'
 import http from '../api'
 import notification from '../notification'
@@ -118,7 +117,6 @@ function handleEvent (event, data, s7Emitter) {
       const buffer = Buffer.alloc(4)
       buffer.writeUInt16BE(stall, 0)
       buffer.writeUInt16BE(card, 2)
-      // if (editStall(s7client, s7def, buffer)) console.log('done', buffer)
       s7Emitter.emit(event, buffer)
       break
     case 'overview-operation':
@@ -133,7 +131,6 @@ function handleEvent (event, data, s7Emitter) {
           if (s) {
             const buffer = Buffer.alloc(2)
             buffer.writeUInt16BE(value, 0)
-            // if (requestOp(s7client, s7def, buffer)) console.log('done', buffer)
             s7Emitter.emit(event, buffer)
           } else {
             // error not found
