@@ -25,6 +25,7 @@ export const comm = (s7def, s7obj, s7Emitter) => {
       })
     })
     setInterval(() => {
+      // console.log(s7def.PLC.ip)
       s7Emitter.emit('ch2', JSON.stringify({ comm: s7def.PLC }))
       if (s7def.PLC.isOnline) {
         s7Emitter.emit('ch2', JSON.stringify({
@@ -49,7 +50,6 @@ export const comm = (s7def, s7obj, s7Emitter) => {
     }, s7def.PLC.polling_time)
     s7Emitter.on('edit-stall', function (buffer) {
       console.log('edit-stall', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer))
-      // return s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer)
     })
     s7Emitter.on('overview-operation', (buffer) => {
       console.log('overview-operation', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer))
@@ -83,10 +83,20 @@ export function updateLog (s7client, s7def, s7obj, log, cb) {
   switch (operation) {
     case 1:
     case 2:
-      updateAlarms(device, s7client, function (err, res) {
-        if (err) return cb(commError(err, s7def.PLC, s7client))
-        cb(null, { alarms: res })
-      })
+      if (device !== 0 && device <= s7def.DBS_ALARM.length) {
+        s7client.ReadArea(0x84, s7def.DBS_ALARM[device - 1], s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
+          if (err) return cb(commError(err, s7def.PLC, s7client))
+          utils.updateAlarms(0, s7data, s7obj.alarms[device - 1], s7obj.diag.groups[device - 1], function (res) {
+            s7obj.diag.count = 0
+            s7obj.diag.groups.forEach(g => {
+              s7obj.diag.count += g.count
+            })
+            cb(null, { alarms: s7obj.diag })
+          })
+        })
+      } else {
+        cb(null, {})
+      }
       break
     case 4:
       s7client.ReadArea(0x84, s7def.DB_CARDS, s7def.DB_CARDS_INIT, s7def.DB_CARDS_LEN, 0x02, function (err, s7data) {
@@ -110,29 +120,6 @@ export function updateLog (s7client, s7def, s7obj, log, cb) {
     default:
       cb(null, {})
   }
-}
-
-function updateAlarms (device, s7client, s7def, s7obj, callback) {
-  async.series([
-    function (cb) {
-      s7client.ReadArea(0x84, s7def.DBS_ALARM[device], s7def.DB_ALARM_INIT, s7def.DB_ALARM_LEN, 0x02, function (err, s7data) {
-        if (err) return cb(err)
-        utils.updateAlarms(0, s7data, s7obj.alarms[device - 1], s7obj.diag.groups[device - 1], function (res) {
-          cb(null, s7obj.diag.groups[device - 1])
-        })
-      })
-    },
-    function (cb) {
-      s7obj.diag.count = 0
-      s7obj.diag.groups.forEach(g => {
-        s7obj.diag.count += g.count
-      })
-      cb(null, s7obj.diag)
-    }
-  ], function (err, results) {
-    if (err) return callback(err)
-    callback(null, results[1])
-  })
 }
 
 const commOpen = (plc, s7client, callback) => {

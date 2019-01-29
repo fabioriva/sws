@@ -62,4 +62,4 @@ export const DB_ALARM_2 = 532
 export const DB_ALARM_3 = 533
 export const DB_ALARM_INIT = 12
 export const DB_ALARM_LEN = 16 * ALARM_LEN * 4
-export const DBS_ALARM = [0, DB_ALARM_1, DB_ALARM_2, DB_ALARM_3]
+export const DBS_ALARM = [DB_ALARM_1, DB_ALARM_2, DB_ALARM_3]
