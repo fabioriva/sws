@@ -17,7 +17,7 @@ export const MB = 8
 export const DEVICES = 1
 export const MEASURES = 4
 export const OPERATIONS = 16
-export const QUEUE = 1
+export const QUEUE = 5
 
 export const StallStatus = {
   FREE: 0,
