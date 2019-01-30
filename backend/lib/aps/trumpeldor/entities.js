@@ -256,7 +256,7 @@ export var map = {
       nr: 1,
       label: 'Level 1',
       min: 1,
-      max: 31,
+      max: 13,
       stalls: stalls.slice(0, 13),
       elevators: [
         { id: 'el-1', label: 'EL' }
@@ -265,8 +265,8 @@ export var map = {
     {
       nr: 2,
       label: 'Level 2',
-      min: 32,
-      max: 62,
+      min: 14,
+      max: 26,
       stalls: stalls.slice(13, 26),
       elevators: [
         { id: 'el-2', label: 'EL' }
@@ -275,8 +275,8 @@ export var map = {
     {
       nr: 3,
       label: 'Level 3',
-      min: 63,
-      max: 93,
+      min: 27,
+      max: 40,
       stalls: stalls.slice(26, 40),
       elevators: [
         { id: 'el-3', label: 'EL' }
