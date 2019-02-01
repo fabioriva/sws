@@ -141,8 +141,8 @@ const commOpen = (plc, s7client, callback) => {
   })
 }
 
-const commError = (id, err, plc, s7client) => {
-  console.log(`(-- ${id} --) ${plc.ip} >> Error Code # ${err} - ${s7client.ErrorText(err)}`)
+const commError = (err, plc, s7client) => {
+  console.log(`${plc.ip} >> Error Code # ${err} - ${s7client.ErrorText(err)}`)
   if (err === 665420) {
     console.log(`${plc.ip} >> Disconnect # ${s7client.Disconnect()}`)
   }
