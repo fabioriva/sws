@@ -5,17 +5,17 @@ import uuid from 'uuid/v4'
 import WebSocket from 'ws'
 import * as s7def from './def'
 import * as s7obj from './entities'
-// import * as s7plc from './plc'
+import * as s7plc from './plc'
 import * as utils from '../utils'
 import http from '../api'
 import notification from '../notification'
 import LogSchema from 'lib/models/LogSchema'
 import DiagSchema from 'lib/models/DiagSchema'
-import {
-  comm,
-  updateDiag,
-  updateLog
-} from '../s7comm'
+// import {
+//   comm,
+//   updateDiag,
+//   updateLog
+// } from '../s7comm'
 
 class AppEmitter extends EventEmitter {}
 export const museEmitter = new AppEmitter()
@@ -38,10 +38,10 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
   /**
    * s7 comm
    */
-  const s7Emitter = new AppEmitter()
-  const s7client = comm(s7def, s7obj, s7Emitter)
-  s7Emitter.on('ch1', (data) => wss.broadcast('ch1', data)) // ch1: data channel
-  s7Emitter.on('ch2', (data) => wss.broadcast('ch2', data)) // ch2: comm channel
+  // const s7Emitter = new AppEmitter()
+  // const s7client = comm(s7def, s7obj, s7Emitter)
+  s7plc.s7Emitter.on('ch1', (data) => wss.broadcast('ch1', data)) // ch1: data channel
+  s7plc.s7Emitter.on('ch2', (data) => wss.broadcast('ch2', data)) // ch2: comm channel
   /**
    * websocket
    */
@@ -66,7 +66,7 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
     ws.on('message', function incoming (message) {
       const { event, data } = JSON.parse(message)
       museEmitter.emit('logger', message, event, data)
-      handleEvent(event, data, s7Emitter)
+      handleEvent(event, data)
     })
     museEmitter.emit('logger', `${ip}, ${ws.id}, ${ws.channel}, ${wss.clients.size}`)
   })
@@ -87,15 +87,15 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
     log.save((err, doc) => {
       if (err) throw err
       museEmitter.emit('logger', doc)
-      // s7plc.updateLog(s7log, (err, res) => {
-      updateLog(s7client, s7def, s7obj, s7log, (err, res) => {
+      s7plc.updateLog(s7log, (err, res) => {
+      // updateLog(s7client, s7def, s7obj, s7log, (err, res) => {
         if (err) console.log(err)
         wss.broadcast('ch1', JSON.stringify(res))
         wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
       })
       if (s7log.operation === 1) {
-        // s7plc.updateDiag(doc, (err, res) => {
-        updateDiag(s7client, s7def, (err, res) => {
+        s7plc.updateDiag(doc, (err, res) => {
+        // updateDiag(s7client, s7def, (err, res) => {
           if (err) console.log(err)
           var diag = new Diag({
             alarmId: doc._id,
@@ -111,15 +111,15 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
   })
 })
 
-function handleEvent (event, data, s7Emitter) {
+function handleEvent (event, data) {
   switch (event) {
     case 'edit-stall':
       const { stall, card } = data
       const buffer = Buffer.alloc(4)
       buffer.writeUInt16BE(stall, 0)
       buffer.writeUInt16BE(card, 2)
-      // if (s7plc.editStall(buffer)) console.log('done')
-      s7Emitter.emit(event, buffer)
+      if (s7plc.editStall(buffer)) console.log('done')
+      // s7Emitter.emit(event, buffer)
       break
     case 'overview-operation':
       const { operation, value } = data
@@ -133,8 +133,8 @@ function handleEvent (event, data, s7Emitter) {
           if (s) {
             const buffer = Buffer.alloc(2)
             buffer.writeUInt16BE(value, 0)
-            // if (s7plc.requestOp(buffer)) console.log('done')
-            s7Emitter.emit(event, buffer)
+            if (s7plc.requestOp(buffer)) console.log('done')
+            // s7Emitter.emit(event, buffer)
           } else {
             // error not found
 

@@ -2,7 +2,7 @@ import async from 'async'
 import snap7 from 'node-snap7'
 import * as utils from './utils'
 
-// const wait = ms => new Promise((resolve) => setTimeout(resolve, ms))
+const wait = ms => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const comm = (s7def, s7obj, s7Emitter) => {
   const s7client = new snap7.S7Client()
@@ -24,30 +24,32 @@ export const comm = (s7def, s7obj, s7Emitter) => {
         s7Emitter.emit('ch1', JSON.stringify({ map: s7obj.map }))
       })
     })
-    setInterval(() => {
-      // console.log(s7def.PLC.ip)
-      s7Emitter.emit('ch2', JSON.stringify({ comm: s7def.PLC }))
-      if (s7def.PLC.isOnline) {
-        s7Emitter.emit('ch2', JSON.stringify({
-          diag: {
-            alarmCount: s7obj.diag.count,
-            isActive: s7obj.diag.count > 0
-          }
-        }))
-        s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
-          if (err) return commError(4, err, s7def.PLC, s7client)
-          utils.updateData(s7data, s7def, s7obj, function (err, res) {
-            if (err) throw err
-            s7Emitter.emit('ch1', JSON.stringify({
-              overview: s7obj.overview,
-              racks: s7obj.racks
-            }))
+    async.forever(function (next) {
+      wait(s7def.PLC.polling_time).then(() => {
+        s7Emitter.emit('ch2', JSON.stringify({ comm: s7def.PLC }))
+        if (s7def.PLC.isOnline) {
+          s7Emitter.emit('ch2', JSON.stringify({
+            diag: {
+              alarmCount: s7obj.diag.count,
+              isActive: s7obj.diag.count > 0
+            }
+          }))
+          s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
+            if (err) return commError(4, err, s7def.PLC, s7client)
+            utils.updateData(s7data, s7def, s7obj, function (err, res) {
+              if (err) throw err
+              s7Emitter.emit('ch1', JSON.stringify({
+                overview: s7obj.overview,
+                racks: s7obj.racks
+              }))
+            })
           })
-        })
-      } else {
-        s7def.PLC.isOnline = s7client.Connect()
-      }
-    }, s7def.PLC.polling_time)
+        } else {
+          s7def.PLC.isOnline = s7client.Connect()
+        }
+        next()
+      })
+    })
     s7Emitter.on('edit-stall', function (buffer) {
       console.log('edit-stall', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer))
     })
@@ -57,6 +59,15 @@ export const comm = (s7def, s7obj, s7Emitter) => {
   })
   return s7client
 }
+
+//     s7Emitter.on('edit-stall', function (buffer) {
+//       console.log('edit-stall', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer))
+//     })
+//     s7Emitter.on('overview-operation', (buffer) => {
+//       console.log('overview-operation', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer))
+//     })
+//   return s7client
+// }
 
 export function updateDiag (s7client, s7def, callback) {
   async.series([
@@ -139,7 +150,7 @@ const commError = (id, err, plc, s7client) => {
   return err
 }
 
-// export {
-//   commError,
-//   commOpen
-// }
+export {
+  commError,
+  commOpen
+}
