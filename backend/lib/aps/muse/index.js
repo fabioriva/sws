@@ -89,14 +89,16 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
       museEmitter.emit('logger', doc)
       s7plc.updateLog(s7log, (err, res) => {
       // updateLog(s7client, s7def, s7obj, s7log, (err, res) => {
-        if (err) console.log(err)
+        // if (err) console.log(err)
+        if (err) throw err
         wss.broadcast('ch1', JSON.stringify(res))
         wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
       })
       if (s7log.operation === 1) {
         s7plc.updateDiag(doc, (err, res) => {
         // updateDiag(s7client, s7def, (err, res) => {
-          if (err) console.log(err)
+          // if (err) console.log(err)
+          if (err) throw err
           var diag = new Diag({
             alarmId: doc._id,
             s7data: res[0],
