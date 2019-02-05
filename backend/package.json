@@ -9,10 +9,12 @@
     "gen": "babel-node lib/aps/trumpeldor/generator.js --exec babel-node --presets es2015,stage-2",
     "build": "rm -r dist && babel lib -d dist",
     "start": "NODE_ENV=production node dist/index.js",
-    "pm2": "NODE_ENV=production pm2 start dist/index.js"
+    "pm2": "NODE_ENV=production pm2 start dist/index.js",
+    "trumpeldor": "nodemon lib/aps/trumpeldor/index.js --exec babel-node --presets @babel/env"
   },
   "dependencies": {
     "async": "^2.6.1",
+    "micro": "^9.3.3",
     "moment": "^2.24.0",
     "mongoose": "^5.4.9",
     "node-snap7": "^1.0.1",
@@ -23,11 +25,13 @@
     "xlsx": "^0.14.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/plugin-transform-async-to-generator": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
     "babel-plugin-module-resolver": "^3.1.3",
     "babel-plugin-transform-define": "^1.3.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
     "nodemon": "^1.18.9",
     "standard": "^12.0.1"
   }

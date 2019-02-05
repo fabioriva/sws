@@ -1,26 +1,30 @@
 import { EventEmitter } from 'events'
 import mongoose from 'mongoose'
-import url from 'url'
-import uuid from 'uuid/v4'
-import WebSocket from 'ws'
+import pino from 'pino'
 import * as s7def from './def'
 import * as s7obj from './entities'
-// import * as s7plc from './plc'
-import * as utils from '../utils'
-import http from '../api'
+import plcClient from './s7comm'
+import logServer from './s7log'
+import websocket from './ws'
+import micro from './micro'
 import notification from '../notification'
 import LogSchema from 'lib/models/LogSchema'
-import DiagSchema from 'lib/models/DiagSchema'
-import {
-  comm,
-  updateDiag,
-  updateLog
-} from '../s7comm'
+// import DiagSchema from 'lib/models/DiagSchema'
 
 class AppEmitter extends EventEmitter {}
-export const trumpeldorEmitter = new AppEmitter()
+
+const logger = pino({
+  prettyPrint: {
+    colorize: true,
+    translateTime: 'yyyy-mm-dd HH:MM:ss.l o'
+  }
+})
 
 const dev = process.env.NODE_ENV !== 'production'
+const HOST = dev ? process.env.BACKEND_URL : '192.168.20.3'
+const PORT = 49002
+const HTTP = 8084
+
 const options = {
   autoIndex: dev,
   useCreateIndex: true,
@@ -29,119 +33,63 @@ const options = {
 const mongodbUri = 'mongodb://localhost:27017/trumpeldor'
 
 mongoose.createConnection(mongodbUri, options).then(conn => {
-  var Log = conn.model('Log', LogSchema)
-  var Diag = conn.model('Diag', DiagSchema)
-  /**
-   * http API
-   */
-  const server = http(Diag, Log, s7def, s7obj).listen(s7def.HTTP_PORT)
-  /**
-   * S7 comm
-   */
-  const s7Emitter = new AppEmitter()
-  const s7client = comm(s7def, s7obj, s7Emitter)
-  s7Emitter.on('ch1', (data) => wss.broadcast('ch1', data)) // ch1: data channel
-  s7Emitter.on('ch2', (data) => wss.broadcast('ch2', data)) // ch2: comm channel
-  /**
-   * websocket
-   */
-  const wss = new WebSocket.Server({
-    path: '/ws/trumpeldor',
-    server: server
-  })
-  wss.broadcast = function broadcast (channel, data) {
-    wss.clients.forEach(function each (client) {
-      if (client.readyState === WebSocket.OPEN && client.channel === channel) {
-        client.send(data)
-      }
-    })
-  }
-  wss.on('connection', function connection (ws, req) {
-    const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
-    const { query: { channel } } = url.parse(req.url, true)
-    ws.isAlive = true
-    ws.id = uuid()
-    ws.channel = channel
-    ws.on('pong', utils.heartbeat)
-    ws.on('message', function incoming (message) {
-      const { event, data } = JSON.parse(message)
-      trumpeldorEmitter.emit('logger', message, event, data)
-      handleEvent(event, data, s7Emitter)
-    })
-    trumpeldorEmitter.emit('logger', `${ip}, ${ws.id}, ${ws.channel}, ${wss.clients.size}`)
-  })
-  setInterval(function ping () {
-    wss.clients.forEach((ws) => {
-      if (ws.isAlive === false) {
-        return ws.terminate()
-      }
-      ws.isAlive = false
-      ws.ping(utils.noop)
-    })
-  }, 3000)
-  /**
-   * S7 log
-   */
-  trumpeldorEmitter.on('data', (s7log) => {
+  const appEmitter = new AppEmitter()
+
+  const Log = conn.model('Log', LogSchema)
+  // const Diag = conn.model('Diag', DiagSchema)
+
+  const server = micro(HTTP, Log, s7obj)
+
+  const wss = websocket('/ws/trumpeldor', server, appEmitter)
+
+  plcClient(s7def, s7obj, appEmitter)
+
+  logServer(HOST, PORT, appEmitter)
+
+  appEmitter.on('ch1', (data) => wss('ch1', data)) // ch1: data channel
+  appEmitter.on('ch2', (data) => wss('ch2', data)) // ch2: comm channel
+
+  appEmitter.on('log', (s7log) => {
     var log = new Log()
     log.$s7log = s7log // access in pre save hook as this.$s7log
     log.$s7obj = s7obj // access in pre save hook as this.$s7obj
     log.save((err, doc) => {
       if (err) throw err
-      trumpeldorEmitter.emit('logger', doc)
-      // s7plc.updateLog(s7log, (err, res) => {
-      updateLog(s7client, s7def, s7obj, s7log, (err, res) => {
-        if (err) throw err
-        wss.broadcast('ch1', JSON.stringify(res))
-        wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
-      })
-      if (s7log.operation === 1) {
-        // s7plc.updateDiag(doc, (err, res) => {
-        updateDiag(s7client, s7def, (err, res) => {
-          if (err) throw err
-          var diag = new Diag({
-            alarmId: doc._id,
-            s7data: res[0],
-            s7map: res[1]
-          })
-          diag.save((err) => {
-            if (err) throw err
-          })
-        })
-      }
+      logger.info(s7log)
+      appEmitter.emit('update-log', s7log)
+      wss('ch2', JSON.stringify({ mesg: notification(log) }))
     })
   })
-})
 
-function handleEvent (event, data, s7Emitter) {
-  switch (event) {
-    case 'edit-stall':
-      const { stall, card } = data
-      const buffer = Buffer.alloc(4)
-      buffer.writeUInt16BE(stall, 0)
-      buffer.writeUInt16BE(card, 2)
-      s7Emitter.emit(event, buffer)
-      // if (s7plc.editStall(buffer)) console.log('done')
-      break
-    case 'overview-operation':
-      const { operation, value } = data
-      let s = s7obj.stalls.find(s => s.status === value)
-      switch (operation) {
-        case 1: // Entry 1
-          break
-        case 2: // Entry 2
-          break
-        default:
-          if (s) {
-            const buffer = Buffer.alloc(2)
-            buffer.writeUInt16BE(value, 0)
-            s7Emitter.emit(event, buffer)
-            // if (s7plc.requestOp(buffer)) console.log('done')
-          } else {
-            // error not found
-            console.log('overview-operation', 'card not found')
-          }
-      }
-      break
-  }
-}
+  appEmitter.on('event', (message) => {
+    const { event, data } = JSON.parse(message)
+    switch (event) {
+      case 'edit-stall':
+        const { stall, card } = data
+        const buffer = Buffer.alloc(4)
+        buffer.writeUInt16BE(stall, 0)
+        buffer.writeUInt16BE(card, 2)
+        appEmitter.emit(event, buffer)
+        break
+      case 'overview-operation':
+        const { operation, value } = data
+        let s = s7obj.stalls.find(s => s.status === value)
+        switch (operation) {
+          case 1: // Entry 1
+            break
+          case 2: // Entry 2
+            break
+          default:
+            if (s) {
+              const buffer = Buffer.alloc(2)
+              buffer.writeUInt16BE(value, 0)
+              appEmitter.emit(event, buffer)
+            } else {
+              // error not found
+              console.log('overview-operation', 'card not found')
+            }
+        }
+        break
+    }
+  })
+})
