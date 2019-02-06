@@ -10,7 +10,7 @@ const LOG_LEN = 32
 //   }
 // })
 
-module.exports = function startServer (host, port, eventEmitter) {
+module.exports = function startServer (PORT, HOST, eventEmitter) {
   const server = net.createServer(function (socket) {
     const client = `${socket.remoteAddress}:${socket.remotePort}`
     socket.on('error', function (e) {
@@ -34,6 +34,5 @@ module.exports = function startServer (host, port, eventEmitter) {
         eventEmitter.emit('log', log)
       }
     })
-  })
-  server.listen(port, host)
+  }).listen(PORT, HOST, () => console.log(`Listening on ${HOST}:${PORT}`))
 }

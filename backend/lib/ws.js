@@ -15,7 +15,7 @@ module.exports = function startServer (wsPath, server, eventEmitter) {
     })
   }
   wss.on('connection', function connection (ws, req) {
-    const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
+    // const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]
     const { query: { channel } } = url.parse(req.url, true)
     ws.isAlive = true
     ws.id = uuid()

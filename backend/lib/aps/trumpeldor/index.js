@@ -3,11 +3,11 @@ import mongoose from 'mongoose'
 import pino from 'pino'
 import * as s7def from './def'
 import * as s7obj from './entities'
-import plcClient from './s7comm'
-import logServer from './s7log'
-import websocket from './ws'
-import micro from './micro'
-import notification from '../notification'
+import plc from 'lib/plc'
+import log from 'lib/log'
+import websocket from 'lib/ws'
+import micro from 'lib/micro'
+import notification from 'lib/aps/notification'
 import LogSchema from 'lib/models/LogSchema'
 // import DiagSchema from 'lib/models/DiagSchema'
 
@@ -22,15 +22,17 @@ const logger = pino({
 
 const dev = process.env.NODE_ENV !== 'production'
 const HOST = dev ? process.env.BACKEND_URL : '192.168.20.3'
+
+const websocketUri = '/ws/trumpeldor'
 const PORT = 49002
 const HTTP = 8084
 
+const mongodbUri = 'mongodb://localhost:27017/trumpeldor'
 const options = {
   autoIndex: dev,
   useCreateIndex: true,
   useNewUrlParser: true
 }
-const mongodbUri = 'mongodb://localhost:27017/trumpeldor'
 
 mongoose.createConnection(mongodbUri, options).then(conn => {
   const appEmitter = new AppEmitter()
@@ -40,11 +42,11 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
 
   const server = micro(HTTP, Log, s7obj)
 
-  const wss = websocket('/ws/trumpeldor', server, appEmitter)
+  const wss = websocket(websocketUri, server, appEmitter)
 
-  plcClient(s7def, s7obj, appEmitter)
+  plc(s7def, s7obj, appEmitter)
 
-  logServer(HOST, PORT, appEmitter)
+  log(PORT, HOST, appEmitter)
 
   appEmitter.on('ch1', (data) => wss('ch1', data)) // ch1: data channel
   appEmitter.on('ch2', (data) => wss('ch2', data)) // ch2: comm channel

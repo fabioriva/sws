@@ -1,5 +1,4 @@
 const micro = require('micro')
-// const match = require('micro-route/match')
 const moment = require('moment')
 const { parse } = require('url')
 
@@ -48,10 +47,8 @@ function queryHistory (query, history, callback) {
   }
   history.countDocuments(queryFilter, function (err, count) {
     if (err) return callback(err)
-    // console.log(count)
     history.find(queryFilter).sort({ date: -1 }).exec(function (err, query) {
       if (err) return callback(err)
-      // console.log(query)
       callback(null, {
         count: count,
         dateFrom: from, // moment(from).format('YYYY-MM-DD HH:mm:ss'),
