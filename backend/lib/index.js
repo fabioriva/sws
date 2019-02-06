@@ -2,7 +2,7 @@ import net from 'net'
 import pino from 'pino'
 import Log from 'lib/models/LogS7'
 import * as aps from 'lib/aps/def'
-import { bassanoEmitter } from 'lib/aps/bassano'
+// import { bassanoEmitter } from 'lib/aps/bassano'
 import { museEmitter } from 'lib/aps/muse'
 import { nyuEmitter } from 'lib/aps/nyu'
 // import { trumpeldorEmitter } from 'lib/aps/trumpeldor'
@@ -37,7 +37,7 @@ const server = net.createServer(function (socket) {
       const log = new Log(buffer)
       switch (log.system) {
         case aps.BASSANO:
-          bassanoEmitter.emit('data', log)
+          // bassanoEmitter.emit('data', log)
           break
         case aps.BOSTON:
           break
@@ -60,7 +60,7 @@ const server = net.createServer(function (socket) {
 })
 server.listen(PORT, HOST)
 
-bassanoEmitter.on('logger', mesg => logger.info(log('bassano', mesg)))
+// bassanoEmitter.on('logger', mesg => logger.info(log('bassano', mesg)))
 museEmitter.on('logger', mesg => logger.info(log('muse', mesg)))
 nyuEmitter.on('logger', mesg => logger.info(log('nyu', mesg)))
 // trumpeldorEmitter.on('logger', mesg => logger.info(log('trumpeldor', mesg)))
