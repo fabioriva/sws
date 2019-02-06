@@ -50,19 +50,13 @@ module.exports = function startClient (s7def, s7obj, eventEmitter) {
         next()
       })
     })
-    eventEmitter.on('edit-stall', function (buffer) {
-      // console.log('edit-stall', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer))
-      s7client.WriteArea(0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer, function (err) {
+    eventEmitter.on('plc-write', function (area, dbNumber, start, amount, wordLen, buffer) {
+      // console.log(area, dbNumber, start, amount, wordLen, buffer)
+      s7client.WriteArea(area, dbNumber, start, amount, wordLen, buffer, function (err) {
         if (err) return commError(err, s7def.PLC, s7client)
       })
     })
-    eventEmitter.on('overview-operation', function (buffer) {
-      // console.log('overview-operation', buffer, s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer))
-      s7client.WriteArea(0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer, function (err) {
-        if (err) return commError(err, s7def.PLC, s7client)
-      })
-    })
-    eventEmitter.on('update-log', function (log) {
+    eventEmitter.on('plc-update', function (log) {
       const { device, operation } = log
       switch (operation) {
         case 1:
@@ -104,28 +98,6 @@ module.exports = function startClient (s7def, s7obj, eventEmitter) {
   })
   // return s7client
 }
-
-/*
-export function updateDiag (s7client, s7def, callback) {
-  async.series([
-    function (cb) {
-      s7client.ReadArea(0x84, s7def.DB_DATA, s7def.DB_DATA_INIT, s7def.DB_DATA_LEN, 0x02, function (err, s7data) {
-        if (err) return cb(err)
-        cb(null, s7data)
-      })
-    },
-    function (cb) {
-      s7client.ReadArea(0x84, s7def.DB_MAP, s7def.DB_MAP_INIT, s7def.DB_MAP_LEN, 0x02, function (err, s7data) {
-        if (err) return cb(err)
-        cb(null, s7data)
-      })
-    }
-  ], function (err, results) {
-    if (err) return callback(commError(err, s7def.PLC, s7client))
-    callback(null, results)
-  })
-}
-*/
 
 const commOpen = (plc, s7client, callback) => {
   const { ip, rack, slot } = plc

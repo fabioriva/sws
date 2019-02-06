@@ -1,6 +1,6 @@
-const micro = require('micro')
-const moment = require('moment')
-const { parse } = require('url')
+import micro, { send } from 'micro'
+import moment from 'moment'
+import { parse } from 'url'
 
 module.exports = function startServer (PORT, history, s7obj) {
   const server = micro(async (req, res) => {
@@ -15,10 +15,10 @@ module.exports = function startServer (PORT, history, s7obj) {
         return s7obj.cards
       case 'history':
         queryHistory(query, history, function (err, json) {
-          if (err) return micro.send(res, 500, 'Error query')
+          if (err) return send(res, 500, 'Error query')
           // console.log('query', json)
           // return JSON.stringify(json)
-          micro.send(res, 200, json)
+          send(res, 200, json)
         })
         break
       case 'map':
@@ -28,7 +28,7 @@ module.exports = function startServer (PORT, history, s7obj) {
       case 'racks':
         return s7obj.racks
       default:
-        micro.send(res, 500, 'Page not found')
+        send(res, 500, 'Page not found')
     }
   }).listen(PORT, () => console.log(`Listening on localhost:${PORT}`))
   return server

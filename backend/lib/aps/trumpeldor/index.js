@@ -5,8 +5,8 @@ import * as s7def from './def'
 import * as s7obj from './entities'
 import plc from 'lib/plc'
 import log from 'lib/log'
-import websocket from 'lib/ws'
 import micro from 'lib/micro'
+import websocket from 'lib/ws'
 import notification from 'lib/aps/notification'
 import LogSchema from 'lib/models/LogSchema'
 // import DiagSchema from 'lib/models/DiagSchema'
@@ -46,32 +46,37 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
 
   plc(s7def, s7obj, appEmitter)
 
+  appEmitter.on('ch1', (data) => wss.broadcast('ch1', data)) // ch1: data channel
+  appEmitter.on('ch2', (data) => wss.broadcast('ch2', data)) // ch2: comm channel
+
   log(PORT, HOST, appEmitter)
 
-  appEmitter.on('ch1', (data) => wss('ch1', data)) // ch1: data channel
-  appEmitter.on('ch2', (data) => wss('ch2', data)) // ch2: comm channel
-
-  appEmitter.on('log', (s7log) => {
+  appEmitter.on('log-error', (client, e) => logger.error('%s socket error %s', client, e))
+  appEmitter.on('log-close', (client) => logger.warn('%s socket close', client))
+  appEmitter.on('log-end', (client) => logger.warn('%s socket end', client))
+  appEmitter.on('log', (client, s7log) => {
+    logger.info('%s socket data', client, s7log)
     var log = new Log()
     log.$s7log = s7log // access in pre save hook as this.$s7log
     log.$s7obj = s7obj // access in pre save hook as this.$s7obj
     log.save((err, doc) => {
       if (err) throw err
-      logger.info(s7log)
-      appEmitter.emit('update-log', s7log)
-      wss('ch2', JSON.stringify({ mesg: notification(log) }))
+      appEmitter.emit('plc-update', s7log)
+      wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
     })
   })
 
-  appEmitter.on('event', (message) => {
-    const { event, data } = JSON.parse(message)
+  appEmitter.on('ws-connect', (client, mesg) => logger.info('%s websocket connect %s', client, mesg))
+  appEmitter.on('ws-event', (client, mesg) => {
+    logger.info('%s websocket event %s', client, mesg)
+    const { event, data } = JSON.parse(mesg)
     switch (event) {
       case 'edit-stall':
         const { stall, card } = data
         const buffer = Buffer.alloc(4)
         buffer.writeUInt16BE(stall, 0)
         buffer.writeUInt16BE(card, 2)
-        appEmitter.emit(event, buffer)
+        appEmitter.emit('plc-write', 0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer)
         break
       case 'overview-operation':
         const { operation, value } = data
@@ -85,10 +90,10 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
             if (s) {
               const buffer = Buffer.alloc(2)
               buffer.writeUInt16BE(value, 0)
-              appEmitter.emit(event, buffer)
+              appEmitter.emit('plc-write', 0x84, s7def.DB_DATA, s7def.REQ_EXIT, 2, 0x02, buffer)
             } else {
               // error not found
-              console.log('overview-operation', 'card not found')
+              logger.warn('%s websocket event: %s, message: %s', client, event, 'card not found')
             }
         }
         break
