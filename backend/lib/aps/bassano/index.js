@@ -5,11 +5,11 @@ import * as s7def from './def'
 import * as s7obj from './entities'
 import plc from 'lib/plc'
 import log from 'lib/log'
-import micro from 'lib/micro'
+import api from 'lib/micro'
 import websocket from 'lib/ws'
 import notification from 'lib/aps/notification'
 import LogSchema from 'lib/models/LogSchema'
-// import DiagSchema from 'lib/models/DiagSchema'
+import DiagSchema from 'lib/models/DiagSchema'
 
 class AppEmitter extends EventEmitter {}
 
@@ -34,41 +34,51 @@ const options = {
   useNewUrlParser: true
 }
 
+const appEmitter = new AppEmitter()
+
 mongoose.createConnection(mongodbUri, options).then(conn => {
-  const appEmitter = new AppEmitter()
-
   const Log = conn.model('Log', LogSchema)
-  // const Diag = conn.model('Diag', DiagSchema)
+  const Diag = conn.model('Diag', DiagSchema)
 
-  const server = micro(HTTP, Log, s7obj)
+  plc(s7def, s7obj, appEmitter, logger)
 
-  const wss = websocket(websocketUri, server, appEmitter)
+  const serverApi = api(Log, s7obj)
 
-  plc(s7def, s7obj, appEmitter)
+  serverApi.listen(HTTP, () => logger.info(`Api server listening on localhost:${HTTP}`))
+
+  const wss = websocket(websocketUri, serverApi, appEmitter, logger)
 
   appEmitter.on('ch1', (data) => wss.broadcast('ch1', data)) // ch1: data channel
   appEmitter.on('ch2', (data) => wss.broadcast('ch2', data)) // ch2: comm channel
 
-  log(PORT, HOST, appEmitter)
+  const serverLog = log(appEmitter, logger)
 
-  appEmitter.on('log-error', (client, e) => logger.error('%s socket error %s', client, e))
-  appEmitter.on('log-close', (client) => logger.warn('%s socket close', client))
-  appEmitter.on('log-end', (client) => logger.warn('%s socket end', client))
-  appEmitter.on('log', (client, s7log) => {
-    logger.info('%s socket data', client, s7log)
+  serverLog.listen(PORT, HOST, () => logger.info(`Log server listening on ${HOST}:${PORT}`))
+
+  appEmitter.on('log', (s7log) => {
     var log = new Log()
     log.$s7log = s7log // access in pre save hook as this.$s7log
     log.$s7obj = s7obj // access in pre save hook as this.$s7obj
     log.save((err, doc) => {
       if (err) throw err
-      appEmitter.emit('plc-update', s7log)
       wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
+      appEmitter.emit('plc-update', s7log)
+      if (s7log.operation === 1) appEmitter.emit('plc-update-diagnostic', doc._id)
     })
   })
 
-  appEmitter.on('ws-connect', (client, mesg) => logger.info('%s websocket connect %s', client, mesg))
+  appEmitter.on('diagnostic', (_id, data, map) => {
+    var diag = new Diag({
+      alarmId: _id,
+      s7data: data,
+      s7map: map
+    })
+    diag.save((err) => {
+      if (err) throw err
+    })
+  })
+
   appEmitter.on('ws-event', (client, mesg) => {
-    logger.info('%s websocket event %s', client, mesg)
     const { event, data } = JSON.parse(mesg)
     switch (event) {
       case 'edit-stall':

@@ -2,7 +2,7 @@ import micro, { send } from 'micro'
 import moment from 'moment'
 import { parse } from 'url'
 
-module.exports = function startServer (PORT, history, s7obj) {
+module.exports = function startServer (history, s7obj) {
   const server = micro(async (req, res) => {
     const parsedUrl = parse(req.url, true)
     const { pathname, query } = parsedUrl
@@ -30,7 +30,7 @@ module.exports = function startServer (PORT, history, s7obj) {
       default:
         send(res, 500, 'Page not found')
     }
-  }).listen(PORT, () => console.log(`Listening on localhost:${PORT}`))
+  })
   return server
 }
 

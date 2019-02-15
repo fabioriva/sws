@@ -22,7 +22,7 @@
     "isomorphic-unfetch": "^3.0.0",
     "jsonwebtoken": "^8.4.0",
     "moment": "^2.24.0",
-    "mongoose": "^5.4.9",
+    "mongoose": "^5.4.11",
     "next": "^7.0.2",
     "next-redux-wrapper": "^2.1.0",
     "prop-types": "^15.6.2",

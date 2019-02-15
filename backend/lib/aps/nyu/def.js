@@ -1,5 +1,5 @@
-export const APS = 'nyu'
-export const HTTP_PORT = 8083
+// export const APS = 'nyu'
+// export const HTTP_PORT = 8083
 export const PLC = {
   ip: '192.168.55.2',
   rack: 0,
