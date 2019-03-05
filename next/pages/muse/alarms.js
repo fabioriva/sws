@@ -32,13 +32,15 @@ const Ready = (props) => {
 }
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '5'})
+  static async getInitialProps () {
+    const props = {
+      activeItem: '5',
+      pageRole: SERVICE
+    }
     const res = await fetch(`${BACKEND_URL}/aps/${APS}/alarms`)
-    const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
-      statusCode,
+      ...props,
       alarms: json  //.alarms
     }
   }
@@ -114,5 +116,4 @@ class AppUi extends React.Component {
   }
 }
 
-// export default compose(withAuth(withRedux(initStore, null)(AppUi)))
-export default withAuth(AppUi, SERVICE)
+export default withAuth(AppUi)

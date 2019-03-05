@@ -46,6 +46,9 @@ export default class PageLayout extends React.Component {
           html, body {
             height: 100%;
             margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+              'Helvetica Neue', Arial, Noto Sans, sans-serif, 'Apple Color Emoji',
+              'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
           }
           html {
             font-family: 'Roboto', sans-serif;
@@ -64,14 +67,13 @@ export default class PageLayout extends React.Component {
             height: 100%;
           }
           .app-footer {
-            background-color: #f0f0f0;
             padding: 12px 0;
             text-align: center;
             font-size: 90%;
           }
           .app-title {
             margin-top: 0;
-            margin-bottom: .5rem;
+            margin-bottom: 48px;
             font-weight: 300;
           }
           .app-subtitle {

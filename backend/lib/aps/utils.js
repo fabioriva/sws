@@ -1,4 +1,4 @@
-import async from 'async'
+import { series, waterfall } from 'async'
 import moment from 'moment'
 
 const BytesToInt = (b1, b2) => {
@@ -149,7 +149,7 @@ const updateQueue = (byte, data, queue, callback) => {
 }
 
 function updateData (s7data, s7def, s7obj, callback) {
-  async.series([
+  series([
     function (cb) {
       updateBits(s7def.DB_DATA_INIT_MB, s7data, s7obj.merkers, function (results) {
         cb(null, s7obj.merkers)
@@ -237,7 +237,7 @@ function mapCount (stalls, data, size, stallStatus) {
 }
 
 function updateMap (start, buffer, s7def, stalls, statistics, callback) {
-  async.waterfall([
+  waterfall([
     function (cb) {
       // stalls.forEach((e, i) => e.update(buffer.readInt16BE(i * s7def.STALL_LEN), buffer.readInt16BE((i * s7def.STALL_LEN) + 2), buffer.readInt32BE((i * s7def.STALL_LEN) + 4), buffer.readInt16BE((i * s7def.STALL_LEN) + 8)))
       // cb(null, stalls)

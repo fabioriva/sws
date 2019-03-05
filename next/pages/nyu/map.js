@@ -9,57 +9,36 @@ import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/nyu'
 import { SERVICE, VALET } from 'src/constants/roles'
-import parseCookies from 'src/lib/parseCookies'
+import nextCookie from 'next-cookies'
 import withAuth from 'src/lib/withAuth'
-
-// const setStallLabel = (map, filter) => {
-//   switch (filter) {
-//     case 'SHOW_NUMBERS':
-//       map.levels.forEach(l => {
-//         l.stalls.forEach(s => { s.label = s.nr })
-//         return l
-//       })
-//       return map
-//     case 'SHOW_CARDS':
-//       map.levels.forEach(l => {
-//         l.stalls.forEach(s => { s.label = s.status })
-//         return l
-//       })
-//       return map
-//     case 'SHOW_SIZES':
-//       map.levels.forEach(l => {
-//         l.stalls.forEach(s => { s.label = s.size })
-//         return l
-//       })
-//       return map
-//     default:
-//       return map
-//   }
-// }
 
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
-    ctx.store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '2' })
+    const props = {
+      activeItem: '2',
+      pageRole: VALET
+    }
     // check if diagnostic is active
-    const { diagnostic } = parseCookies(ctx)
-    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    const { diagnostic } = nextCookie(ctx)
     if (diagnostic) {
       const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
-      const json = await res.json()
-      return {
-        diagnostic: diagnostic,
-        map: json.map, // setStallLabel(json.map, 'SHOW_NUMBERS'),
-        occupancy: json.map.statistics[0]
+      if (res.ok) {
+        const json = await res.json()
+        return {
+          ...props,
+          diagnostic: diagnostic,
+          map: json.map,
+          occupancy: json.map.statistics[0]
+        }
       }
     }
     // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/${APS}/map`)
-    const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     const map = json  // JSON.parse(json)
     return {
-      statusCode,
-      map: map, // setStallLabel(map, 'SHOW_NUMBERS'),
+      ...props,
+      map: map,
       occupancy: map.statistics[0]
     }
   }
@@ -102,8 +81,6 @@ class AppUi extends React.Component {
     this.ws.close()
   }
   showModal = (stall, card) => {
-  
-    // if (this.props.message.roles.find(e => e === 'service' || e === 'admin')) {
     if (this.props.currentUser.role <= SERVICE) {
     this.setState({
       editModal: {
@@ -125,7 +102,6 @@ class AppUi extends React.Component {
     })
   }
   handleMapChange = (stall, card) => {
-    // console.log('handleChange', stall, card)
     this.setState({
       editModal: {
         stall: stall,
@@ -135,7 +111,6 @@ class AppUi extends React.Component {
     })
   }
   handleMapOk = (stall, card) => {
-    // console.log('handleOk', stall, card)
     this.setState({
       editModal: {
         stall: 0,
@@ -230,10 +205,7 @@ class AppUi extends React.Component {
               />
             </Col>
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <h3>Map Occupancy</h3>
-              <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: '6px', margin: '16px 0', padding: '16px' }}>
-                <Occupancy data={occupancy} />
-            </div>
+              <Occupancy data={occupancy} />
             </Col>
           </Row>
         </Default>
@@ -463,4 +435,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi, VALET)
+export default withAuth(AppUi)

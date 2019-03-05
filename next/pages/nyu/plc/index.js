@@ -41,8 +41,11 @@ const data = [
 ]
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '4' })
+  static async getInitialProps () {
+    return {
+      activeItem: '4',
+      pageRole: SERVICE
+    }
   }
   renderLink = (item, key) => {
     return (
@@ -82,4 +85,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi, SERVICE)
+export default withAuth(AppUi)

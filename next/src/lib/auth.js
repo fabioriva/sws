@@ -1,11 +1,26 @@
-import fetch from 'isomorphic-unfetch'
+import Router from 'next/router'
 import nextCookie from 'next-cookies'
+import cookie from 'js-cookie'
+import fetch from 'isomorphic-unfetch'
+
+export const login = async ({ token, aps }) => {
+  cookie.set('token', token, { expires: 1 })
+  Router.push(`/${aps}/overview`)
+}
+
+export const logout = () => {
+  cookie.remove('token')
+  cookie.remove('diagnostic')
+  // to support logging out from all windows
+  window.localStorage.setItem('logout', Date.now())
+  Router.push('/')
+}
 
 function getUrl (context = {}) {
   return (context.req && context.req.url) || context.pathname
 }
 
-export default async (ctx, pageRole) => {
+export const auth = async (ctx, pageRole) => {
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
   const apiUrl = process.browser
     ? `${protocol}://${window.location.host}/api/profile.js`

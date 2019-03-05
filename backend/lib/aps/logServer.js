@@ -1,10 +1,10 @@
-import net from 'net'
+import { createServer } from 'net'
 import Log from 'lib/models/LogS7'
 
 const LOG_LEN = 32
 
 module.exports = function startServer (eventEmitter, logger) {
-  const server = net.createServer(function (socket) {
+  const server = createServer(function (socket) {
     const client = `${socket.remoteAddress}:${socket.remotePort}`
     socket.on('error', function (e) {
       logger.error('%s socket error %s', client, e)

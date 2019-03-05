@@ -7,14 +7,14 @@ function openNotification (mesg) {
       notification['error']({
         message: message,
         description: <span>{description}</span>,
-        icon: <span style={{ fontSize: '24px' }}>&#x1F44E;&nbsp;</span>
+        // icon: <span style={{ fontSize: '24px' }}>&#x1F44E;&nbsp;</span>
       })
       break
     case 2:
       notification['success']({
         message: message,
         description: <span>{description}</span>,
-        icon: <span style={{ fontSize: '24px' }}>&#x1F44D;&nbsp;</span>
+        // icon: <span style={{ fontSize: '24px' }}>&#x1F44D;&nbsp;</span>
       })
       break
     case 3:
@@ -22,7 +22,7 @@ function openNotification (mesg) {
       notification['warning']({
         message: message,
         description: <span>{description}</span>,
-        icon: <span style={{ fontSize: '24px' }}>&#x26A0;&nbsp;</span>
+        // icon: <span style={{ fontSize: '24px' }}>&#x26A0;&nbsp;</span>
       })
       break
     case 5:
@@ -43,10 +43,10 @@ function openNotification (mesg) {
       notification['info']({
         message: message,
         description: <span>{description}</span>,
-        style: {
-          width: 480,
-          marginLeft: 335 - 480
-        }
+        // style: {
+        //   width: 480,
+        //   marginLeft: 335 - 480
+        // }
       })
   }
 }

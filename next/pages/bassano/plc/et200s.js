@@ -9,28 +9,33 @@ import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
-import parseCookies from 'src/lib/parseCookies'
+import nextCookie from 'next-cookies'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
+    const props = {
+      activeItem: '4',
+      pageRole: SERVICE
+    }
     // check if diagnostic is active
-    const { diagnostic } = parseCookies(ctx)
-    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    const { diagnostic } = nextCookie(ctx)
     if (diagnostic) {
       const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
-      const json = await res.json()
-      return {
-        diagnostic: diagnostic,
-        racks: json.racks
+      if (res.ok) {
+        const json = await res.json()
+        return {
+          ...props,
+          diagnostic: diagnostic,
+          racks: json.racks
+        }
       }
     }
     // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/${APS}/racks`)
-    const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
-      statusCode,
+      ...props,
       racks: json
     }
   }
@@ -308,4 +313,4 @@ class AppUi extends React.Component {
 export default compose(
   withRouter,
   withAuth
-)(AppUi, SERVICE)
+)(AppUi)

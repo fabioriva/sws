@@ -6,29 +6,33 @@ import Operation from 'src/components/OperationModal'
 import { Row, Col } from 'antd'
 import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } from 'src/constants/nyu'
 import { VALET } from 'src/constants/roles'
-import parseCookies from 'src/lib/parseCookies'
+import nextCookie from 'next-cookies'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
-    ctx.store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '1'})
+    const props = {
+      activeItem: '1',
+      pageRole: VALET
+    }
     // check if diagnostic is active
-    const { diagnostic } = parseCookies(ctx)
-    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    const { diagnostic } = nextCookie(ctx)
     if (diagnostic) {
       const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
-      const json = await res.json()
-      return {
-        diagnostic: diagnostic,
-        overview: json.overview
+      if (res.ok) {
+        const json = await res.json()
+        return {
+          ...props,
+          diagnostic: diagnostic,
+          overview: json.overview
+        }
       }
     }
     // if diagnostic is not active fetch data
     const res = await fetch(`${BACKEND_URL}/aps/${APS}/overview`)
-    const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
-      statusCode,
+      ...props,
       overview: json  // json.data.overview
     }
   }
@@ -73,7 +77,6 @@ class AppUi extends React.Component {
     this.ws.close()
   }
   showOperationModal = (operationId) => {
-    console.log(operationId)
     this.setState({
       operationModal: {
         card: {
@@ -100,7 +103,6 @@ class AppUi extends React.Component {
     })
   }
   handleChange = (fields) => {
-    console.log('handleChange', fields)
     this.setState({
       operationModal: {
         ...this.state.operationModal, ...fields
@@ -108,7 +110,6 @@ class AppUi extends React.Component {
     })
   }
   handleConfirm = (card, operationId) => {
-    console.log('handleConfirm', card, operationId)
     this.setState({
       operationModal: {
         card: {
@@ -177,4 +178,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi, VALET)
+export default withAuth(AppUi)

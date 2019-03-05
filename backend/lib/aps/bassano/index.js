@@ -3,10 +3,10 @@ import mongoose from 'mongoose'
 import pino from 'pino'
 import * as s7def from './def'
 import * as s7obj from './entities'
-import plc from 'lib/plc'
-import log from 'lib/log'
-import api from 'lib/micro'
-import websocket from 'lib/ws'
+import api from 'lib/aps/apiServer'
+import log from 'lib/aps/logServer'
+import plc from 'lib/aps/plc'
+import websocket from 'lib/aps/ws'
 import notification from 'lib/aps/notification'
 import LogSchema from 'lib/models/LogSchema'
 import DiagSchema from 'lib/models/DiagSchema'
@@ -42,7 +42,7 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
 
   plc(s7def, s7obj, appEmitter, logger)
 
-  const serverApi = api(Log, s7obj)
+  const serverApi = api(Diag, Log, s7def, s7obj)
 
   serverApi.listen(HTTP, () => logger.info(`Api server listening on localhost:${HTTP}`))
 

@@ -9,13 +9,15 @@ import { SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({type: 'UI_SIDEBAR_SET_MENU', item: '3'})
+  static async getInitialProps () {
+    const props = {
+      activeItem: '3',
+      pageRole: SERVICE
+    }
     const res = await fetch(`${BACKEND_URL}/aps/${APS}/cards`)
-    const statusCode = res.statusCode > 200 ? res.statusCode : false
     const json = await res.json()
     return {
-      statusCode,
+      ...props,
       cards: json // .cards
     }
   }
@@ -180,4 +182,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi, SERVICE)
+export default withAuth(AppUi)

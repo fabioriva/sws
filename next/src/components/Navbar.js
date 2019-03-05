@@ -1,20 +1,21 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
-import cookie from 'cookie'
-import redirect from 'src/lib/redirect'
+import { logout } from 'src/lib/auth'
+import cookie from 'js-cookie'
+// import redirect from 'src/lib/redirect'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { navbarSetDiag, sidebarToggle } from 'src/store'
+// import { bindActionCreators } from 'redux'
+import { sidebarToggle } from 'src/store'
 import { Alert, Layout, Badge, Icon, Tag, Tooltip } from 'antd'
 import openNotification from 'src/lib/openNotification'
 // i18n
 import intl from 'react-intl-universal'
-import en_US from 'src/locales/en-US.json'
-import it_IT from 'src/locales/it-IT.json'
+import enUS from 'src/locales/en-US.json'
+import itIT from 'src/locales/it-IT.json'
 
 const locales = {
-  'en-US': en_US, // require('src/locales/en-US.json'),
-  'it-IT': it_IT  // require('src/locales/it-IT.json')
+  'en-US': enUS,
+  'it-IT': itIT
 }
 
 const { Header } = Layout
@@ -64,9 +65,8 @@ class Navbar extends Component {
     intl.init({
       currentLocale,
       locales
-    })
-    .then(() => {
-       this.setState({ initDone: true }) // After loading CLDR locale data, start to render
+    }).then(() => {
+      this.setState({ initDone: true }) // After loading CLDR locale data, start to render
     })
   }
   componentDidMount () {
@@ -91,15 +91,9 @@ class Navbar extends Component {
   componentWillUnmount () {
     this.ws.close()
   }
-  handleClose = () => {
-    this.props.navbarSetDiag(false)
-    if (process.browser) {
-      document.cookie = cookie.serialize('diagnostic', '', { maxAge: -1 }) // 0 = Delete cookie / -1 = Expire the cookie immediately
-      window.location.href = this.props.navbar.user.pathname // reload page in the browser
-    }
-  }
-  signout = () => {
-    redirect({}, '/') // token cookie expires in /
+  handleCloseDiagnostic = () => {
+    window.location.href = this.props.navbar.user.url
+    cookie.remove('diagnostic')
   }
   render () {
     const comm = this.state.comm
@@ -107,19 +101,20 @@ class Navbar extends Component {
     const diag = this.state.diag
     const { user } = this.props.navbar
     const { collapsed } = this.props.sidebar
+    const { dispatch } = this.props
     return (
       <div>
         <Header className='app-navbar'>
           <Icon
             className='app-navbar-trigger'
             type={collapsed ? 'menu-unfold' : 'menu-fold'}
-            onClick={() => this.props.sidebarToggle(!collapsed)}
+            onClick={() => dispatch(sidebarToggle(!collapsed))}
           />
           <div className='app-navbar-right'>
-            { this.props.navbar.diag &&
+            { cookie.get('diagnostic') &&
             <span className='app-navbar-element'>
               <Tooltip title='Diagnostic is active'>
-                <Icon className='app-navbar-icon' type='thunderbolt' />
+                <Icon className='app-navbar-icon' type='thunderbolt' theme='twoTone' />
               </Tooltip>
             </span>
             }
@@ -132,7 +127,7 @@ class Navbar extends Component {
             </span>
             <span className='app-navbar-element'>
               <Tooltip title={`Sign out ${user.username}`}>
-                <Icon className='app-navbar-icon' type='user' onClick={this.signout} />
+                <Icon className='app-navbar-icon' type='user' onClick={logout} />
               </Tooltip>
             </span>
             <span className='app-navbar-comm'>
@@ -144,7 +139,9 @@ class Navbar extends Component {
           percent={this.state.navbarComm}
         />
         {
-          this.props.navbar.diag && <Diagnostic message={this.props.navbar.diag} onClose={this.handleClose} />
+          // this.props.navbar.diag && <Diagnostic message={this.props.navbar.diag} onClose={this.handleClose} />
+          // cookie.get('diagnostic') && <Diagnostic message={cookie.get('diagnostic')} onClose={() => cookie.remove('diagnostic')} />
+          cookie.get('diagnostic') && <Diagnostic message={cookie.get('diagnostic')} onClose={this.handleCloseDiagnostic} />
         }
         <style jsx global>{`
           .ant-layout-header {
@@ -191,11 +188,18 @@ class Navbar extends Component {
 
 const mapStateToProps = ({ navbar, sidebar }) => ({ navbar, sidebar })
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch),
-    sidebarToggle: bindActionCreators(sidebarToggle, dispatch)
-  }
-}
+// const mapStateToProps = (state) => {
+//   const { navbar, sidebar } = state
+//   return { navbar, sidebar }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Navbar)
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch),
+//     sidebarToggle: bindActionCreators(sidebarToggle, dispatch)
+//   }
+// }
+
+// export default connect(mapStateToProps, mapDispatchToProps)(Navbar)
+
+export default connect(mapStateToProps)(Navbar)

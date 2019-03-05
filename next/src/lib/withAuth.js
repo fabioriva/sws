@@ -1,33 +1,59 @@
 import React from 'react'
 import Error from 'next/error'
-import checkLoggedIn from 'src/lib/checkLoggedIn'
+import Router from 'next/router'
+import { auth } from 'src/lib/auth'
 
 /*
  * Higher order component that passes `getInitialProps` through
  * to the child component
  */
 
-const WithAuth = (Child, pageRole) => {
-  return class extends React.Component {
+export default (Component) => {
+  return class WithAuth extends React.Component {
     static async getInitialProps (ctx) {
-      // check if logged
-      const { statusCode, currentUser } = await checkLoggedIn(ctx)
+      const props =
+        (Component.getInitialProps
+          ? await Component.getInitialProps(ctx)
+          : null) || {}
+
+      const { activeItem, pageRole } = props
+
+      const { currentUser, statusCode } = await auth(ctx, pageRole)
+
       if (statusCode === 401) return { statusCode: statusCode }
-      // check user role against page role
-      if (currentUser.role === undefined || currentUser.role > pageRole) return { statusCode: 401 }
-      ctx.store.dispatch({ type: 'UI_NAVBAR_SET_USER', user: { ...currentUser, pathname: ctx.pathname } })
-      return {
-        ...(Child.getInitialProps ? await Child.getInitialProps(ctx) : {}),
-        currentUser
+
+      ctx.store.dispatch({ type: 'UI_NAVBAR_SET_USER', user: { ...currentUser, url: ctx.asPath } })
+      ctx.store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: activeItem })
+
+      return { ...props, currentUser }
+    }
+
+    constructor (props) {
+      super(props)
+      this.syncLogout = this.syncLogout.bind(this)
+    }
+
+    componentDidMount () {
+      window.addEventListener('storage', this.syncLogout)
+    }
+
+    componentWillUnmount () {
+      window.removeEventListener('storage', this.syncLogout)
+      window.localStorage.removeItem('logout')
+    }
+
+    syncLogout (event) {
+      if (event.key === 'logout') {
+        console.log('logged out from storage!')
+        Router.push('/')
       }
     }
+
     render () {
       if (this.props.statusCode > 200) {
         return <Error statusCode={this.props.statusCode} />
       }
-      return <Child {...this.props} />
+      return <Component {...this.props} />
     }
   }
 }
-
-export default WithAuth

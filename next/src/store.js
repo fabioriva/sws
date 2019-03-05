@@ -4,9 +4,9 @@ import thunkMiddleware from 'redux-thunk'
 
 const appInitialState = {
   navbar: {
+    // diag: false,
     // locale: 'en-US',
-    user: {},
-    diag: false
+    user: {}
   },
   sidebar: {
     activeItem: '0',
@@ -16,7 +16,7 @@ const appInitialState = {
 }
 
 export const actionTypes = {
-  UI_NAVBAR_SET_DIAG: 'UI_NAVBAR_SET_DIAG',
+  // UI_NAVBAR_SET_DIAG: 'UI_NAVBAR_SET_DIAG',
   UI_NAVBAR_SET_USER: 'UI_NAVBAR_SET_USER',
   UI_SIDEBAR_SET_MENU: 'UI_SIDEBAR_SET_MENU',
   UI_SIDEBAR_TOGGLE: 'UI_SIDEBAR_TOGGLE'
@@ -25,14 +25,14 @@ export const actionTypes = {
 // REDUCERS
 export const reducer = (state = appInitialState, action) => {
   switch (action.type) {
-    case actionTypes.UI_NAVBAR_SET_DIAG:
-      // console.log('UI_NAVBAR_SET_DIAG', action)
-      return Object.assign({}, state, {
-        navbar: {
-          ...state.navbar,
-          diag: action.status
-        }
-      })
+    // case actionTypes.UI_NAVBAR_SET_DIAG:
+    //   // console.log('UI_NAVBAR_SET_DIAG', action)
+    //   return Object.assign({}, state, {
+    //     navbar: {
+    //       ...state.navbar,
+    //       diag: action.status
+    //     }
+    //   })
     case actionTypes.UI_NAVBAR_SET_USER:
       // console.log('UI_NAVBAR_SET_USER', action)
       return Object.assign({}, state, {
@@ -63,9 +63,9 @@ export const reducer = (state = appInitialState, action) => {
 }
 
 // ACTIONS
-export const navbarSetDiag = (status) => dispatch => {
-  return dispatch({ type: actionTypes.UI_NAVBAR_SET_DIAG, status: status })
-}
+// export const navbarSetDiag = (status) => dispatch => {
+//   return dispatch({ type: actionTypes.UI_NAVBAR_SET_DIAG, status: status })
+// }
 export const navbarSetUser = (user) => dispatch => {
   return dispatch({ type: actionTypes.UI_NAVBAR_SET_USER, user: user })
 }

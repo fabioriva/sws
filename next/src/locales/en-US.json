@@ -32,7 +32,7 @@
   "OPERATION": "Operation",
   "HISTORY_QUERY": "History from <strong>{dateFrom}</strong> to <strong>{dateTo}</strong>",
   "HISTORY_ITEMS": "Total items <strong>{count}</strong>",
-
+  "HISTORY_DIAG": "Activate Diagnostic",
   "DEVICE_ID_0": "Operator",
 
   "MODE_ID_0": "---",

@@ -1,10 +1,10 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import cookie from 'cookie'
+// import { connect } from 'react-redux'
+// import { bindActionCreators } from 'redux'
+// import { navbarSetDiag } from 'src/store'
+// import cookie from 'cookie'
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import { navbarSetDiag } from 'src/store'
 import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
@@ -13,22 +13,26 @@ import { ADMIN, SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
-  static async getInitialProps ({ store }) {
-    store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: '6' })
+  static async getInitialProps () {
     let dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
     let dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
     const res = await fetch(`${BACKEND_URL}/aps/${APS}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`)
     const json = await res.json()
-    return json
+    return {
+      activeItem: '6',
+      pageRole: SERVICE,
+      history: json
+    }
   }
   constructor (props) {
     super(props)
+    const { history } = props
     this.state = {
       isFetching: true,
-      count: props.count,
-      dateFrom: props.dateFrom,
-      dateTo: props.dateTo,
-      query: props.query,
+      count: history.count,
+      dateFrom: history.dateFrom,
+      dateTo: history.dateTo,
+      query: history.query,
       queryModal: {
         range: {
           value: []
@@ -65,7 +69,6 @@ class AppUi extends React.Component {
         visible: false
       }
     })
-    console.log('>>>>>', this.state)
   }
   handleChange = (fields) => {
     this.setState({
@@ -98,18 +101,19 @@ class AppUi extends React.Component {
       })
     })
   }
-  enableDiag = async (alarm) => {
-    this.props.navbarSetDiag(alarm._id)
-    const COOKIE_MAX_AGE = 1 * 24 * 60 * 60 // 1 day
-    const options = { maxAge: COOKIE_MAX_AGE }
-    document.cookie = cookie.serialize('diagnostic', alarm._id, options)
-  }
+  // enableDiag = async (alarm) => {
+  //   this.props.navbarSetDiag(alarm._id)
+  //   const COOKIE_MAX_AGE = 1 * 24 * 60 * 60 // 1 day
+  //   const options = { maxAge: COOKIE_MAX_AGE }
+  //   document.cookie = cookie.serialize('diagnostic', alarm._id, options)
+  // }
   render () {
+    const { currentUser } = this.props
     const { count, dateFrom, dateTo, query, queryModal } = this.state
-    const diag = {
-      enabled: this.props.currentUser.role <= ADMIN,
-      enableDiag: this.enableDiag
-    }
+    // const diag = {
+    //   enabled: currentUser.role <= ADMIN, // this.props.navbar.user.role <= ADMIN,
+    //   enableDiag: this.enableDiag
+    // }
     return (
       <Layout
         aps={APS_TITLE}
@@ -123,7 +127,7 @@ class AppUi extends React.Component {
           dateTo={dateTo}
           query={query}
           queryModal={this.showModal}
-          diagnostic={diag}
+          diagnostic={currentUser.role <= ADMIN}
         />
         <Query
           data={queryModal}
@@ -136,11 +140,18 @@ class AppUi extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch)
-  }
-}
+// const  mapStateToProps = (state) => {
+//   const { navbar } = state
+//   return { navbar }
+// }
 
-export default connect(state => state, mapDispatchToProps)(withAuth(AppUi, SERVICE))
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     navbarSetDiag: bindActionCreators(navbarSetDiag, dispatch)
+//   }
+// }
+
+// export default connect(mapStateToProps, mapDispatchToProps)(withAuth(AppUi, SERVICE))
+
+export default withAuth(AppUi)
 

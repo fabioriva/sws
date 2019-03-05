@@ -1,13 +1,14 @@
 import React from 'react'
 import Head from 'next/head'
 import LoginForm from 'src/components/LoginForm'
-import cookie from 'cookie'
 
 export default class PageLogin extends React.Component {
-  componentDidMount () {
-    if (process.browser) {
-      document.cookie = cookie.serialize('token', '', { maxAge: -1 })
-    }
+  static getInitialProps ({ req }) {
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
+    const apiUrl = process.browser
+      ? `${protocol}://${window.location.host}/api/login.js`
+      : `${protocol}://${req.headers.host}/api/login.js`
+    return { apiUrl }
   }
   render () {
     return (
@@ -25,7 +26,7 @@ export default class PageLogin extends React.Component {
             <h1>&#x1F680;&nbsp;<span className='app-title'><span className='color-1'>S</span>otefin&nbsp;<span className='color-2'>W</span>eb&nbsp;<span className='color-3'>S</span>ervice</span></h1>
             <h4 className='text-muted'>The future of automated parking systems servicing</h4>
           </div>
-          <LoginForm />
+          <LoginForm apiUrl={this.props.apiUrl} />
           <p className='text-center text-muted'><i className='anticon anticon-copyright' /> 2017-present <a href='http://www.sotefin.com'>Sotefin SA</a></p>
         </div>
         <style jsx global>{`
@@ -42,6 +43,9 @@ export default class PageLogin extends React.Component {
             background-image: url(/static/sotefin_shuttle.jpg);
             background-repeat: no-repeat;
             background-position: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+              'Helvetica Neue', Arial, Noto Sans, sans-serif, 'Apple Color Emoji',
+              'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
           }
           .text-center {
             text-align: center;
@@ -54,7 +58,6 @@ export default class PageLogin extends React.Component {
           }
           .app-title {
             color: #ffa500;
-            font-family: 'Roboto', sans-serif;
             font-size: 33px;
             font-weight: 400!important;
           }

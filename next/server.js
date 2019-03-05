@@ -1,43 +1,43 @@
 const express = require('express')
+const httpProxy = require('http-proxy')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const cors = require('cors')
-const mongoose = require('mongoose')
+// const cors = require('cors')
 const next = require('next')
 const port = parseInt(process.env.PORT, 10) || 8080
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
+
 const aps = require('./routes/aps')
-const auth = require('./routes/auth')
 
-const options = {
-  autoIndex: dev,
-  useCreateIndex: true,
-  useNewUrlParser: true
-}
-const mongodbUri = 'mongodb://localhost:27017/sws' // 'mongodb://webservice:h0savP6L.@localhost:27017/sws'
+const proxy = httpProxy.createProxyServer()
+const target = 'http://localhost:3001'
 
-mongoose.connect(mongodbUri, options)
-var db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error:'))
-db.once('open', function () {
-  app.prepare().then(() => {
-    const server = express()
-    server.use(bodyParser.json())
-    server.use(compression())
-    server.use(cors())
-    server.use('/', auth)
-    aps('/bassano', server, app)
-    aps('/muse', server, app)
-    aps('/nyu', server, app)
-    aps('/trumpeldor', server, app)
-    server.get('*', (req, res) => {
-      return handle(req, res)
-    })
-    server.listen(port, (err) => {
-      if (err) throw err
-      console.log(`> Ready on http://localhost:${port}`)
-    })
+app.prepare().then(() => {
+  const server = express()
+  // Move the proxy stuff to the very front
+  server.all('/api/login.js', function (req, res) {
+    console.log('/api/login.js')
+    proxy.web(req, res, { target }, error => console.log('Error!', error))
+  })
+  server.all('/api/profile.js', function (req, res) {
+    console.log('/api/profile.js')
+    proxy.web(req, res, { target }, error => console.log('Error!', error))
+  })
+  server.use(bodyParser.json())
+  server.use(compression())
+  // server.use(cors())
+  // server.use('/', auth)
+  aps('/bassano', server, app)
+  aps('/muse', server, app)
+  aps('/nyu', server, app)
+  aps('/trumpeldor', server, app)
+  server.get('*', (req, res) => {
+    return handle(req, res)
+  })
+  server.listen(port, (err) => {
+    if (err) throw err
+    console.log(`> Ready on http://localhost:${port}`)
   })
 })
