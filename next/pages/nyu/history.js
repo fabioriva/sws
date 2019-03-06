@@ -22,12 +22,13 @@ class AppUi extends React.Component {
   }
   constructor (props) {
     super(props)
+    const { history } = props
     this.state = {
       isFetching: true,
-      count: props.count,
-      dateFrom: props.dateFrom,
-      dateTo: props.dateTo,
-      query: props.query,
+      count: history.count,
+      dateFrom: history.dateFrom,
+      dateTo: history.dateTo,
+      query: history.query,
       queryModal: {
         range: {
           value: []
