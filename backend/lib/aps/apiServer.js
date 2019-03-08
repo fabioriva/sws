@@ -117,7 +117,6 @@ function getOperations (query, history, callback) {
     } },
     { $sort: { '_id': 1 } } // order by date ascending
   ], function (err, result) {
-    console.log(err)
     if (err) return callback(err)
     // console.log('Statistics:', result)
     callback(null, result)
