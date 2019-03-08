@@ -17,14 +17,8 @@ const target = 'http://localhost:3001'
 app.prepare().then(() => {
   const server = express()
   // Move the proxy stuff to the very front
-  server.all('/api/login.js', function (req, res) {
-    console.log('/api/login.js')
-    proxy.web(req, res, { target }, error => console.log('Error!', error))
-  })
-  server.all('/api/profile.js', function (req, res) {
-    console.log('/api/profile.js')
-    proxy.web(req, res, { target }, error => console.log('Error!', error))
-  })
+  server.all('/api/login.js', (req, res) => proxy.web(req, res, { target }, error => console.log('Error!', error)))
+  server.all('/api/profile.js', (req, res) => proxy.web(req, res, { target }, error => console.log('Error!', error)))
   server.use(bodyParser.json())
   server.use(compression())
   // server.use(cors())

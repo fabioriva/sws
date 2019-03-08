@@ -42,37 +42,20 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
       case 'racks':
         return s7obj.racks
       case 'statistics':
-        const from = moment('2019-01-01').hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
-        const to = moment().hours(23).minutes(59).seconds(59)
-        console.log(from, to)
-        history.aggregate([
-          { $match: {
-            // $and: [
-            //   { 'operation.id': 1 },
-            //   // { 'date': {
-            //   //   $gte: from,
-            //   //   $lt: to
-            //   // } }
-            // ]
-            $or: [
-              { 'operation.id': 5 },
-              { 'operation.id': 6 }
-            ]
-          } },
-          { $group: {
-            // _id: '$alarm.id',
-            _id: '$operation.id',
-            total: { $sum: 1 } }
-          },
-          { $sort: { total: -1 } }
-        ], function (err, result) {
-          if (err) {
-            console.log(err)
-            return
-          }
-          console.log(result)
-          result.forEach(e => console.log(e._id, e.total))
-          send(res, 200, result)
+        // getAlarms(query, history, function (err, result) {
+        //   if (err) return send(res, 500, `/statistics: Error aggregate: ${err}`)
+        //   // send(res, 200, result)
+        // })
+        getOperations(query, history, function (err, result) {
+          if (err) return send(res, 500, `/statistics: Error aggregate: ${err}`)
+          const operations = result.map((e) => {
+            return {
+              name: `${e._id.year}-${e._id.month}-${e._id.day}`,
+              entries: e.entries,
+              exits: e.exits
+            }
+          })
+          send(res, 200, operations)
         })
         break
       default:
@@ -80,6 +63,65 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
     }
   })
   return server
+}
+
+function getAlarms (query, history, callback) {
+  const { dateFrom, dateTo } = query
+  history.aggregate([
+    { $match: {
+      $and: [ { 'date': { $gte: new Date(dateFrom), $lt: new Date(dateTo) } }, { 'operation.id': 1 } ] } },
+    { $group: {
+      // '_id': {
+      //   'year': { '$year': '$date' },
+      //   'month': { '$month': '$date' },
+      //   'day': { '$dayOfMonth': '$date' }
+      // },
+      '_id': '$alarm.id',
+      'total': { $sum: 1 }
+    } },
+    { $sort: { '_id': 1 } } // order by date ascending
+  ], function (err, result) {
+    console.log(err)
+    if (err) return callback(err)
+    console.log('Alarms Statistics:', result)
+    callback(null, result)
+  })
+}
+
+function getOperations (query, history, callback) {
+  // const from = moment().subtract(1, 'months').startOf('month').hours(0).minutes(0).seconds(0).toDate() // transform to Date object for mongoose aggregate
+  // const to = moment().subtract(1, 'months').endOf('month').hours(23).minutes(59).seconds(59).toDate() // transform to Date object for mongoose aggregate
+  const { dateFrom, dateTo } = query
+  // console.log(typeof dateFrom, dateFrom, typeof dateTo, dateTo)
+  let from = new Date(dateFrom)
+  let to = new Date(dateTo)
+  // console.log(typeof from, from, typeof to, to)
+  history.aggregate([
+    // { $match: { $and: [ { 'date': { $gte: from, $lt: to } }, { $or: [ { 'operation.id': 5 }, { 'operation.id': 6 } ] } ] } },
+    { $match: { 'date': { $gte: from, $lt: to } } },
+    { $group: {
+      '_id': {
+        'year': { '$year': '$date' },
+        'month': { '$month': '$date' },
+        'day': { '$dayOfMonth': '$date' }
+      },
+      'total': { $sum: 1 },
+      'entries': { $sum: { $cond: [ { $eq: ['$operation.id', 5] }, 1, 0 ] } },
+      'exits': { $sum: { $cond: [ { $eq: ['$operation.id', 6] }, 1, 0 ] } }
+    } },
+    { $project: {
+      // _id: 0,
+      // name: { $concat: [ { $toString: '$_id.year' }, '-', { $toString: '$_id.month' }, '-', { $toString: '$_id.year' } ] },
+      entries: '$entries',
+      exits: '$exits'
+    } },
+    { $sort: { '_id': 1 } } // order by date ascending
+  ], function (err, result) {
+    console.log(err)
+    if (err) return callback(err)
+    // console.log('Statistics:', result)
+    callback(null, result)
+  })
 }
 
 function getDiagnostic (query, diagnostic, s7def, s7obj, callback) {

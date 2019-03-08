@@ -37,8 +37,11 @@ const AlarmModal = props => {
       data !== undefined &&
       <span>
         <p>Date: <strong>{data.logged}</strong></p>
-        <p>Info: Id <strong>{data.alarm.id}</strong> {data.alarm.info}</p>
-        <p>Diagnostic Id: <strong>{data._id}</strong></p>
+        <p>Alarm Id: <strong>{data.alarm.id}</strong></p>
+        <p><strong>{data.alarm.info}</strong></p>
+        {
+        !props.disabled && <p>Diagnostic Id: <strong>{data._id}</strong></p>
+        }
       </span>
     }
     </Modal>
