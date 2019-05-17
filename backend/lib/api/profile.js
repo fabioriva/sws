@@ -12,16 +12,16 @@ const profile = async (req, res) => {
   const auth = await req.headers.authorization
   const { token } = JSON.parse(auth)
 
-  console.log(auth, token)
-
   const { pathname } = await json(req)
   const [apsPath] = pathname.substring(1).split('/')
+
+  console.log('(0)', auth, token, pathname, apsPath)
 
   try {
     const cert = fs.readFileSync(path.join(__dirname, '../../ssh-key/jwtRS256.key'))
     const decoded = jwt.verify(token, cert)
     const { aps } = decoded
-
+    console.log('(1)', decoded)
     if (aps === apsPath) {
       send(res, 200, JSON.stringify(decoded))
     } else {

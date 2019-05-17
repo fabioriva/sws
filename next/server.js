@@ -16,7 +16,7 @@ const target = 'http://localhost:3001'
 
 app.prepare().then(() => {
   const server = express()
-  // Move the proxy stuff to the very front
+  // Move the proxy stuff to the very front because of body parser
   server.all('/api/login.js', (req, res) => proxy.web(req, res, { target }, error => console.log('Error!', error)))
   server.all('/api/profile.js', (req, res) => proxy.web(req, res, { target }, error => console.log('Error!', error)))
   server.use(bodyParser.json())
@@ -24,6 +24,7 @@ app.prepare().then(() => {
   // server.use(cors())
   // server.use('/', auth)
   aps('/bassano', server, app)
+  aps('/longmatan', server, app)
   aps('/muse', server, app)
   aps('/nyu', server, app)
   aps('/trumpeldor', server, app)

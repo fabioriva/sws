@@ -1,4 +1,5 @@
-import micro, { send } from 'micro'
+import micro, { send, json } from 'micro'
+// import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
 import { parse } from 'url'
 import { series } from 'async'
@@ -10,9 +11,29 @@ import {
 module.exports = function startServer (diagnostic, history, s7def, s7obj) {
   const server = micro(async (req, res) => {
     const parsedUrl = parse(req.url, true)
+    // const { pathname, query } = parsedUrl
+
     const { pathname, query } = parsedUrl
     const page = pathname.split('/').pop()
-    // console.log(pathname, query, page)
+
+    // const auth = await req.headers.authorization
+    // const { token } = JSON.parse(auth)
+
+    // const { query } = await json(req)
+    // console.log('!!!!?', pathname, page, query, token)
+
+    // const apiUrl = `localhost:3001/api/profile.js`
+    // const response = await fetch(apiUrl, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': JSON.stringify({ token }) // 'Authorization': token
+    //   },
+    //   body: JSON.stringify({ pathname }) // body: JSON.stringify({ pathname: getUrl(ctx) })
+    // })
+    // const user = await response.json()
+    // console.log('rrrrrrrrrrrrrrrrres', user)
+
     switch (page) {
       case 'alarms':
         return s7obj.diag
@@ -20,7 +41,7 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
         return s7obj.cards
       case 'diagnostic':
         getDiagnostic(query, diagnostic, s7def, s7obj, function (err, s7obj) {
-          if (err) return send(res, 500, '/diagnostic: Error query')
+          if (err) return send(res, 500, `/diagnostic: Error ${err}`)
           const json = {
             overview: s7obj.overview,
             racks: s7obj.racks,
@@ -31,7 +52,7 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
         break
       case 'history':
         getHistory(query, history, function (err, json) {
-          if (err) return send(res, 500, '/history: Error query')
+          if (err) return send(res, 500, `/history: Error ${err}`)
           send(res, 200, json)
         })
         break
@@ -42,20 +63,9 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
       case 'racks':
         return s7obj.racks
       case 'statistics':
-        // getAlarms(query, history, function (err, result) {
-        //   if (err) return send(res, 500, `/statistics: Error aggregate: ${err}`)
-        //   // send(res, 200, result)
-        // })
-        getOperations(query, history, function (err, result) {
-          if (err) return send(res, 500, `/statistics: Error aggregate: ${err}`)
-          const operations = result.map((e) => {
-            return {
-              name: `${e._id.year}-${e._id.month}-${e._id.day}`,
-              entries: e.entries,
-              exits: e.exits
-            }
-          })
-          send(res, 200, operations)
+        getStatistics(query, history, function (err, results) {
+          if (err) return send(res, 500, `/statistics: Error ${err}`)
+          send(res, 200, results)
         })
         break
       default:
@@ -81,10 +91,15 @@ function getAlarms (query, history, callback) {
     } },
     { $sort: { '_id': 1 } } // order by date ascending
   ], function (err, result) {
-    console.log(err)
     if (err) return callback(err)
-    console.log('Alarms Statistics:', result)
-    callback(null, result)
+    // console.log('Alarms Statistics:', result)
+    const alarms = result.map((e) => {
+      return {
+        name: `Id ${e._id}`,
+        total: e.total
+      }
+    })
+    callback(null, alarms)
   })
 }
 
@@ -109,17 +124,48 @@ function getOperations (query, history, callback) {
       'entries': { $sum: { $cond: [ { $eq: ['$operation.id', 5] }, 1, 0 ] } },
       'exits': { $sum: { $cond: [ { $eq: ['$operation.id', 6] }, 1, 0 ] } }
     } },
-    { $project: {
-      // _id: 0,
-      // name: { $concat: [ { $toString: '$_id.year' }, '-', { $toString: '$_id.month' }, '-', { $toString: '$_id.year' } ] },
-      entries: '$entries',
-      exits: '$exits'
-    } },
+    // { $project: {
+    //   // _id: 0,
+    //   // name: { $concat: [ { $toString: '$_id.year' }, '-', { $toString: '$_id.month' }, '-', { $toString: '$_id.year' } ] },
+    //   entries: '$entries',
+    //   exits: '$exits'
+    // } },
     { $sort: { '_id': 1 } } // order by date ascending
   ], function (err, result) {
     if (err) return callback(err)
     // console.log('Statistics:', result)
-    callback(null, result)
+    const operations = result.map((e) => {
+      return {
+        name: `${e._id.year}-${e._id.month}-${e._id.day}`,
+        entries: e.entries,
+        exits: e.exits,
+        total: e.total
+      }
+    })
+    callback(null, operations)
+  })
+}
+
+function getStatistics (query, history, callback) {
+  series([
+    function (cb) {
+      getAlarms(query, history, function (err, result) {
+        if (err) cb(err)
+        cb(null, result)
+      })
+    },
+    function (cb) {
+      getOperations(query, history, function (err, result) {
+        if (err) cb(err)
+        cb(null, result)
+      })
+    }
+  ],
+  function (err, results) {
+    if (err) return callback(err)
+    console.log('Alarms:', results[0])
+    console.log('Operations:', results[1])
+    callback(null, results)
   })
 }
 

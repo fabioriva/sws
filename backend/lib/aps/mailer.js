@@ -1,12 +1,17 @@
 const nodemailer = require('nodemailer')
 
+// let account = {
+//   user: 'f.riva.phone@live.com',
+//   pass: 'h0savP6L.$'
+// }
+
 let account = {
-  user: 'f.riva.phone@live.com',
-  pass: 'h0savP6L.$'
+  user: 'info@sotefinservice.com',
+  pass: 'aGep9l*h'
 }
 
 let transporter = nodemailer.createTransport({
-  host: 'smtp-mail.outlook.com',
+  host: 'smtp.bweb.ch', // 'smtp-mail.outlook.com',
   port: 587,
   secureConnection: false, // true for 465, false for other ports
   tls: {
@@ -21,7 +26,7 @@ let transporter = nodemailer.createTransport({
 module.exports = async function main (system, doc) {
   const { logged, alarm, device } = doc
 
-  let subject = `${system}: alarm notification ⚠️`
+  let subject = `${system}: Sotefin Web Service ⚠️ notification`
 
   let html = `
   <p>Log time <b>${logged}</b></p>
@@ -33,7 +38,7 @@ module.exports = async function main (system, doc) {
   `
 
   let mailOptions = {
-    from: '"Sotefin Web Service" <f.riva.phone@live.com>',
+    from: '"Sotefin Web Service" <info@sotefinservice.com>',
     to: 'fabio@elesoft.it, f.riva@sotefin.ch',
     subject: subject,
     // text: 'Hello world?', // plain text body
