@@ -8,7 +8,7 @@ import Alarms from 'src/components/charts/Alarms'
 import Operations from 'src/components/charts/Operations'
 import Query from 'src/components/ModalStatistics'
 import { Row, Col } from 'antd'
-import { APS, APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/trumpeldor'
+import { APS, APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/nyu'
 import { SERVICE } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 

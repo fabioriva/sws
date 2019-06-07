@@ -1,5 +1,5 @@
 import micro, { send, json } from 'micro'
-// import fetch from 'isomorphic-unfetch'
+import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
 import { parse } from 'url'
 import { series } from 'async'
@@ -11,16 +11,34 @@ import {
 module.exports = function startServer (diagnostic, history, s7def, s7obj) {
   const server = micro(async (req, res) => {
     const parsedUrl = parse(req.url, true)
-    // const { pathname, query } = parsedUrl
-
     const { pathname, query } = parsedUrl
     const page = pathname.split('/').pop()
+
+    // const { method, url } = req
+    // console.log(method, url)
+
+    // switch (method) {
+    //   case 'GET':
+    //     console.log('method is GET', parsedUrl.query)
+    //     break
+    //   case 'POST':
+    //     const { query } = await json(req)
+    //     console.log('method is POST', query)
+    //     break
+    //   default:
+    //     console.log('hhhhh')
+    // }
+
+    // if (!('authorization' in req.headers)) {
+    //   // throw createError(401, 'Authorization header missing')
+    //   return send(res, 401, { success: false, message: 'Authorization header missing' })
+    // }
 
     // const auth = await req.headers.authorization
     // const { token } = JSON.parse(auth)
 
     // const { query } = await json(req)
-    // console.log('!!!!?', pathname, page, query, token)
+    // console.log('!!!!?', pathname, page, query)//, token !== undefined ? token : 'Authorization header missing')
 
     // const apiUrl = `localhost:3001/api/profile.js`
     // const response = await fetch(apiUrl, {
@@ -147,6 +165,7 @@ function getOperations (query, history, callback) {
 }
 
 function getStatistics (query, history, callback) {
+  console.log(query)
   series([
     function (cb) {
       getAlarms(query, history, function (err, result) {

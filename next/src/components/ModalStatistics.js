@@ -54,7 +54,7 @@ const ModalQuery = props => {
             />
           )}
         </Form.Item>
-        <Form.Item
+        {/* <Form.Item
           {...formItemLayout}
           label={intl.get('FILTERS')}
         >
@@ -64,7 +64,7 @@ const ModalQuery = props => {
               <Radio value='b'>{intl.get('ALARMS')}</Radio>
             </Radio.Group>
           )}
-        </Form.Item>
+        </Form.Item> */}
       </Form>
     </Modal>
   )
