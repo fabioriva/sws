@@ -45,10 +45,12 @@ export var diag = {
   count: 0,
   groups: [
     {
+      title: 'System 1',
       count: 0,
       active: []
     },
     {
+      title: 'System 2',
       count: 0,
       active: []
     }

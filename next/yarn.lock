@@ -3458,11 +3458,6 @@ is-directory@^0.3.1:
   resolved "https://registry.yarnpkg.com/is-directory/-/is-directory-0.3.1.tgz#61339b6f2475fc772fd9c9d83f5c8575dc154ae1"
   integrity sha1-YTObbyR1/Hcv2cnYP1yFddwVSuE=
 
-is-electron@^2.1.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/is-electron/-/is-electron-2.2.0.tgz#8943084f09e8b731b3a7a0298a7b5d56f6b7eef0"
-  integrity sha512-SpMppC2XR3YdxSzczXReBjqs2zGscWQpBIKqwXYBFic0ERaxNVgwLCHwOLZeESfdJQjX0RDvrJ1lBXX2ij+G1Q==
-
 is-extendable@^0.1.0, is-extendable@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/is-extendable/-/is-extendable-0.1.1.tgz#62b110e289a471418e3ec36a617d472e301dfc89"
@@ -3764,11 +3759,6 @@ load-json-file@^4.0.0:
     parse-json "^4.0.0"
     pify "^3.0.0"
     strip-bom "^3.0.0"
-
-load-script@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/load-script/-/load-script-1.0.0.tgz#0491939e0bee5643ee494a7e3da3d2bac70c6ca4"
-  integrity sha1-BJGTngvuVkPuSUp+PaPSuscMbKQ=
 
 loader-runner@^2.3.0:
   version "2.4.0"
@@ -5533,10 +5523,10 @@ react-error-overlay@5.1.4:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-5.1.4.tgz#88dfb88857c18ceb3b9f95076f850d7121776991"
   integrity sha512-fp+U98OMZcnduQ+NSEiQa4s/XMsbp+5KlydmkbESOw4P69iWZ68ZMFM5a2BuE0FgqPBKApJyRuYHR95jM8lAmg==
 
-react-intl-universal@^1.16.2:
-  version "1.16.2"
-  resolved "https://registry.yarnpkg.com/react-intl-universal/-/react-intl-universal-1.16.2.tgz#ee5f996c4253cdb86c79ff534c599452f95000a2"
-  integrity sha512-0GspMlo/URzCoWTHYSAYPMHbeV5mK87lU8QKZSDy7FgzeP82QDyCcpynjARRxnKVUssmzTYOHatzpPU9jxkkXw==
+react-intl-universal@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-intl-universal/-/react-intl-universal-2.0.3.tgz#dfd80b8063cf0645e1ec82adb35e8c2dac62cca2"
+  integrity sha512-ntWCecCb/s3ZXZ3PV5pPfPm692oGxTOdXhvyIL21nSivqVOW5USKJw+9Q52KOsmjgZNqPJkesEY/EZi4/8F14Q==
   dependencies:
     console-polyfill "^0.3.0"
     cookie "^0.3.1"
@@ -5544,8 +5534,6 @@ react-intl-universal@^1.16.2:
     intl "^1.2.5"
     intl-messageformat "^2.2.0"
     invariant "^2.2.2"
-    is-electron "^2.1.0"
-    load-script "^1.0.0"
     lodash.merge "^4.6.1"
     object-keys "^1.0.11"
     querystring "^0.2.0"

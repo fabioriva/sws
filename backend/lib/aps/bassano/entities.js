@@ -55,14 +55,17 @@ export var diag = {
   count: 0,
   groups: [
     {
+      title: 'Montavetture A',
       count: 0,
       active: []
     },
     {
+      title: 'Montavetture B',
       count: 0,
       active: []
     },
     {
+      title: 'Torre',
       count: 0,
       active: []
     }

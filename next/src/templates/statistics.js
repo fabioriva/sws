@@ -8,10 +8,9 @@ import Alarms from 'src/components/charts/Alarms'
 import Operations from 'src/components/charts/Operations'
 import Query from 'src/components/ModalStatistics'
 
-const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
-
 export default (def, role) => {
   const { APS, APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } = def
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
   return class extends React.Component {
     static async getInitialProps (ctx) {
       // Last month
