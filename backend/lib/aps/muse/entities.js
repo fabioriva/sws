@@ -61,18 +61,22 @@ var diag = {
   count: 0,
   groups: [
     {
+      title: 'EL1',
       count: 0,
       active: []
     },
     {
+      title: 'EL2',
       count: 0,
       active: []
     },
     {
+      title: 'EL3',
       count: 0,
       active: []
     },
     {
+      title: 'EL4',
       count: 0,
       active: []
     }

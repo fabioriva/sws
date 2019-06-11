@@ -35,6 +35,7 @@ export var diag = {
   count: 0,
   groups: [
     {
+      title: 'Main',
       count: 0,
       active: []
     }
