@@ -1,27 +1,23 @@
 import React, { Component } from 'react'
-import { Row, Col, Card, Button, Icon, Modal, Table } from 'antd'
+import { Avatar, Card, Button, List } from 'antd' //, Icon, Modal, Table, Typography } from 'antd'
 import intl from 'react-intl-universal'
 
-const confirm = Modal.confirm
+// const confirm = Modal.confirm
+// const { Text } = Typography
+
+const data = [
+  { position: '1°', card: '111', color: '#3f8600' },
+  { position: '2°', card: '222', color: '#ccc' },
+  { position: '3°', card: '333', color: '#ccc' },
+  { position: '4°', card: '444', color: '#ccc' },
+  { position: '5°', card: '555', color: '#ccc' }
+]
 
 export default class Queue extends Component {
-  handleDelete = (card, index) => {
-    console.log(card, index)
-    confirm({
-      title: `${intl.get('DELETE_ITEM')}`,
-      content: `${intl.get('DELETE_INFO', {card: card})}`,
-      onOk () {
-        return new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('Oops errors!'))
-      },
-      onCancel () {}
-    })
-  }
   render () {
     const {
       queueList,
-      exitButton,
+      exitButton
     } = this.props.exitQueue
     const button =
       <Button
@@ -31,7 +27,7 @@ export default class Queue extends Component {
         icon='logout'
         onClick={() => this.props.showModal(0)}
       >
-      {intl.get('EXIT_CAR')}
+        {intl.get('EXIT_CAR')}
       </Button>
     return (
       <div>
@@ -40,7 +36,30 @@ export default class Queue extends Component {
           actions={[button]}
           style={{ width: '100%' }}
         >
-          <Table
+          <List
+            itemLayout='horizontal'
+            dataSource={queueList}
+            style={{ margin: '0 20px' }}
+            renderItem={(item, key) => (
+              <List.Item
+                actions={[
+                  <Button shape='circle' icon='delete' size='small'
+                    // type='delete'
+                    onClick={() => this.props.handleDelete(item.card, key)}
+                    disabled={item.card >= 0}
+                  />
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={item.id === 1 ? <Avatar icon='arrow-up' style={{ backgroundColor: data[key].color }} /> : <Avatar style={{ backgroundColor: data[key].color }}>{item.id}</Avatar>}
+                  title={`${item.id}° exit call`}
+                  description={item.card !== 0 ? <span>Card <strong className='value'>{item.card}</strong> from stall <strong>{item.stall}</strong></span> : <span>Empty</span>}
+                />
+              </List.Item>
+            )}
+          />
+
+          {/* <Table
             columns={[
               {
                 dataIndex: 'card',
@@ -63,9 +82,15 @@ export default class Queue extends Component {
             pagination={false}
             showHeader={false}
             size='small'
-          />
+          /> */}
+
         </Card>
         <style jsx global>{`
+          .value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #364d79;
+          }
           .col-text-align-center {
             font-size: 16px;
             font-weight: bold;

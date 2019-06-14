@@ -133,9 +133,20 @@ class AppUi extends React.Component {
   }
   render () {
     const { map, editModal, visibilityFilter, occupancy } = this.state
-    const levels = []
-    map.levels.forEach((l, i) => {
-      levels.push(
+    // const levels = []
+    // map.levels.forEach((l, i) => {
+    //   levels.push(
+    //     <Level
+    //       level={l}
+    //       key={i}
+    //       stallStatus={STALL_STATUS}
+    //       visibilityFilter={visibilityFilter}
+    //       openModal={this.showModal}
+    //     />
+    //   )
+    // })
+    const levels = map.levels.map((l, i) => {
+      return (
         <Level
           level={l}
           key={i}

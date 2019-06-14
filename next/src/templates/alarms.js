@@ -93,7 +93,7 @@ export default (def, role) => {
                   tab={<Badge count={g.count}><span style={{ padding: 12 }}>{g.title}</span></Badge>}
                   key={key}
                 >
-                  {g.length > 0 ? this.renderList(g.active) : <Ready label={g.title} />}
+                  {g.active.length > 0 ? this.renderList(g.active) : <Ready label={g.title} />}
                 </Tabs.TabPane>
               ))
             }

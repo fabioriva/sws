@@ -1,6 +1,6 @@
 // export const HTTP_PORT = 8084
 export const PLC = {
-  ip: '140.80.48.12', // '192.168.20.55',
+  ip: '192.168.20.55', // '140.80.48.12'
   rack: 0,
   slot: 1,
   polling_time: 500
@@ -61,3 +61,5 @@ export const DB_ALARM = 531
 export const DB_ALARM_INIT = 12
 export const DB_ALARM_LEN = 16 * ALARM_LEN * 4
 export const DBS_ALARM = [DB_ALARM]
+
+export const DB_EXIT_QUEUE = 40

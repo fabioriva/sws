@@ -80,7 +80,7 @@ class Device extends Component {
           disabled={!merker.status}
           icon={icon !== undefined && icon}
           key={i}
-          onClick={() => this.props.action !== undefined && this.props.action(id)}
+          onClick={() => this.props.actions[i] !== undefined && this.props.actions[i](id)}
         >
           {b.label}
         </Button>
