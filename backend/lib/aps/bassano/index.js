@@ -7,6 +7,7 @@ import api from 'lib/aps/apiServer'
 import log from 'lib/aps/logServer'
 import plc from 'lib/aps/plc'
 import websocket from 'lib/aps/ws'
+import mailer from 'lib/aps/mailer'
 import notification from 'lib/aps/notification'
 import LogSchema from 'lib/models/LogSchema'
 import DiagSchema from 'lib/models/DiagSchema'
@@ -63,7 +64,10 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
       if (err) throw err
       wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
       appEmitter.emit('plc-update', s7log)
-      if (s7log.operation === 1) appEmitter.emit('plc-update-diagnostic', doc._id)
+      if (s7log.operation === 1) {
+        appEmitter.emit('plc-update-diagnostic', doc._id)
+        mailer('Trumpeldor', doc, s7def.EMAIL_ADDRESSES_RECIPIENT)
+      }
     })
   })
 

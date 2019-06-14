@@ -63,3 +63,7 @@ export const DB_ALARM_LEN = 16 * ALARM_LEN * 4
 export const DBS_ALARM = [DB_ALARM]
 
 export const DB_EXIT_QUEUE = 40
+
+export const EMAIL_ADDRESSES_RECIPIENT = [
+  'f.riva@sotefin.ch'
+]

@@ -64,10 +64,10 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
       if (err) throw err
       wss.broadcast('ch2', JSON.stringify({ mesg: notification(log) }))
       appEmitter.emit('plc-update', s7log)
-      // if (s7log.operation === 1) {
-      //   appEmitter.emit('plc-update-diagnostic', doc._id)
-      //   mailer('Trumpeldor', doc)
-      // }
+      if (s7log.operation === 1) {
+        appEmitter.emit('plc-update-diagnostic', doc._id)
+        mailer('Trumpeldor', doc, s7def.EMAIL_ADDRESSES_RECIPIENT)
+      }
     })
   })
 
@@ -115,13 +115,10 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
         {
           const { card, index } = data
           const buffer = Buffer.alloc(32).fill(0)
-          const init = index === 0 ? 4 : 4 + (4 * index)
+          const init = index === 0 ? 4 : 4 + (4 * index) // Q[0] Offset 4.0
           console.log(card, index, init)
           appEmitter.emit('plc-write', 0x84, s7def.DB_EXIT_QUEUE, init, 4, 0x02, buffer)
         }
-        // s7client.WriteArea(0x84, 40, init, 4, 0x02, Buffer.alloc(32).fill(0), function (err) {
-        //   if (err) return commError(err, PLC, s7client) //, logger)
-        // })
         break
     }
   })
