@@ -1,6 +1,6 @@
 import { Row, Col } from 'antd'
 import * as def from 'src/constants/nyu'
-import { SERVICE } from 'src/constants/roles'
+import { VALET } from 'src/constants/roles'
 import withAuth from 'src/lib/withAuth'
 import AppUi from '/src/templates/overview'
 
@@ -28,7 +28,7 @@ const MainView = ({ devices, exitQueue }) => {
   )
 }
 
-export default withAuth(AppUi(def, SERVICE, MainView))
+export default withAuth(AppUi(def, VALET, MainView))
 
 // import React from 'react'
 // import Layout from 'src/components/Layout'

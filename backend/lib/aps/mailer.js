@@ -12,7 +12,7 @@ let account = {
 }
 
 let transporter = nodemailer.createTransport({
-  host: 'smtp.bweb.ch', // 'smtp-mail.outlook.com',
+  host: 'smtp.bweb.ch',
   port: 465,
   secure: true, // true for 465, false for other ports
   // tls: {
@@ -52,7 +52,7 @@ module.exports = async function main (system, doc, recipient) {
     `
 
     let mailOptions = {
-      from: '"Sotefin Web Service" <info@sotefinservice.com>',
+      from: 'Sotefin Web Service <no-reply@sotefinservice.com>',
       to: recipient,
       subject: subject,
       // text: 'Hello world?', // plain text body
