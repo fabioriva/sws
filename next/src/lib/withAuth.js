@@ -20,8 +20,6 @@ export default (Component) => {
 
       const { currentUser, statusCode } = await auth(ctx, pageRole)
 
-      console.log(activeItem, pageRole, currentUser, statusCode)
-
       if (statusCode === 401) return { statusCode: statusCode }
 
       ctx.store.dispatch({ type: 'UI_NAVBAR_SET_USER', user: { ...currentUser, url: ctx.asPath } })

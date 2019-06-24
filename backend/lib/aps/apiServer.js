@@ -1,8 +1,16 @@
 import micro, { send, json } from 'micro'
-import fetch from 'isomorphic-unfetch'
+// import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
 import { parse } from 'url'
 import { series } from 'async'
+import {
+  dailyOperations,
+  weeklyOperations,
+  monthlyOperations,
+  yearlyOperations,
+  // getOperations,
+  // getAlarms
+} from './statistics'
 import {
   updateData,
   updateMap
@@ -93,97 +101,66 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
   return server
 }
 
-function getAlarms (query, history, callback) {
-  const { dateFrom, dateTo } = query
-  history.aggregate([
-    { $match: {
-      $and: [ { 'date': { $gte: new Date(dateFrom), $lt: new Date(dateTo) } }, { 'operation.id': 1 } ] } },
-    { $group: {
-      // '_id': {
-      //   'year': { '$year': '$date' },
-      //   'month': { '$month': '$date' },
-      //   'day': { '$dayOfMonth': '$date' }
-      // },
-      '_id': '$alarm.id',
-      'total': { $sum: 1 }
-    } },
-    { $sort: { '_id': 1 } } // order by date ascending
-  ], function (err, result) {
-    if (err) return callback(err)
-    // console.log('Alarms Statistics:', result)
-    const alarms = result.map((e) => {
-      return {
-        name: `Id ${e._id}`,
-        total: e.total
-      }
-    })
-    callback(null, alarms)
-  })
-}
-
-function getOperations (query, history, callback) {
-  // const from = moment().subtract(1, 'months').startOf('month').hours(0).minutes(0).seconds(0).toDate() // transform to Date object for mongoose aggregate
-  // const to = moment().subtract(1, 'months').endOf('month').hours(23).minutes(59).seconds(59).toDate() // transform to Date object for mongoose aggregate
-  const { dateFrom, dateTo } = query
-  // console.log(typeof dateFrom, dateFrom, typeof dateTo, dateTo)
-  let from = new Date(dateFrom)
-  let to = new Date(dateTo)
-  // console.log(typeof from, from, typeof to, to)
-  history.aggregate([
-    // { $match: { $and: [ { 'date': { $gte: from, $lt: to } }, { $or: [ { 'operation.id': 5 }, { 'operation.id': 6 } ] } ] } },
-    { $match: { 'date': { $gte: from, $lt: to } } },
-    { $group: {
-      '_id': {
-        'year': { '$year': '$date' },
-        'month': { '$month': '$date' },
-        'day': { '$dayOfMonth': '$date' }
-      },
-      'total': { $sum: 1 },
-      'entries': { $sum: { $cond: [ { $eq: ['$operation.id', 5] }, 1, 0 ] } },
-      'exits': { $sum: { $cond: [ { $eq: ['$operation.id', 6] }, 1, 0 ] } }
-    } },
-    // { $project: {
-    //   // _id: 0,
-    //   // name: { $concat: [ { $toString: '$_id.year' }, '-', { $toString: '$_id.month' }, '-', { $toString: '$_id.year' } ] },
-    //   entries: '$entries',
-    //   exits: '$exits'
-    // } },
-    { $sort: { '_id': 1 } } // order by date ascending
-  ], function (err, result) {
-    if (err) return callback(err)
-    // console.log('Statistics:', result)
-    const operations = result.map((e) => {
-      return {
-        name: `${e._id.year}-${e._id.month}-${e._id.day}`,
-        entries: e.entries,
-        exits: e.exits,
-        total: e.total
-      }
-    })
-    callback(null, operations)
-  })
-}
-
 function getStatistics (query, history, callback) {
-  console.log(query)
+  // console.log(query)
+  const { dateFrom, dateTo } = query
+  const date = moment(dateFrom) // query.date)
+  const day = date.format('YYYY-MM-DD HH:mm')
+  const weekStart = date.clone().subtract(1, 'weeks').startOf('week').format('YYYY-MM-DD HH:mm')
+  const weekEnd = date.clone().subtract(1, 'weeks').endOf('week').format('YYYY-MM-DD HH:mm')
+  const monthStart = date.clone().subtract(1, 'months').startOf('month').format('YYYY-MM-DD HH:mm')
+  const monthEnd = date.clone().subtract(1, 'months').endOf('month').format('YYYY-MM-DD HH:mm')
+  const yearStart = date.clone().subtract(1, 'years').startOf('year').format('YYYY-MM-DD HH:mm')
+  const yearEnd = date.clone().subtract(1, 'years').endOf('year').format('YYYY-MM-DD HH:mm')
+  // console.log(day)
+  // console.log(weekStart, weekEnd)
+  // console.log(monthStart, monthEnd)
+  // console.log(yearStart, yearEnd)
   series([
     function (cb) {
-      getAlarms(query, history, function (err, result) {
+      dailyOperations(day, history, function (err, result) {
         if (err) cb(err)
         cb(null, result)
       })
     },
     function (cb) {
-      getOperations(query, history, function (err, result) {
+      weeklyOperations(weekStart, weekEnd, history, function (err, result) {
+        if (err) cb(err)
+        cb(null, result)
+      })
+    },
+    function (cb) {
+      monthlyOperations(monthStart, monthEnd, history, function (err, result) {
+        if (err) cb(err)
+        cb(null, result)
+      })
+    },
+    function (cb) {
+      yearlyOperations(yearStart, yearEnd, history, function (err, result) {
         if (err) cb(err)
         cb(null, result)
       })
     }
+    // function (cb) {
+    //   getOperations(query, history, function (err, result) {
+    //     if (err) cb(err)
+    //     cb(null, result)
+    //   })
+    // },
+    // function (cb) {
+    //   getAlarms(query, history, function (err, result) {
+    //     if (err) cb(err)
+    //     cb(null, result)
+    //   })
+    // }
   ],
   function (err, results) {
     if (err) return callback(err)
-    console.log('Alarms:', results[0])
-    console.log('Operations:', results[1])
+    // console.log('daily operations:\n', results[0])
+    // console.log('weekly operations:\n', results[1])
+    // console.log('monthly operations:\n', results[2])
+    // console.log('yearly operations:\n', results[3])
+    // console.log('Alarms:', results[1])
     callback(null, results)
   })
 }

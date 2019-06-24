@@ -1,18 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Icon, Empty } from 'antd'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label, Legend } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label, LabelList, Legend } from 'recharts'
 
 const Chart = ({ data, label, showModal }) => (
-  <Card
-    // actions={[
-    //   <Icon type='setting' onClick={() => showModal()} disabled />,
-    //   <Icon type='reload' onClick={() => showModal()} disabled />,
-    //   <Icon type='search' onClick={() => showModal()} />
-    // ]}
-    extra={<Icon type='search' style={{ fontSize: '16px' }} onClick={() => showModal()} />}
-    headStyle={{ background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}
-  >
+  // <Card
+  //   // actions={[
+  //   //   <Icon type='setting' onClick={() => showModal()} disabled />,
+  //   //   <Icon type='reload' onClick={() => showModal()} disabled />,
+  //   //   <Icon type='search' onClick={() => showModal()} />
+  //   // ]}
+  //   extra={<Icon type='search' style={{ fontSize: '16px' }} onClick={() => showModal()} />}
+  //   headStyle={{ background: '#fafafa', borderBottom: '1px solid #e8e8e8' }}
+  // >
+  <div>
     { data.length !== 0 ? (
       <BarChart width={480} height={320} data={data} layout='horizontal' margin={{ top: 5, right: 5, left: 0, bottom: 20 }}>
         <CartesianGrid strokeDasharray='3 3' />
@@ -22,12 +23,21 @@ const Chart = ({ data, label, showModal }) => (
         <YAxis />
         <Tooltip />
         <Legend verticalAlign='top' />
-        <Bar dataKey='entries' stackId='a' fill='#00ff00' barSize={32} label />
-        <Bar dataKey='exits' stackId='a' fill='#ff0000' barSize={32} label />
+        {/* <Bar dataKey='entries' stackId='a' fill='#00ff00' barSize={32} label /> */}
+        <Bar dataKey='entries' stackId='a' fill='#00ff00' barSize={32}>
+          <LabelList dataKey='entries' position='inside' />
+        </Bar>
+        <Bar dataKey='exits' stackId='a' fill='#ff0000' barSize={32}>
+          <LabelList dataKey='exits' position='inside' />
+        </Bar>
+        <Bar dataKey='total' stackId='c' fill='#ffff00' barSize={32}>
+          <LabelList dataKey='total' position='inside' />
+        </Bar>
       </BarChart>
-    ) : <Empty />
+    ) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
     }
-  </Card>
+  </div>
+  // </Card>
 )
 
 Chart.propTypes = {
