@@ -127,6 +127,15 @@ export class Operation {
   }
 }
 
+export class Step {
+  constructor (id, info, type = 0, data = []) {
+    this.id = id
+    this.info = info
+    this.type = type
+    this.data = data
+  }
+}
+
 export class Queue {
   constructor (id, card = 0, stall = 0) {
     this.id = id + 1

@@ -160,7 +160,6 @@ export default (def, role) => {
     render () {
       const { statistics, queryModal } = this.state
       const { data, dateFrom, dateTo } = statistics
-      console.log(typeof dateFrom, dateFrom)
       return (
         <Layout
           aps={APS_TITLE}

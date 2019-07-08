@@ -1,5 +1,8 @@
 import moment from 'moment'
 
+// add zero: 2013-02-08  # A calendar date part
+const addZero = (n) => n <= 9 ? '0' + n.toString() : n.toString()
+
 export const getAlarms = (query, history, callback) => {
   const { dateFrom, dateTo } = query
   history.aggregate([
@@ -110,8 +113,11 @@ export const dailyOperations = (day, history, callback) => {
   ], function (err, result) {
     if (err) return callback(err)
     const statistics = result.map((e) => {
+      let date = `${e._id.year}-${addZero(e._id.month)}-${addZero(e._id.day)} ${e._id.hour}`
+      console.log(date, moment(date).format('h a'))
       return {
-        name: `h ${e._id.hour}`,
+        // name: `h ${e._id.hour}`,
+        name: `${moment(date).format('hh a')}`,
         entries: e.entries,
         exits: e.exits,
         total: e.total
@@ -147,8 +153,11 @@ export const weeklyOperations = (start, end, history, callback) => {
   ], function (err, result) {
     if (err) return callback(err)
     const statistics = result.map((e) => {
+      let date = `${e._id.year}-${addZero(e._id.month)}-${addZero(e._id.day)}`
+      console.log(date, moment(date).format('ddd'))
       return {
-        name: `${e._id.year}-${e._id.month}-${e._id.day}`,
+        // name: `${e._id.year}-${e._id.month}-${e._id.day}`,
+        name: moment(date).isValid() ? `${moment(date).format('ddd')}` : null,
         entries: e.entries,
         exits: e.exits,
         total: e.total

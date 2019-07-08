@@ -66,7 +66,7 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
       appEmitter.emit('plc-update', s7log)
       if (s7log.operation === 1) {
         appEmitter.emit('plc-update-diagnostic', doc._id)
-        mailer('Trumpeldor', doc, s7def.EMAIL_ADDRESSES_RECIPIENT)
+        mailer('Stallo S. Giovanni', doc, s7def.EMAIL_ADDRESSES_RECIPIENT)
       }
     })
   })

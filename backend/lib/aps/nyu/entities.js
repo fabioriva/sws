@@ -190,6 +190,23 @@ var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollbac
 var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entry')
 var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
 
+const SILOMAT_A = [
+  inputs3.find(b => b.addr === 'E110.0'),
+  inputs3.find(b => b.addr === 'E110.1'),
+  inputs3.find(b => b.addr === 'E110.2'),
+  inputs3.find(b => b.addr === 'E110.3'),
+  inputs3.find(b => b.addr === 'E110.4'),
+  inputs3.find(b => b.addr === 'E110.5'),
+  inputs3.find(b => b.addr === 'E110.6'),
+  inputs3.find(b => b.addr === 'E110.7'),
+  outputs3.find(b => b.addr === 'A112.1'),
+  outputs3.find(b => b.addr === 'A112.2'),
+  outputs3.find(b => b.addr === 'A112.3'),
+  outputs3.find(b => b.addr === 'A111.2'),
+  outputs3.find(b => b.addr === 'A111.3'),
+  outputs3.find(b => b.addr === 'A111.4')
+]
+
 var ELA = {
   a: devices[0],
   b: measures.slice(0, 4),
@@ -201,8 +218,26 @@ var ELA = {
   d: [
     B1A,
     B2A
-  ]
+  ],
+  e: SILOMAT_A
 }
+
+const SILOMAT_B = [
+  inputs5.find(b => b.addr === 'E210.0'),
+  inputs5.find(b => b.addr === 'E210.1'),
+  inputs5.find(b => b.addr === 'E210.2'),
+  inputs5.find(b => b.addr === 'E210.3'),
+  inputs5.find(b => b.addr === 'E210.4'),
+  inputs5.find(b => b.addr === 'E210.5'),
+  inputs5.find(b => b.addr === 'E210.6'),
+  inputs5.find(b => b.addr === 'E210.7'),
+  outputs5.find(b => b.addr === 'A212.1'),
+  outputs5.find(b => b.addr === 'A212.2'),
+  outputs5.find(b => b.addr === 'A212.3'),
+  outputs5.find(b => b.addr === 'A211.2'),
+  outputs5.find(b => b.addr === 'A211.3'),
+  outputs5.find(b => b.addr === 'A211.4')
+]
 
 var ELB = {
   a: devices[1],
@@ -215,7 +250,8 @@ var ELB = {
   d: [
     B1B,
     B2B
-  ]
+  ],
+  e: SILOMAT_B
 }
 
 export var overview = {

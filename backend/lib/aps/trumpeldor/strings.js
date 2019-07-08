@@ -40,6 +40,23 @@ export const measures = [
   'Encoder R'
 ]
 
+// export const steps = [
+//   'Idle',
+//   'Going to entry',
+//   'Door opening',
+//   'Waiting car',
+//   'Vehicle not entering',
+//   'Door closing',
+//   'Wait start',
+//   'Vehicle centering',
+//   'Find stall',
+//   'Going to stall',
+//   'Parking vehicle'
+//   // 'NU',
+//   // 'Going to entry',
+//   // 'Going to low level (Fire alarm)'
+// ]
+
 export const inputs1 = [
   { addr: 'E4.0', label: 'A', info: '' },
   { addr: 'E4.1', label: 'B', info: '' },
@@ -123,14 +140,14 @@ export const inputs1 = [
   { addr: 'E13.7', label: '', info: '' }
 ]
 export const inputs2 = [
-  { addr: 'E14.0', label: 'RMV', info: '' },
-  { addr: 'E14.1', label: 'RMH', info: '' },
-  { addr: 'E14.2', label: 'RES', info: '' },
-  { addr: 'E14.3', label: 'REH', info: '' },
-  { addr: 'E14.4', label: 'RCV', info: '' },
-  { addr: 'E14.5', label: 'REAV', info: '' },
-  { addr: 'E14.6', label: 'REAH', info: '' },
-  { addr: 'E14.7', label: 'RCH', info: '' },
+  { addr: 'E14.0', label: 'RMV', info: 'Silomat position V' },
+  { addr: 'E14.1', label: 'RMH', info: 'Silomat position H' },
+  { addr: 'E14.2', label: 'RES', info: 'Silomat low' },
+  { addr: 'E14.3', label: 'REH', info: 'Silomat high' },
+  { addr: 'E14.4', label: 'RCV', info: 'Silomat front centering closed' },
+  { addr: 'E14.5', label: 'REAV', info: 'Silomat front centering detection' },
+  { addr: 'E14.6', label: 'REAH', info: 'Silomat back centering detection' },
+  { addr: 'E14.7', label: 'RCH', info: 'Silomat back centering closed' },
   { addr: 'E15.0', label: 'ASBK', info: '' },
   { addr: 'E15.1', label: 'FSBK', info: '' },
   { addr: 'E15.2', label: 'MTC', info: '' },

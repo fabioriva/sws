@@ -15,7 +15,7 @@ const Chart = ({ data, label, showModal }) => (
   // >
   <div>
     { data.length !== 0 ? (
-      <BarChart width={480} height={320} data={data} layout='horizontal' margin={{ top: 5, right: 5, left: 0, bottom: 20 }}>
+      <BarChart width={720} height={320} data={data} layout='horizontal' margin={{ top: 5, right: 5, left: 0, bottom: 20 }}>
         <CartesianGrid strokeDasharray='3 3' />
         <XAxis dataKey='name' height={100} interval={0} angle={-90} textAnchor='end'>
           <Label value={label} offset={0} position='insideBottom' />

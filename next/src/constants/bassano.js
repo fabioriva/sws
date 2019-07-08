@@ -50,6 +50,12 @@ export const SIDEBAR_MENU = [
     icon: 'search',
     label: 'Operations History',
     role: roles.SERVICE
+  },
+  {
+    href: '/bassano/statistics',
+    icon: 'bar-chart',
+    label: 'Statistics',
+    role: roles.SERVICE
   }
   // {
   //   href: '/bassano/admin',

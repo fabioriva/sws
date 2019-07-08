@@ -10,6 +10,7 @@ import {
   Device,
   Measure,
   Operation,
+  // Step,
   Queue,
   Stall
 } from '../models'
@@ -140,11 +141,49 @@ for (let q = 0; q < s7def.QUEUE; q++) {
   exitQueue.push(new Queue(q))
 }
 
-var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'logout', 'Uscita')
-var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entrata')
+var B00 = new Button(merkers1.find(b => b.addr === 'M3.5'), 'logout', 'Exit')
+var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entry')
 var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollback')
-// var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entrata')
-// var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
+
+// const PANEL = [
+//   outputs1.find(b => b.addr === 'A5.0'),
+//   outputs1.find(b => b.addr === 'A5.1'),
+//   outputs1.find(b => b.addr === 'A5.2'),
+//   outputs1.find(b => b.addr === 'A5.3'),
+//   outputs1.find(b => b.addr === 'A5.4')
+// ]
+
+const SILOMAT = [
+  inputs2.find(b => b.addr === 'E14.0'),
+  inputs2.find(b => b.addr === 'E14.1'),
+  inputs2.find(b => b.addr === 'E14.2'),
+  inputs2.find(b => b.addr === 'E14.3'),
+  inputs2.find(b => b.addr === 'E14.4'),
+  inputs2.find(b => b.addr === 'E14.5'),
+  inputs2.find(b => b.addr === 'E14.6'),
+  inputs2.find(b => b.addr === 'E14.7'),
+  outputs2.find(b => b.addr === 'A15.1'),
+  outputs2.find(b => b.addr === 'A15.2'),
+  outputs2.find(b => b.addr === 'A15.3'),
+  outputs2.find(b => b.addr === 'A14.4'),
+  outputs2.find(b => b.addr === 'A14.5'),
+  outputs2.find(b => b.addr === 'A14.6')
+]
+
+// /*
+//  * Steps
+//  */
+
+// export const steps = []
+// for (let s = 0; s < s7def.STEPS; s++) {
+//   steps.push(new Step(s, strings.steps[s]))
+// }
+
+// steps[3].type = 2
+// steps[3].data = PANEL
+
+// steps[7].type = 1
+// steps[7].data = SILOMAT
 
 var EL = {
   a: devices[0],
@@ -157,7 +196,10 @@ var EL = {
   d: [
     B1A,
     B2A
-  ]
+  ],
+  e: SILOMAT
+  // f: steps,
+  // g: PANEL
 }
 
 export var overview = {
