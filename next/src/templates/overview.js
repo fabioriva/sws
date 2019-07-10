@@ -43,9 +43,6 @@ function deleteModal (card, index, ws) {
           }
         })
       )
-      return new Promise((resolve, reject) => {
-        setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-      }).catch(() => console.log('Oops errors!'))
     },
     onCancel () {}
   })

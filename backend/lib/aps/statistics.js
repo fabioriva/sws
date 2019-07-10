@@ -113,7 +113,7 @@ export const dailyOperations = (day, history, callback) => {
   ], function (err, result) {
     if (err) return callback(err)
     const statistics = result.map((e) => {
-      let date = `${e._id.year}-${addZero(e._id.month)}-${addZero(e._id.day)} ${e._id.hour}`
+      let date = `${e._id.year}-${addZero(e._id.month)}-${addZero(e._id.day)} ${addZero(e._id.hour)}`
       console.log(date, moment(date).format('h a'))
       return {
         // name: `h ${e._id.hour}`,
