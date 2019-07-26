@@ -1,5 +1,5 @@
-export const APS = 'nyu'
-export const HTTP_PORT = 8083
+// export const APS = 'nyu'
+// export const HTTP_PORT = 8083
 export const PLC = {
   ip: '192.168.55.2',
   rack: 0,
@@ -61,3 +61,4 @@ export const DB_ALARM_1 = 431
 export const DB_ALARM_2 = 432
 export const DB_ALARM_INIT = 12
 export const DB_ALARM_LEN = 16 * ALARM_LEN * 4
+export const DBS_ALARM = [DB_ALARM_1, DB_ALARM_2]

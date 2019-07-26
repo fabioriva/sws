@@ -1,5 +1,6 @@
 const commOpen = (plc, s7client, callback) => {
-  s7client.ConnectTo(plc.ip, plc.rack, plc.slot, function (err) {
+  const { ip, rack, slot } = plc
+  s7client.ConnectTo(ip, rack, slot, function (err) {
     if (err) return callback(err)
     callback(err, true)
   })

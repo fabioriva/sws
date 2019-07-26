@@ -1,7 +1,11 @@
 import React from 'react'
 import classnames from 'classnames'
+import cookie from 'js-cookie'
 // import moment from 'moment'
-import { LocaleProvider, Button, Popover, Table, message } from 'antd'
+// import { connect } from 'react-redux'
+// import { bindActionCreators } from 'redux'
+// import { navbarSetDiag } from 'src/store'
+import { LocaleProvider, Button, Modal, Popover, Table } from 'antd'
 import en_US from 'antd/lib/locale-provider/en_US'
 import it_IT from 'antd/lib/locale-provider/it_IT'
 import intl from 'react-intl-universal'
@@ -9,10 +13,44 @@ import intl from 'react-intl-universal'
 const { Column } = Table
 const ITEMS_PER_PAGE = 25
 
+// const setDiagnostic = (record, props) => {
+//   console.log(record, props)
+//   const { dispatch } = props
+//   dispatch(navbarSetDiag(record._id))
+//   cookie.set('diagnostic', record._id, { expires: 1 })
+// }
 
-export default class History extends React.Component {
+const AlarmModal = props => {
+  const { data } = props
+  return (
+    <Modal
+      title={data !== undefined && data.device.name}
+      visible={props.visible}
+      footer={[
+        <Button onClick={props.onCancel}>Cancel</Button>,
+        <Button type='danger' onClick={() => props.onOk(data !== undefined && data._id)} disabled={props.disabled}>
+          {intl.get('HISTORY_DIAG')}
+        </Button>,
+      ]}
+    >
+    {
+      data !== undefined &&
+      <span>
+        <p>Date: <strong>{data.logged}</strong></p>
+        <p>Alarm Id: <strong>{data.alarm.id}</strong></p>
+        <p><strong>{data.alarm.info}</strong></p>
+        {
+        !props.disabled && <p>Diagnostic Id: <strong>{data._id}</strong></p>
+        }
+      </span>
+    }
+    </Modal>
+  )
+}
+
+class History extends React.Component {
   state = {
-    visible: true
+    visible: false
   }
   getCurrentLocale = () => {
     const { currentLocale } = intl.getInitOptions()
@@ -31,25 +69,42 @@ export default class History extends React.Component {
       'col-info'   : row.operation.id === 4
     })
   }
-  popoverDiag = (record) => {
-    return (
-      <span>
-        <p>{record.alarm.info}</p>
-        <Button
-          type='danger'
-          onClick={() => this.enableDiag(record)}
-          disabled={!this.props.diagnostic.enabled}
-        >
-          Activate Diagnostic
-        </Button>
-      </span>
-    )
+  // popoverDiag = (record) => {
+  //   return (
+  //     <span>
+  //       <p>{record.alarm.info}</p>
+  //       <Button
+  //         type='danger'
+  //         onClick={() => cookie.set('diagnostic', record._id, { expires: 1 })} // setDiagnostic(record, this.props)} // this.enableDiag(record)}
+  //         disabled={!this.props.diagnostic || cookie.get('diagnostic') !== undefined} // {!this.props.diagnostic.enabled}
+  //       >
+  //         Activate Diagnostic
+  //       </Button>
+  //     </span>
+  //   )
+  // }
+  handleCancel = (e) => {
+    this.setState({
+      visible: false
+    })
   }
-  enableDiag = (record) => {
-    this.setState({ visible: false })
-    message.success(`Diagnostic activated. ${record._id}`)
-    this.props.diagnostic.enableDiag !== undefined && this.props.diagnostic.enableDiag(record)
+  handleOk = (id) => {
+    this.setState({
+      visible: false
+    })
+    cookie.set('diagnostic', id, { expires: 1 })
   }
+  showModal = (record) => {
+    this.setState({
+      diagnostic: record,
+      visible: true
+    })
+  }
+  // enableDiag = (record) => {
+  //   this.setState({ visible: false })
+  //   message.success(`Diagnostic activated. ${record._id}`)
+  //   this.props.diagnostic.enableDiag !== undefined && this.props.diagnostic.enableDiag(record)
+  // }
   // handleVisibleChange = (visible) => {
   //   this.setState({ visible })
   // }
@@ -70,6 +125,13 @@ export default class History extends React.Component {
     return (
       <LocaleProvider locale={this.getCurrentLocale()}>
         <div>
+          <AlarmModal
+            visible={this.state.visible}
+            onCancel={this.handleCancel}
+            onOk={this.handleOk}
+            data={this.state.diagnostic}
+            disabled={!this.props.diagnostic || cookie.get('diagnostic') !== undefined}
+          />
           <Table
             title={() => title}
             dataSource={query}
@@ -111,14 +173,15 @@ export default class History extends React.Component {
               render={(text, record, index) => (
                 record.alarm.id !== 0
                 ?
-                <Popover
-                  content={this.popoverDiag(record)}
-                  title={`Alarm ID ${record.alarm.id}`}
-                  trigger='hover'
-                >
-                  {/* <span>{intl.get(`OPERATION_ID_${text}`)} ID {record.alarm}</span> */}
-                  <span>{text} ID {record.alarm.id}</span>
-                </Popover>
+                <a onClick={() => this.showModal(record)} >{text} ID {record.alarm.id}</a>
+                // <Popover
+                //   content={this.popoverDiag(record)}
+                //   title={`Alarm ID ${record.alarm.id}`}
+                //   trigger='hover'
+                // >
+                //   {/* <span>{intl.get(`OPERATION_ID_${text}`)} ID {record.alarm}</span> */}
+                //   <span>{text} ID {record.alarm.id}</span>
+                // </Popover>
                 :
                 // intl.get(`OPERATION_ID_${text}`)
                 <span>{text}</span>
@@ -180,8 +243,11 @@ export default class History extends React.Component {
               margin: 8px 0;
             }
           `}</style>
-        </div>
+          </div>
       </LocaleProvider>
     )
   }
 }
+
+// export default connect()(History)
+export default History

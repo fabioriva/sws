@@ -1,4 +1,4 @@
-export const HTTP_PORT = 8082
+// export const HTTP_PORT = 8082
 export const PLC = {
   ip: '140.80.49.2',
   rack: 0,
@@ -65,3 +65,4 @@ export const DB_ALARM_3 = 433
 export const DB_ALARM_4 = 434
 export const DB_ALARM_INIT = 12
 export const DB_ALARM_LEN = 16 * ALARM_LEN * 4
+export const DBS_ALARM = [DB_ALARM_1, DB_ALARM_2, DB_ALARM_3, DB_ALARM_4]

@@ -1,76 +1,75 @@
-import cookie from 'cookie'
-import redirect from 'src/lib/redirect'
+import { Component } from 'react'
+import fetch from 'isomorphic-unfetch'
+import { login } from 'src/lib/auth'
 import { Form, Icon, Input, Button, Checkbox } from 'antd'
 
-const dev = process.env.NODE_ENV !== 'production'
-const ROOT_URL = dev ? process.env.BACKEND_URL : 'https://www.sotefinservice.com'
-const COOKIE_MAX_AGE = 1 * 24 * 60 * 60 // 1 day
-
-class NormalLoginForm extends React.Component {
-  constructor(props) {
+class NormalLoginForm extends Component {
+  constructor (props) {
     super(props)
-    this.state = {
-      message: ''
-    }
+    this.state = { error: '' }
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
-  handleSubmit = (e) => {
-    e.preventDefault()
-    this.props.form.validateFields((err, values) => {
+
+  handleSubmit (event) {
+    event.preventDefault()
+    const url = this.props.apiUrl
+    console.log(url)
+    // const url = `${process.env.API_URL}/api/login.js`
+    console.log(`${process.env.API_URL}/api/login.js`)
+    this.props.form.validateFields(async (err, credentials) => {
       if (!err) {
-        fetch(`${ROOT_URL}/authentication`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ values })
-        })
-        .then(res => res.json())
-	      .then(res => {
-          if (res.success) {
-            const { token, aps } = res
-            const options = { maxAge: COOKIE_MAX_AGE }
-            document.cookie = cookie.serialize('token', token, options)
-            // document.cookie = cookie.serialize('user', JSON.stringify(user), options)
-            // document.cookie = cookie.serialize('userContext', user.aps[0], options)
-            // if (aps !== undefined && aps.length == 1 ) {
-            //   redirect({}, `/${aps[0]}/overview`)
-            // } else {
-            //   // TODO: aps selection
-            //   redirect({}, `/muse/overview`)
-            // }
-            redirect({}, `/${aps}/overview`)         
+        const { username, password } = credentials
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          })
+          console.log(response)
+          if (response.ok) {
+            const { token, aps } = await response.json()
+            login({ token, aps })
           } else {
+            const { message } = await response.json()
+            this.setState({ error: message })
+            console.log(this.state.error)
             this.props.form.setFields({
               username: {
-                value: values.username,
-                errors: [new Error(res.message)]
+                value: username,
+                errors: [new Error(message)]
               },
               password: {
                 value: '',
-                errors: [new Error(res.message)]
-              },
+                errors: [new Error(message)]
+              }
             })
-            this.setState({ message: res.message })
           }
-        })
+        } catch (error) {
+          console.error(
+            'You have an error in your code or there are Network issues.',
+            error
+          )
+          throw new Error(error)
+        }
       }
     })
   }
-  render() {
+
+  render () {
     const { getFieldDecorator } = this.props.form
     return (
       <Form onSubmit={this.handleSubmit} className='login-form'>
         <Form.Item>
           {getFieldDecorator('username', {
-            rules: [{ required: true, message: 'Please input your username!' }],
+            rules: [{ required: true, message: 'Please input your username!' }]
           })(
             <Input className='login-form-input' prefix={<Icon type='user' style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder='Username' />
           )}
         </Form.Item>
         <Form.Item>
           {getFieldDecorator('password', {
-            rules: [{ required: true, message: 'Please input your password!' }],
+            rules: [{ required: true, message: 'Please input your password!' }]
           })(
             <Input className='login-form-input' prefix={<Icon type='lock' style={{ color: 'rgba(0,0,0,.25)' }} />} type='password' placeholder='Password' />
           )}
@@ -78,7 +77,7 @@ class NormalLoginForm extends React.Component {
         <Form.Item>
           {getFieldDecorator('remember', {
             valuePropName: 'checked',
-            initialValue: true,
+            initialValue: true
           })(
             <Checkbox disabled>Remember me</Checkbox>
           )}
@@ -88,7 +87,6 @@ class NormalLoginForm extends React.Component {
           </Button>
           <div>Or <a href='mailto:info@sotefin.ch'>register now!</a></div>
         </Form.Item>
-        {/* <p style={{ color: 'red', fontSize: 20, textAlign: 'center' }}>{this.state.message}</p> */}
         <style jsx global>{`
           .login-form {
             width: 100%;

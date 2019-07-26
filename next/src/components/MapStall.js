@@ -22,7 +22,7 @@ export default class Stall extends Component {
   }
   render () {
     const { stall, stallStatus, visibilityFilter } = this.props
-    const title = stall.status !== 0 ? 'Stall number ' + stall.nr + ' is busy with card ' + stall.status + ' since ' + stall.date : 'Stall is empty'
+    const title = stall.status === 0 ? 'Empty' : stall.status === stallStatus.LOCK ? 'Locked' : `Stall number ${stall.nr} is busy with card ${stall.status} since ${stall.date}`
     const label = setLabel(visibilityFilter, stall)
     return (
       <Tooltip placement='top' title={title}>
@@ -36,7 +36,12 @@ export default class Stall extends Component {
             's-rsvd': stall.status === stallStatus.RSVD,
             's-typ1': visibilityFilter === 'SHOW_SIZES' && stall.size === 1,
             's-typ2': visibilityFilter === 'SHOW_SIZES' && stall.size === 2,
-            's-typ3': visibilityFilter === 'SHOW_SIZES' && stall.size === 3
+            's-typ3': visibilityFilter === 'SHOW_SIZES' && stall.size === 3,
+            's-typ4': visibilityFilter === 'SHOW_SIZES' && stall.size === 4,
+            's-typ5': visibilityFilter === 'SHOW_SIZES' && stall.size === 5,
+            's-typ6': visibilityFilter === 'SHOW_SIZES' && stall.size === 6,
+            's-typ7': visibilityFilter === 'SHOW_SIZES' && stall.size === 7,
+            's-typ8': visibilityFilter === 'SHOW_SIZES' && stall.size === 8
           })}
           id={'s-' + stall.nr}
         >

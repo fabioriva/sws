@@ -1,33 +1,41 @@
 import React from 'react'
+import { compose } from 'redux'
+import Link from 'next/link'
+import { withRouter } from 'next/router'
 import fetch from 'isomorphic-unfetch'
 import Layout from 'src/components/Layout'
 import List from 'src/components/PlcList'
 import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
-import { APS, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/bassano'
+import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/constants/longmatan'
 import { SERVICE } from 'src/constants/roles'
-import parseCookies from 'src/lib/parseCookies'
+import nextCookie from 'next-cookies'
 import withAuth from 'src/lib/withAuth'
 
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
+    const props = {
+      activeItem: '4',
+      pageRole: SERVICE
+    }
     // check if diagnostic is active
-    const { diagnostic } = parseCookies(ctx)
-    ctx.store.dispatch({ type: 'UI_NAVBAR_SET_DIAG', status: diagnostic })
+    const { diagnostic } = nextCookie(ctx)
     if (diagnostic) {
-      const res = await fetch(`${BACKEND_URL}/aps/bassano/diagnostic?id=${diagnostic}`)
-      const json = await res.json()
-      return {
-        diagnostic: diagnostic,
-        racks: json.racks
+      const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
+      if (res.ok) {
+        const json = await res.json()
+        return {
+          ...props,
+          diagnostic: diagnostic,
+          racks: json.racks
+        }
       }
     }
     // if diagnostic is not active fetch data
-    const res = await fetch(`${BACKEND_URL}/aps/bassano/racks`)
-    const statusCode = res.statusCode > 200 ? res.statusCode : false
+    const res = await fetch(`${BACKEND_URL}/aps/${APS}/racks`)
     const json = await res.json()
     return {
-      statusCode,
+      ...props,
       racks: json
     }
   }
@@ -35,8 +43,6 @@ class AppUi extends React.Component {
     super(props)
     this.state = {
       isFetching: true,
-      // comm: { isOnline: false },
-      // diag: { alarmCount: 0 },
       racks: props.racks
     }
   }
@@ -60,18 +66,21 @@ class AppUi extends React.Component {
     this.ws.close()
   }
   render () {
-    const rack = this.state.racks[1]
+    const { rackNumber } = this.props.router.query
+    const rack = this.state.racks[rackNumber]
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle={`PLC Digital I/O - ${rack.title}`}
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}
       >
         <Mobile>
+          <Link href={`/${APS}/plc`}><a>[Back]</a></Link>
           <List rack={rack} />
         </Mobile>
         <Default>
+          <Link href={`/${APS}/plc`}><a>[Back]</a></Link>
           <Rack rack={rack} />
         </Default>
         <style jsx global>{`
@@ -141,7 +150,6 @@ class AppUi extends React.Component {
             position: absolute;
             height: 18px;
             width: 12px;
-            background-color: #C0C0C0;
             border-top: 1px solid #000000;
             border-bottom: 1px solid #000000;
             cursor: help;
@@ -155,65 +163,6 @@ class AppUi extends React.Component {
             border: 1px solid #000000;
             cursor: help;
           }
-          /* ET200S */
-          .card-et200s {
-            position: absolute;
-            border: 1px solid #000000;
-            height: 360px;
-            width: 88px;
-            background-color: #505050;
-            color: #000000;
-            text-align: center;
-            vertical-align: middle;
-            line-height: 16px;
-          }
-          .title-et200s {
-            height: 18px;
-            color: #ffff00;
-          }
-          .label-et200s {
-            position: absolute;
-            height: 18px;
-            width: 65px;
-            background-color: #FFFF00;
-            border: 1px solid #000000;
-            font-size: 14px;
-          }
-          .type-et200s {
-            position: absolute;
-            left: 4px;
-            top: 342px;
-            height: 18px;
-            color: #F0F0F0;
-            font-family: "Arial", Sans-Serif;
-            font-size: 0.58em;
-            text-align: left;
-          }
-          .bit-et200s-id {
-            position: absolute;
-            line-height: 18px;
-            height: 18px;
-            width: 65px;
-            background-color: #FFFFFF;
-            border: 1px solid #000000;
-            font-size: 0.78em;
-          }
-          .bit-et200s-st {
-            position: absolute;
-            height: 18px;
-            width: 12px;
-            background-color: #C0C0C0;
-            border-top: 1px solid #000000;
-            border-bottom: 1px solid #000000;
-          }
-          .bit-et200s-nr {
-            position: absolute;
-            line-height: 18px;
-            height: 18px;
-            width: 12px;
-            background-color: #E0E0E0;
-            border: 1px solid #000000;
-          }
           .bit-false {
             background-color: #C0C0C0;
           }
@@ -221,7 +170,7 @@ class AppUi extends React.Component {
             background-color: #00FF00;
           }
           /**
-          * Card 01
+          * Cards
           */
           .c1 {
             left: 1px;
@@ -654,4 +603,9 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi, SERVICE)
+// export default withAuth(AppUi, SERVICE)
+// export default withRouter(withAuth(AppUi, SERVICE))
+export default compose(
+  withRouter,
+  withAuth
+)(AppUi)

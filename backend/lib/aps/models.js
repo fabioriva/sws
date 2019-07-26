@@ -1,3 +1,5 @@
+import moment from 'moment'
+import * as utils from './utils'
 // import * as strings from './strings'
 
 class Bit {
@@ -68,12 +70,17 @@ export class Card {
   constructor (nr, code, from, to) {
     this.nr = nr
     this.code = code
-    this.from = from || new Date()
-    this.to = to || new Date()
+    this.from = from // || moment().hours(0).minutes(0).seconds(0)
+    this.to = to // || moment().hours(23).minutes(59).seconds(59)
     this.rand = this.getRandomIntInclusive(256, 4095).toString(16).toUpperCase()
   }
   getRandomIntInclusive (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
+  }
+  update (code, from, to) {
+    this.code = code.toString(16).toUpperCase()
+    this.from = moment(utils.getPLCDateTime(0, from)).format('HH:mm:ss')
+    this.to = moment(utils.getPLCDateTime(0, to)).format('HH:mm:ss')
   }
 }
 
@@ -120,6 +127,15 @@ export class Operation {
   }
 }
 
+export class Step {
+  constructor (id, info, type = 0, data = []) {
+    this.id = id
+    this.info = info
+    this.type = type
+    this.data = data
+  }
+}
+
 export class Queue {
   constructor (id, card = 0, stall = 0) {
     this.id = id + 1
@@ -132,7 +148,14 @@ export class Stall {
   constructor (nr, status, date, size) {
     this.nr = nr
     this.status = status
-    this.date = date || new Date()
+    this.date = date // || moment().format('YYYY-MM-DD HH:mm:ss')
     this.size = size
+  }
+  update (status, days, msec, size) {
+    // console.log(status, days, msec, size)
+    this.status = status
+    this.date = moment(utils.getPLCDateTime(days, msec)).format('YYYY-MM-DD HH:mm:ss')
+    this.size = size
+    // console.log(this.nr, this.status, this.date, this.size)
   }
 }

@@ -32,6 +32,7 @@
   "OPERATION": "Operazione",
   "HISTORY_QUERY": "Storico dal <strong>{dateFrom}</strong> al <strong>{dateTo}</strong>",
   "HISTORY_ITEMS": "Totale registrazioni <strong>{count}</strong>",
+  "HISTORY_DIAG": "Attiva Diagnostica",
 
   "DEVICE_ID_0": "Operatore",
 

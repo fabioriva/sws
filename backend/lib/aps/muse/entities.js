@@ -61,18 +61,22 @@ var diag = {
   count: 0,
   groups: [
     {
+      title: 'EL1',
       count: 0,
       active: []
     },
     {
+      title: 'EL2',
       count: 0,
       active: []
     },
     {
+      title: 'EL3',
       count: 0,
       active: []
     },
     {
+      title: 'EL4',
       count: 0,
       active: []
     }
@@ -276,8 +280,46 @@ var B1A = new Button(merkers1.find(b => b.addr === 'M3.0'), 'login', 'Entry')
 var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollback')
 var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entry')
 var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
-var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'rollback', 'Rollback')
-var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'rollback', 'Rollback')
+var B1C = new Button(merkers1.find(b => b.addr === 'M3.2'), 'logout', 'Exit')
+var B2C = new Button(merkers1.find(b => b.addr === 'M4.2'), 'rollback', 'Rollback')
+var B1D = new Button(merkers1.find(b => b.addr === 'M3.3'), 'logout', 'Exit')
+var B2D = new Button(merkers1.find(b => b.addr === 'M4.3'), 'rollback', 'Rollback')
+// var B3B = new Button(merkers1.find(b => b.addr === 'M4.2'), 'rollback', 'Rollback')
+// var B4B = new Button(merkers1.find(b => b.addr === 'M4.3'), 'rollback', 'Rollback')
+
+const SILOMAT_3 = [
+  inputs7.find(b => b.addr === 'E312.0'),
+  inputs7.find(b => b.addr === 'E312.1'),
+  inputs7.find(b => b.addr === 'E312.2'),
+  inputs7.find(b => b.addr === 'E312.3'),
+  inputs7.find(b => b.addr === 'E312.4'),
+  inputs7.find(b => b.addr === 'E312.5'),
+  inputs7.find(b => b.addr === 'E312.6'),
+  inputs7.find(b => b.addr === 'E312.7'),
+  outputs8.find(b => b.addr === 'A311.1'),
+  outputs8.find(b => b.addr === 'A311.2'),
+  outputs8.find(b => b.addr === 'A311.3'),
+  outputs8.find(b => b.addr === 'A311.4'),
+  outputs8.find(b => b.addr === 'A311.5'),
+  outputs8.find(b => b.addr === 'A311.6')
+]
+
+const SILOMAT_4 = [
+  inputs9.find(b => b.addr === 'E412.0'),
+  inputs9.find(b => b.addr === 'E412.1'),
+  inputs9.find(b => b.addr === 'E412.2'),
+  inputs9.find(b => b.addr === 'E412.3'),
+  inputs9.find(b => b.addr === 'E412.4'),
+  inputs9.find(b => b.addr === 'E412.5'),
+  inputs9.find(b => b.addr === 'E412.6'),
+  inputs9.find(b => b.addr === 'E412.7'),
+  outputs11.find(b => b.addr === 'A411.1'),
+  outputs11.find(b => b.addr === 'A411.2'),
+  outputs11.find(b => b.addr === 'A411.3'),
+  outputs11.find(b => b.addr === 'A411.4'),
+  outputs11.find(b => b.addr === 'A411.5'),
+  outputs11.find(b => b.addr === 'A411.6')
+]
 
 var EL1 = {
   a: devices[0],
@@ -290,7 +332,8 @@ var EL1 = {
   d: [
     B1A,
     B2A
-  ]
+  ],
+  e: []
 }
 
 var EL2 = {
@@ -304,7 +347,8 @@ var EL2 = {
   d: [
     B1B,
     B2B
-  ]
+  ],
+  e: []
 }
 
 var EL3 = {
@@ -315,7 +359,8 @@ var EL3 = {
     outputs6.find(b => b.addr === 'A300.7'),
     outputs6.find(b => b.addr === 'A300.6')
   ],
-  d: [B3B]
+  d: [B1C, B2C],
+  e: SILOMAT_3
 }
 
 var EL4 = {
@@ -326,7 +371,8 @@ var EL4 = {
     outputs9.find(b => b.addr === 'A400.7'),
     outputs9.find(b => b.addr === 'A400.6')
   ],
-  d: [B4B]
+  d: [B1D, B2D],
+  e: SILOMAT_4
 }
 
 var overview = {

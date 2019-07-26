@@ -2,9 +2,10 @@ import net from 'net'
 import pino from 'pino'
 import Log from 'lib/models/LogS7'
 import * as aps from 'lib/aps/def'
-import { bassanoEmitter } from 'lib/aps/bassano'
+// import { bassanoEmitter } from 'lib/aps/bassano'
 import { museEmitter } from 'lib/aps/muse'
 import { nyuEmitter } from 'lib/aps/nyu'
+// import { trumpeldorEmitter } from 'lib/aps/trumpeldor'
 
 const dev = process.env.NODE_ENV !== 'production'
 const HOST = dev ? process.env.BACKEND_URL : '192.168.20.3'
@@ -36,7 +37,7 @@ const server = net.createServer(function (socket) {
       const log = new Log(buffer)
       switch (log.system) {
         case aps.BASSANO:
-          bassanoEmitter.emit('data', log)
+          // bassanoEmitter.emit('data', log)
           break
         case aps.BOSTON:
           break
@@ -50,12 +51,16 @@ const server = net.createServer(function (socket) {
           break
         case aps.WASHINGTON_BLVD:
           break
+        case aps.TRUMPELDOR:
+          // trumpeldorEmitter.emit('data', log)
+          break
       }
     }
   })
 })
 server.listen(PORT, HOST)
 
-bassanoEmitter.on('logger', mesg => logger.info(log('bassano', mesg)))
+// bassanoEmitter.on('logger', mesg => logger.info(log('bassano', mesg)))
 museEmitter.on('logger', mesg => logger.info(log('muse', mesg)))
 nyuEmitter.on('logger', mesg => logger.info(log('nyu', mesg)))
+// trumpeldorEmitter.on('logger', mesg => logger.info(log('trumpeldor', mesg)))

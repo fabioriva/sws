@@ -55,14 +55,17 @@ export var diag = {
   count: 0,
   groups: [
     {
+      title: 'Montavetture A',
       count: 0,
       active: []
     },
     {
+      title: 'Montavetture B',
       count: 0,
       active: []
     },
     {
+      title: 'Torre',
       count: 0,
       active: []
     }
@@ -203,6 +206,23 @@ var B2A = new Button(merkers1.find(b => b.addr === 'M4.0'), 'rollback', 'Rollbac
 var B1B = new Button(merkers1.find(b => b.addr === 'M3.1'), 'login', 'Entrata')
 var B2B = new Button(merkers1.find(b => b.addr === 'M4.1'), 'rollback', 'Rollback')
 
+const SILOMAT = [
+  inputs5.find(b => b.addr === 'E42.0'),
+  inputs5.find(b => b.addr === 'E42.1'),
+  inputs5.find(b => b.addr === 'E42.2'),
+  inputs5.find(b => b.addr === 'E42.3'),
+  inputs5.find(b => b.addr === 'E42.4'),
+  inputs5.find(b => b.addr === 'E42.5'),
+  inputs5.find(b => b.addr === 'E42.6'),
+  inputs5.find(b => b.addr === 'E42.7'),
+  outputs4.find(b => b.addr === 'A31.1'),
+  outputs5.find(b => b.addr === 'A41.2'),
+  outputs5.find(b => b.addr === 'A41.3'),
+  outputs5.find(b => b.addr === 'A41.4'),
+  outputs5.find(b => b.addr === 'A41.5'),
+  outputs5.find(b => b.addr === 'A41.6')
+]
+
 var ELA = {
   a: devices[0],
   b: [],
@@ -214,7 +234,8 @@ var ELA = {
   d: [
     B1A,
     B2A
-  ]
+  ],
+  e: []
 }
 
 var ELB = {
@@ -228,7 +249,8 @@ var ELB = {
   d: [
     B1B,
     B2B
-  ]
+  ],
+  e: []
 }
 
 var T = {
@@ -239,7 +261,8 @@ var T = {
     outputs5.find(b => b.addr === 'A42.7'),
     outputs5.find(b => b.addr === 'A42.6')
   ],
-  d: []
+  d: [],
+  e: SILOMAT
 }
 
 export var overview = {
@@ -448,7 +471,7 @@ const rack1 = {
     },
     {
       nr: '4',
-      type: '6ES7 521-1Bl00-0AB0',
+      type: '6ES7 521-1BL00-0AB0',
       bytes: [
         {
           label: 'EB14',

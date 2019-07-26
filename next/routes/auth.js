@@ -128,6 +128,7 @@ router.post('/authorization', cors(), (req, res) => {
       var cert = fs.readFileSync(path.join(__dirname, '../bin/jwtRS256.key'))
       var decoded = jwt.verify(token, cert)
       const { aps } = decoded
+      console.log(decoded, aps, apsPath)
       if (aps === apsPath) {
         res.status(200).json(decoded)
       } else {

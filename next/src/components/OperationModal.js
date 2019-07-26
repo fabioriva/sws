@@ -68,7 +68,7 @@ class OperationRequestForm extends Component {
       >
         <Form layout='horizontal'>
           <FormItem
-            validateStatus={cardError ? 'error' : ''}
+            validateStatus={cardError ? 'error' : 'success'}
             help={cardError || ''}
             label={intl.get('CARD_NUMBER')}
           >

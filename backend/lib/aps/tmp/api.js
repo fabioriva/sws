@@ -134,13 +134,13 @@ function queryHistory (query, history, cb) {
   async.series([
     function (callback) {
       history.countDocuments(queryFilter, function (err, count) {
-        if (err) callback(err)
+        if (err) return callback(err)
         callback(null, count)
       })
     },
     function (callback) {
       history.find(queryFilter).sort({ date: -1 }).exec(function (err, query) {
-        if (err) callback(err)
+        if (err) return callback(err)
         callback(null, query)
       })
     }
