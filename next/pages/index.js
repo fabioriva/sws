@@ -10,6 +10,7 @@ export default class PageLogin extends React.Component {
       : `${protocol}://${req.headers.host}/api/login.js`
     return { apiUrl }
   }
+
   render () {
     return (
       <div>

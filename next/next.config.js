@@ -25,4 +25,7 @@ module.exports = withCss({
     }
     return config
   },
+  env: {
+    API_URL: process.env.API_URL || 'http://192.168.20.232'
+  }
 })

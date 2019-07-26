@@ -17,9 +17,11 @@ class Device extends Component {
         </Tooltip>
       </Badge>
     const manTag =
-      <Tooltip title={mode.label}>
-        <Tag color='#ffff00' style={{ color: '#000' }}>M</Tag>
-      </Tooltip>
+      <Badge count={step}>
+        <Tooltip title={mode.label}>
+          <Tag color='#ffff00' style={{ color: '#000', marginLeft: '12px' }}>M</Tag>
+        </Tooltip>
+      </Badge>
     const modeTag = mode.id !== 8 ? manTag : autTag
     const title = <span>{ name }</span>
     const extra =
@@ -212,6 +214,9 @@ class Device extends Component {
           }
           .ant-card-grid {
             padding: 0!important;
+          }
+          .ant-card-actions > li > span a, .ant-card-actions > li > span i {
+            width: auto;
           }
           .lamp {
             margin-left: 6px;

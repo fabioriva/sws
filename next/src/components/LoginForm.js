@@ -9,10 +9,13 @@ class NormalLoginForm extends Component {
     this.state = { error: '' }
     this.handleSubmit = this.handleSubmit.bind(this)
   }
+
   handleSubmit (event) {
     event.preventDefault()
     const url = this.props.apiUrl
-
+    console.log(url)
+    // const url = `${process.env.API_URL}/api/login.js`
+    console.log(`${process.env.API_URL}/api/login.js`)
     this.props.form.validateFields(async (err, credentials) => {
       if (!err) {
         const { username, password } = credentials
@@ -52,6 +55,7 @@ class NormalLoginForm extends Component {
       }
     })
   }
+
   render () {
     const { getFieldDecorator } = this.props.form
     return (

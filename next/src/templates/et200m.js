@@ -36,6 +36,7 @@ export default (def, role) => {
         racks: json
       }
     }
+
     constructor (props) {
       super(props)
       this.state = {
@@ -43,6 +44,7 @@ export default (def, role) => {
         racks: props.racks
       }
     }
+
     componentDidMount () {
       const { diagnostic } = this.props
       this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
@@ -59,9 +61,11 @@ export default (def, role) => {
         })
       }
     }
+
     componentWillUnmount () {
       this.ws.close()
     }
+
     render () {
       const { rackNumber } = this.props.router.query
       const rack = this.state.racks[rackNumber]
@@ -141,7 +145,6 @@ export default (def, role) => {
               background-color: #FFFFFF;
               border: 1px solid #000000;
               font-size: 0.78em;
-              cursor: help;
             }
             .bit-et200m-st {
               position: absolute;
@@ -149,7 +152,6 @@ export default (def, role) => {
               width: 12px;
               border-top: 1px solid #000000;
               border-bottom: 1px solid #000000;
-              cursor: help;
             }
             .bit-et200m-nr {
               position: absolute;
@@ -158,7 +160,6 @@ export default (def, role) => {
               width: 12px;
               background-color: #E0E0E0;
               border: 1px solid #000000;
-              cursor: help;
             }
             .bit-false {
               background-color: #C0C0C0;

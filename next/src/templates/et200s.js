@@ -36,6 +36,7 @@ export default (def, role) => {
         racks: json
       }
     }
+
     constructor (props) {
       super(props)
       this.state = {
@@ -43,6 +44,7 @@ export default (def, role) => {
         racks: props.racks
       }
     }
+
     componentDidMount () {
       const { diagnostic } = this.props
       this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
@@ -59,9 +61,11 @@ export default (def, role) => {
         })
       }
     }
+
     componentWillUnmount () {
       this.ws.close()
     }
+
     render () {
       const { rackNumber } = this.props.router.query
       const rack = this.state.racks[rackNumber]

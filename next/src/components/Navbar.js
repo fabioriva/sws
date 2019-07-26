@@ -121,7 +121,7 @@ class Navbar extends Component {
             <span className='app-navbar-element'>
               <Badge count={diag.alarmCount}>
                 <Link href={`/${user.aps}/alarms`}>
-                  <Icon className='app-navbar-icon' type='bell' />
+                  <a><Icon className='app-navbar-icon' type='bell' /></a>
                 </Link>
               </Badge>
             </span>
