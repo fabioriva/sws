@@ -48,7 +48,7 @@ function deleteModal (card, index, ws) {
   })
 }
 
-export default (def, role, MainView) => {
+export default function (def, role, MainView) {
   const { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } = def
   return class extends React.Component {
     static async getInitialProps (ctx) {

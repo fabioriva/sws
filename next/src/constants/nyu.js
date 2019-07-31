@@ -38,7 +38,7 @@ export const SIDEBAR_MENU = [
     role: roles.SERVICE
   },
   {
-    href: '/nyu/plc',
+    href: '/nyu/racks',
     icon: 'database',
     label: 'PLC Digital I/O',
     role: roles.SERVICE

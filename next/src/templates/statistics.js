@@ -2,13 +2,13 @@ import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
 import nextCookie from 'next-cookies'
-import { Row, Col, List, Card, DatePicker } from 'antd'
+import { List, Card, DatePicker } from 'antd'
 import Layout from 'src/components/Layout'
 // import Alarms from 'src/components/charts/Alarms'
 import Operations from 'src/components/charts/Operations'
 // import Query from 'src/components/ModalStatistics'
 
-export default (def, role) => {
+export default function (def, role) {
   const { APS, APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } = def
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
   return class extends React.Component {

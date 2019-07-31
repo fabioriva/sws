@@ -34,7 +34,7 @@ export const SIDEBAR_MENU = [
     role: roles.SERVICE
   },
   {
-    href: '/muse/plc',
+    href: '/muse/racks',
     icon: 'database',
     label: 'PLC Digital I/O',
     role: roles.SERVICE

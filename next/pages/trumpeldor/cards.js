@@ -1,6 +1,6 @@
 import * as def from 'src/constants/trumpeldor'
 import { SERVICE } from 'src/constants/roles'
-import withAuth from 'src/lib/withAuth'
+import { withAuthSync } from 'src/lib/auth'
 import AppUi from '/src/templates/cards'
 
-export default withAuth(AppUi(def, SERVICE))
+export default withAuthSync(AppUi(def, SERVICE))

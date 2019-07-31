@@ -3,7 +3,7 @@ import fetch from 'isomorphic-unfetch'
 import { login } from 'src/lib/auth'
 import { Form, Icon, Input, Button, Checkbox } from 'antd'
 
-class NormalLoginForm extends Component {
+class LoginForm extends Component {
   constructor (props) {
     super(props)
     this.state = { error: '' }
@@ -12,28 +12,22 @@ class NormalLoginForm extends Component {
 
   handleSubmit (event) {
     event.preventDefault()
-    const url = this.props.apiUrl
-    console.log(url)
-    // const url = `${process.env.API_URL}/api/login.js`
-    console.log(`${process.env.API_URL}/api/login.js`)
+    const url = this.props.apiUrl // '/api/login'
     this.props.form.validateFields(async (err, credentials) => {
       if (!err) {
         const { username, password } = credentials
-
         try {
           const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
           })
-          console.log(response)
           if (response.ok) {
             const { token, aps } = await response.json()
             login({ token, aps })
           } else {
             const { message } = await response.json()
             this.setState({ error: message })
-            console.log(this.state.error)
             this.props.form.setFields({
               username: {
                 value: username,
@@ -82,7 +76,7 @@ class NormalLoginForm extends Component {
             <Checkbox disabled>Remember me</Checkbox>
           )}
           <a className='login-form-forgot' href='mailto:info@sotefin.ch'>Forgot password</a>
-          <Button type='primary' htmlType='submit' className='login-form-button'>
+          <Button type='primary' htmlType='submit' className='login-form-button' disabled={this.props.token !== undefined}>
             Log in
           </Button>
           <div>Or <a href='mailto:info@sotefin.ch'>register now!</a></div>
@@ -107,4 +101,4 @@ class NormalLoginForm extends Component {
   }
 }
 
-export default Form.create()(NormalLoginForm)
+export default Form.create()(LoginForm)

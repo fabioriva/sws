@@ -1,14 +1,16 @@
 import React from 'react'
 import Head from 'next/head'
 import LoginForm from 'src/components/LoginForm'
+import nextCookie from 'next-cookies'
 
 export default class PageLogin extends React.Component {
-  static getInitialProps ({ req }) {
+  static getInitialProps (ctx) {
+    const { token } = nextCookie(ctx)
     const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
     const apiUrl = process.browser
-      ? `${protocol}://${window.location.host}/api/login.js`
-      : `${protocol}://${req.headers.host}/api/login.js`
-    return { apiUrl }
+      ? `${protocol}://${window.location.host}/api/login`
+      : `${protocol}://${ctx.req.headers.host}/api/login`
+    return { apiUrl, token }
   }
 
   render () {
@@ -27,8 +29,10 @@ export default class PageLogin extends React.Component {
             <h1>&#x1F680;&nbsp;<span className='app-title'><span className='color-1'>S</span>otefin&nbsp;<span className='color-2'>W</span>eb&nbsp;<span className='color-3'>S</span>ervice</span></h1>
             <h4 className='text-muted'>The future of automated parking systems servicing</h4>
           </div>
-          <LoginForm apiUrl={this.props.apiUrl} />
-          <p className='text-center text-muted'><i className='anticon anticon-copyright' /> 2017-present <a href='http://www.sotefin.com'>Sotefin SA</a></p>
+          <LoginForm apiUrl={this.props.apiUrl} token={this.props.token} />
+          <p className='text-center text-muted'>
+            <i className='anticon anticon-copyright' /> 2017-present <a href='http://www.sotefin.com'>Sotefin SA</a>
+          </p>
         </div>
         <style jsx global>{`
           html, body {

@@ -34,7 +34,7 @@ export const SIDEBAR_MENU = [
     role: roles.SERVICE
   },
   {
-    href: '/bassano/plc',
+    href: '/bassano/racks',
     icon: 'database',
     label: 'PLC Digital I/O',
     role: roles.SERVICE

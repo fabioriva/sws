@@ -28,7 +28,7 @@ const Ready = (props) => {
   )
 }
 
-export default (def, role) => {
+export default function (def, role) {
   const { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } = def
   return class extends React.Component {
     static async getInitialProps () {

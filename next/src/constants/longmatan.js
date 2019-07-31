@@ -44,7 +44,7 @@ export const SIDEBAR_MENU = [
     role: roles.SERVICE
   },
   {
-    href: '/longmatan/plc',
+    href: '/longmatan/racks',
     icon: 'database',
     label: 'PLC Digital I/O',
     role: roles.SERVICE

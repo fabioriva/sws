@@ -1,7 +1,7 @@
 import React from 'react'
 import Error from 'next/error'
 import Router from 'next/router'
-import { auth } from 'src/lib/auth'
+import { profile } from 'src/lib/auth'
 
 /*
  * Higher order component that passes `getInitialProps` through
@@ -18,7 +18,7 @@ export default (Component) => {
 
       const { activeItem, pageRole } = props
 
-      const { currentUser, statusCode } = await auth(ctx, pageRole)
+      const { currentUser, statusCode } = await profile(ctx, pageRole)
 
       if (statusCode === 401) return { statusCode: statusCode }
 

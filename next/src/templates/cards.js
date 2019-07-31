@@ -5,7 +5,7 @@ import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
 import List from 'src/components/CardList'
 
-export default (def, role) => {
+export default function (def, role) {
   const { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL, CARDS } = def
   return class extends React.Component {
     static async getInitialProps () {

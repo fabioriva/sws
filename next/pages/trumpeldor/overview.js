@@ -1,7 +1,7 @@
 import { Row, Col } from 'antd'
 import * as def from 'src/constants/trumpeldor'
 import { VALET } from 'src/constants/roles'
-import withAuth from 'src/lib/withAuth'
+import { withAuthSync } from 'src/lib/auth'
 import AppUi from '/src/templates/overview'
 
 const MainView = ({ devices, exitQueue }) => {
@@ -17,7 +17,7 @@ const MainView = ({ devices, exitQueue }) => {
   )
 }
 
-export default withAuth(AppUi(def, VALET, MainView))
+export default withAuthSync(AppUi(def, VALET, MainView))
 
 // import React from 'react'
 // import Layout from 'src/components/Layout'

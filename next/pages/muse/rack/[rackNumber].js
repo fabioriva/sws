@@ -1,11 +1,11 @@
 import { compose } from 'redux'
 import { withRouter } from 'next/router'
-import * as def from 'src/constants/nyu'
+import * as def from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
-import withAuth from 'src/lib/withAuth'
-import AppUi from '/src/templates/et200s'
+import { withAuthSync } from 'src/lib/auth'
+import AppUi from '/src/templates/rack'
 
 export default compose(
   withRouter,
-  withAuth
+  withAuthSync
 )(AppUi(def, SERVICE))

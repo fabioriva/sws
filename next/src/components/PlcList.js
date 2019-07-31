@@ -15,6 +15,7 @@ class Byte extends Component {
       </List.Item>
     )
   }
+
   render () {
     return (
       <List

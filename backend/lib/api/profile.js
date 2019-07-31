@@ -12,22 +12,23 @@ const profile = async (req, res) => {
   const auth = await req.headers.authorization
   const { token } = JSON.parse(auth)
 
-  const { pathname } = await json(req)
-  const [apsPath] = pathname.substring(1).split('/')
+  // const { pathname } = await json(req)
+  // const [apsPath] = pathname.substring(1).split('/')
 
-  console.log('(0)', auth, token, pathname, apsPath)
+  console.log('(0)', auth, token) //, pathname, apsPath)
 
   try {
     const cert = fs.readFileSync(path.join(__dirname, '../../ssh-key/jwtRS256.key'))
     const decoded = jwt.verify(token, cert)
-    const { aps } = decoded
     console.log('(1)', decoded)
-    if (aps === apsPath) {
-      send(res, 200, JSON.stringify(decoded))
-    } else {
-      // throw createError(401, { success: false, message: 'Token not valid' })
-      send(res, 401, { success: false, message: 'Token not valid' })
-    }
+    send(res, 200, JSON.stringify(decoded))
+    // const { aps } = decoded
+    // if (aps === apsPath) {
+    //   send(res, 200, JSON.stringify(decoded))
+    // } else {
+    //   // throw createError(401, { success: false, message: 'Token not valid' })
+    //   send(res, 401, { success: false, message: 'Token not valid' })
+    // }
   } catch (error) {
     console.log(error)
     throw createError(401, error.statusText)
