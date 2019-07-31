@@ -1,7 +1,7 @@
 import React from 'react'
 import Layout from 'src/components/Layout'
 import ChangePassword from 'src/components/ChangePasswordForm'
-import withAuth from 'src/lib/withAuth'
+import { withAuthSync } from 'src/lib/auth'
 import { VALET } from 'src/constants/roles'
 import {
   APS,
@@ -46,4 +46,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi, VALET)
+export default withAuthSync(AppUi, VALET)

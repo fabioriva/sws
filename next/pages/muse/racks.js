@@ -1,6 +1,6 @@
 import * as def from 'src/constants/muse'
 import { SERVICE } from 'src/constants/roles'
-import withAuth from 'src/lib/withAuth'
+import { withAuthSync } from 'src/lib/auth'
 import AppUi from '/src/templates/plc'
 
 const data = [
@@ -72,4 +72,4 @@ const data = [
   }
 ]
 
-export default withAuth(AppUi(def, SERVICE, data))
+export default withAuthSync(AppUi(def, SERVICE, data))

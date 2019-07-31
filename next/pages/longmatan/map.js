@@ -10,7 +10,7 @@ import { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } from 'src/cons
 import { CARDS, STALLS, STALL_STATUS } from 'src/constants/longmatan'
 import { SERVICE, VALET } from 'src/constants/roles'
 import nextCookie from 'next-cookies'
-import withAuth from 'src/lib/withAuth'
+import { withAuthSync } from 'src/lib/auth'
 
 class AppUi extends React.Component {
   static async getInitialProps (ctx) {
@@ -727,4 +727,4 @@ class AppUi extends React.Component {
   }
 }
 
-export default withAuth(AppUi)
+export default withAuthSync(AppUi)
