@@ -38,7 +38,7 @@ const withRack = Page => {
         Object.keys(data).forEach((key) => {
           if (!diagnostic && key === 'racks') {
             this.setState({
-              overview: data[key]
+              racks: data[key]
             })
           }
         })
