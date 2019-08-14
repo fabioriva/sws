@@ -1,9 +1,9 @@
 import * as roles from 'src/constants/roles'
 
 const dev = process.env.NODE_ENV !== 'production'
-export const BACKEND_URL = dev ? process.env.BACKEND_URL : 'https://www.sotefinservice.com'
+export const BACKEND_URL = dev ? `${process.env.BACKEND_URL}/aps/bassano` : 'https://www.sotefinservice.com/aps/bassano'
 export const WEBSOCK_URL = dev ? `${process.env.WEBSOCKET_URL}/ws/bassano` : 'wss://www.sotefinservice.com/ws/bassano'
-export const APS = 'bassano'
+// export const APS = 'bassano'
 export const APS_ID = 66
 export const APS_TITLE = 'Stallo S. Giovanni&nbsp;&middot;&nbsp;Bassano Del Grappa&nbsp;&middot;&nbsp;Italia'
 export const CARDS = 149

@@ -7,46 +7,30 @@ import List from 'src/components/PlcList'
 import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
 
-export default function (def, role) {
-  const { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } = def
+const withRack = Page => {
   return class extends React.Component {
     static async getInitialProps (ctx) {
-      const props = {
-        activeItem: '4',
-        pageRole: role
-      }
-      // check if diagnostic is active
+      const props = Page.getInitialProps ? await Page.getInitialProps(ctx) : {}
+      const { BACKEND_URL } = props.def
       const { diagnostic } = nextCookie(ctx)
-      if (diagnostic) {
-        const res = await fetch(`${BACKEND_URL}/aps/${APS}/diagnostic?id=${diagnostic}`)
-        if (res.ok) {
-          const json = await res.json()
-          return {
-            ...props,
-            diagnostic: diagnostic,
-            racks: json.racks
-          }
-        }
-      }
-      // if diagnostic is not active fetch data
-      const res = await fetch(`${BACKEND_URL}/aps/${APS}/racks`)
+      const url = diagnostic ? `${BACKEND_URL}/diagnostic?id=${diagnostic}` : `${BACKEND_URL}/racks`
+      const res = await fetch(url)
       const json = await res.json()
+      const data = diagnostic ? json.racks : json
       return {
         ...props,
-        racks: json
+        diagnostic: diagnostic,
+        racks: data
       }
     }
 
-    constructor (props) {
-      super(props)
-      this.state = {
-        isFetching: true,
-        racks: props.racks
-      }
+    state = {
+      racks: this.props.racks
     }
 
-    componentDidMount () {
+    subscribe = () => {
       const { diagnostic } = this.props
+      const { WEBSOCK_URL } = this.props.def
       this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
       this.ws.onerror = e => console.log(e)
       this.ws.onmessage = e => {
@@ -54,12 +38,15 @@ export default function (def, role) {
         Object.keys(data).forEach((key) => {
           if (!diagnostic && key === 'racks') {
             this.setState({
-              isFetching: false,
-              racks: data[key]
+              overview: data[key]
             })
           }
         })
       }
+    }
+
+    componentDidMount () {
+      this.subscribe()
     }
 
     componentWillUnmount () {
@@ -67,6 +54,7 @@ export default function (def, role) {
     }
 
     render () {
+      const { APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } = this.props.def
       const { rackNumber } = this.props.router.query
       const rack = this.state.racks[rackNumber]
       const title = rack !== undefined ? `PLC Digital I/O - ${rack.title}` : `PLC Digital I/O`
@@ -81,11 +69,11 @@ export default function (def, role) {
             rack !== undefined &&
             <React.Fragment>
               <Mobile>
-                <Link href={`/${APS}/racks`}><a>[Back]</a></Link>
+                <Link href={`/${this.props.currentUser.aps}/racks`}><a>[Back]</a></Link>
                 <List rack={rack} />
               </Mobile>
               <Default>
-                <Link href={`/${APS}/racks`}><a>[Back]</a></Link>
+                <Link href={`/${this.props.currentUser.aps}/racks`}><a>[Back]</a></Link>
                 <Rack rack={rack} />
               </Default>
             </React.Fragment>
@@ -95,3 +83,5 @@ export default function (def, role) {
     }
   }
 }
+
+export default withRack

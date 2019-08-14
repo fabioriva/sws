@@ -1,9 +1,9 @@
 import * as roles from 'src/constants/roles'
 
 const dev = process.env.NODE_ENV !== 'production'
-export const BACKEND_URL = dev ? process.env.BACKEND_URL : 'https://www.sotefinservice.com'
+export const BACKEND_URL = dev ? `${process.env.BACKEND_URL}/aps/muse` : 'https://www.sotefinservice.com/aps/muse'
 export const WEBSOCK_URL = dev ? `${process.env.WEBSOCKET_URL}/ws/muse` : 'wss://www.sotefinservice.com/ws/muse'
-export const APS = 'muse'
+// export const APS = 'muse'
 export const APS_ID = 61
 export const APS_TITLE = 'The Muse&nbsp;&middot;&nbsp;Miami&nbsp;&middot;&nbsp;Florida'
 export const CARDS = 208

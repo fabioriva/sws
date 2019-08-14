@@ -1,15 +1,13 @@
 import micro, { send, json } from 'micro'
 // import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import { parse } from 'url'
+import url, { URL } from 'url'
 import { series } from 'async'
 import {
   dailyOperations,
   weeklyOperations,
   monthlyOperations,
-  yearlyOperations,
-  // getOperations,
-  // getAlarms
+  yearlyOperations
 } from './statistics'
 import {
   updateData,
@@ -18,9 +16,13 @@ import {
 
 module.exports = function startServer (diagnostic, history, s7def, s7obj) {
   const server = micro(async (req, res) => {
-    const parsedUrl = parse(req.url, true)
+    const parsedUrl = url.parse(req.url, true)
     const { pathname, query } = parsedUrl
     const page = pathname.split('/').pop()
+
+    // const myURL = new URL(req.url, 'https://www.sotefinservice.com/')
+    // const page = myURL.pathname.split('/').pop()
+    // const query = myURL.searchParams // .get('dateString')
 
     // const { method, url } = req
     // console.log(method, url)
@@ -102,9 +104,8 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
 }
 
 function getStatistics (query, history, callback) {
-  // console.log(query)
-  const { dateFrom, dateTo } = query
-  const date = moment(dateFrom) // query.date)
+  const { dateString } = query
+  const date = moment(dateString) // query.date)
   const day = date.format('YYYY-MM-DD HH:mm')
   const weekStart = date.clone().subtract(1, 'weeks').startOf('week').format('YYYY-MM-DD HH:mm')
   const weekEnd = date.clone().subtract(1, 'weeks').endOf('week').format('YYYY-MM-DD HH:mm')
@@ -143,18 +144,6 @@ function getStatistics (query, history, callback) {
         cb(null, result)
       })
     }
-    // function (cb) {
-    //   getOperations(query, history, function (err, result) {
-    //     if (err) cb(err)
-    //     cb(null, result)
-    //   })
-    // },
-    // function (cb) {
-    //   getAlarms(query, history, function (err, result) {
-    //     if (err) cb(err)
-    //     cb(null, result)
-    //   })
-    // }
   ],
   function (err, results) {
     if (err) return callback(err)
@@ -198,7 +187,7 @@ function getHistory (query, history, callback) {
   const from = dateFrom || moment().hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
   const to = dateTo || moment().hours(23).minutes(59).seconds(59)
   const queryFilter = {
-    'date': {
+    date: {
       $gte: from,
       $lt: to
     },

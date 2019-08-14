@@ -5,7 +5,11 @@ import cookie from 'js-cookie'
 // import { connect } from 'react-redux'
 // import { bindActionCreators } from 'redux'
 // import { navbarSetDiag } from 'src/store'
-import { LocaleProvider, Button, Modal, Popover, Table } from 'antd'
+import { ConfigProvider, Button, Modal, Table } from 'antd'
+
+// import en_US from 'antd/es/locale/en_US'
+// import it_IT from 'antd/es/locale/it_IT'
+
 import en_US from 'antd/lib/locale-provider/en_US'
 import it_IT from 'antd/lib/locale-provider/it_IT'
 import intl from 'react-intl-universal'
@@ -123,128 +127,126 @@ class History extends React.Component {
       </Button>
     </div>
     return (
-      <LocaleProvider locale={this.getCurrentLocale()}>
-        <div>
-          <AlarmModal
-            visible={this.state.visible}
-            onCancel={this.handleCancel}
-            onOk={this.handleOk}
-            data={this.state.diagnostic}
-            disabled={!this.props.diagnostic || cookie.get('diagnostic') !== undefined}
+      <ConfigProvider locale={this.getCurrentLocale()}>
+        <Table
+          title={() => title}
+          dataSource={query}
+          bordered={false}
+          size='small'
+          pagination={{ defaultPageSize: ITEMS_PER_PAGE, pageSize: ITEMS_PER_PAGE }}
+          rowKey='_id'
+          rowClassName={(record, index) => this.rowClassname(record)}
+          // onRow={(record) => {
+          //   return {
+          //     onClick: () => {
+          //       this.props.onAlarm !== undefined && this.props.onAlarm(record)
+          //     }
+          //   }
+          // }}
+        >
+          <Column
+            title={intl.get('DATE')}
+            dataIndex='logged'
+            key='logged'
+            // render={(text) => (moment.utc(text).format('YYYY-MM-DD HH:mm:ss'))}
           />
-          <Table
-            title={() => title}
-            dataSource={query}
-            bordered={false}
-            size='small'
-            pagination={{ defaultPageSize: ITEMS_PER_PAGE, pageSize: ITEMS_PER_PAGE }}
-            rowKey='_id'
-            rowClassName={(record, index) => this.rowClassname(record)}
-            // onRow={(record) => {
-            //   return {
-            //     onClick: () => {
-            //       this.props.onAlarm !== undefined && this.props.onAlarm(record)
-            //     }
-            //   }
-            // }}
-          >
-            <Column
-              title={intl.get('DATE')}
-              dataIndex='logged'
-              key='logged'
-              // render={(text) => (moment.utc(text).format('YYYY-MM-DD HH:mm:ss'))}
-            />
-            <Column
-              title={intl.get('DEVICE')}
-              dataIndex='device.name'
-              key='device'
-              // render={(text, record, index) => text !== 0 ? 'device x' : intl.get(`DEVICE_ID_${text}`)}
-            />
-            <Column
-              title={intl.get('MODE')}
-              dataIndex='mode.info'
-              key='mode'
-              // render={(text, record, index) => intl.get(`MODE_ID_${text}`)}
-            />
-            <Column
-              title={intl.get('OPERATION')}
-              dataIndex='operation.info'
-              key='operation'
-              render={(text, record, index) => (
-                record.alarm.id !== 0
-                ?
-                <a onClick={() => this.showModal(record)} >{text} ID {record.alarm.id}</a>
-                // <Popover
-                //   content={this.popoverDiag(record)}
-                //   title={`Alarm ID ${record.alarm.id}`}
-                //   trigger='hover'
-                // >
-                //   {/* <span>{intl.get(`OPERATION_ID_${text}`)} ID {record.alarm}</span> */}
-                //   <span>{text} ID {record.alarm.id}</span>
-                // </Popover>
-                :
-                // intl.get(`OPERATION_ID_${text}`)
-                <span>{text}</span>
-              )}
-            />
-            <Column
-              title={intl.get('CARD')}
-              dataIndex='card'
-              key='card'
-              className='col-text-align-center'
-              render={(text, record) => (text === 999 ? <span>{intl.get('LOCK')}</span> : text)}
-            />
-            <Column
-              title={intl.get('STALL')}
-              dataIndex='stall'
-              key='stall'
-              className='col-text-align-center'
-            />
-            <Column
-              title={intl.get('SIZE')}
-              dataIndex='size'
-              key='size'
-              className='col-text-align-center'
-            />
-          </Table>
-          <style jsx global>{`
-            .ant-table {
-              background: #fff!important;
-            }
-            .ant-table-tbody>tr, .ant-table-tbody>tr>td, .ant-table-thead>tr {
-              padding-bottom: 2px!important;
-              padding-top: 2px!important;
-            }
-            .col-hidden {
-              display: none
-            }
-            .col-success {
-              background: #dff0d8;
-              color: #3c763d;
-            }
-            .col-info {
-              background: #d9edf7;
-              // color: #31708f;
-            }
-            .col-warning {
-              background: #fcf8e3;
-              // color: #8a6d3b;
-            }
-            .col-danger {
-              background: #f2dede;
-              // color: #a94442;
-            }
-            .col-text-align-center {
-              // text-align: center;
-            }
-            .history-intro {
-              display: flex;
-              justify-content: space-between;
-              margin: 8px 0;
-            }
-          `}</style>
-          </div>
-      </LocaleProvider>
+          <Column
+            title={intl.get('DEVICE')}
+            dataIndex='device.name'
+            key='device'
+            // render={(text, record, index) => text !== 0 ? 'device x' : intl.get(`DEVICE_ID_${text}`)}
+          />
+          <Column
+            title={intl.get('MODE')}
+            dataIndex='mode.info'
+            key='mode'
+            // render={(text, record, index) => intl.get(`MODE_ID_${text}`)}
+          />
+          <Column
+            title={intl.get('OPERATION')}
+            dataIndex='operation.info'
+            key='operation'
+            render={(text, record, index) => (
+              record.alarm.id !== 0
+              ?
+              <a onClick={() => this.showModal(record)} key={index}>{text} ID {record.alarm.id}</a>
+              // <Popover
+              //   content={this.popoverDiag(record)}
+              //   title={`Alarm ID ${record.alarm.id}`}
+              //   trigger='hover'
+              // >
+              //   {/* <span>{intl.get(`OPERATION_ID_${text}`)} ID {record.alarm}</span> */}
+              //   <span>{text} ID {record.alarm.id}</span>
+              // </Popover>
+              :
+              // intl.get(`OPERATION_ID_${text}`)
+              <span>{text}</span>
+            )}
+          />
+          <Column
+            title={intl.get('CARD')}
+            dataIndex='card'
+            key='card'
+            className='col-text-align-center'
+            render={(text, record) => (text === 999 ? <span>{intl.get('LOCK')}</span> : text)}
+          />
+          <Column
+            title={intl.get('STALL')}
+            dataIndex='stall'
+            key='stall'
+            className='col-text-align-center'
+          />
+          <Column
+            title={intl.get('SIZE')}
+            dataIndex='size'
+            key='size'
+            className='col-text-align-center'
+          />
+        </Table>
+        <AlarmModal
+          visible={this.state.visible}
+          onCancel={this.handleCancel}
+          onOk={this.handleOk}
+          data={this.state.diagnostic}
+          disabled={!this.props.diagnostic || cookie.get('diagnostic') !== undefined}
+        />
+        <style jsx global>{`
+          .ant-table {
+            background: #fff!important;
+          }
+          .ant-table-tbody>tr, .ant-table-tbody>tr>td, .ant-table-thead>tr {
+            padding-bottom: 2px!important;
+            padding-top: 2px!important;
+          }
+          .col-hidden {
+            display: none
+          }
+          .col-success {
+            background: #dff0d8;
+            color: #3c763d;
+          }
+          .col-info {
+            background: #d9edf7;
+            // color: #31708f;
+          }
+          .col-warning {
+            background: #fcf8e3;
+            // color: #8a6d3b;
+          }
+          .col-danger {
+            background: #f2dede;
+            // color: #a94442;
+          }
+          .col-text-align-center {
+            // text-align: center;
+          }
+          .history-intro {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+          }
+        `}</style>
+      </ConfigProvider>
     )
   }
 }

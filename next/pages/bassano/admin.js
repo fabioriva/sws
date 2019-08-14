@@ -35,7 +35,7 @@ class AppUi extends React.Component {
   render () {
     return (
       <Layout
-        aps={APS}
+        aps={APS_TITLE}
         pageTitle='Amministrazione utente'
         sidebarMenu={SIDEBAR_MENU}
         socket={`${WEBSOCK_URL}?channel=ch2`}

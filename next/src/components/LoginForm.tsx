@@ -1,19 +1,29 @@
-import { Component } from 'react'
+import * as React from 'react'
 import fetch from 'isomorphic-unfetch'
 import { login } from 'src/lib/auth'
 import { Form, Icon, Input, Button, Checkbox } from 'antd'
+import { FormComponentProps } from 'antd/lib/form'
 
-class LoginForm extends Component {
-  constructor (props) {
+export interface UserFormProps extends FormComponentProps {
+  apiUrl: string;
+  token?: string;
+}
+
+interface State {
+  error: string
+}
+
+class LoginForm extends React.Component<UserFormProps, State> {
+  constructor (props: UserFormProps) {
     super(props)
     this.state = { error: '' }
-    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-  handleSubmit (event) {
+  handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
-    const url = this.props.apiUrl // '/api/login'
-    this.props.form.validateFields(async (err, credentials) => {
+    const url = this.props.apiUrl
+    const { setFields, validateFields } = this.props.form
+    validateFields(async (err, credentials) => {
       if (!err) {
         const { username, password } = credentials
         try {
@@ -28,7 +38,7 @@ class LoginForm extends Component {
           } else {
             const { message } = await response.json()
             this.setState({ error: message })
-            this.props.form.setFields({
+            setFields({
               username: {
                 value: username,
                 errors: [new Error(message)]
@@ -101,4 +111,4 @@ class LoginForm extends Component {
   }
 }
 
-export default Form.create()(LoginForm)
+export default Form.create<UserFormProps>()(LoginForm)

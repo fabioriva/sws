@@ -2,21 +2,16 @@ import { Row, Col } from 'antd'
 import * as def from 'src/constants/bassano'
 import { VALET } from 'src/constants/roles'
 import { withAuthSync } from 'src/lib/auth'
-import AppUi from '/src/templates/overview'
+import withOverview from 'src/hocs/with-overview'
 
-const MainView = ({ devices, exitQueue }) => {
-  return (
-    <Row gutter={16}>
-      <Col xs={24} sm={24} md={14} lg={18} xl={18}>
-        <Row type='flex' justify='center' align='top' gutter={16}>
+const Page = ({ devices, exitQueue }) => (
+  <Row gutter={16}>
+    <Col xs={24} sm={24} md={14} lg={18} xl={18}>
+    <Row type='flex' justify='center' align='top' gutter={16}>
           <Col xs={24} sm={24} md={24} lg={10} xl={8}>
             { devices[0] }
           </Col>
           <Col xs={24} sm={24} md={24} lg={10} xl={8}>
-            {/* <Device
-              device={devices[1]}
-              action={this.showOperationModal}
-            /> */}
             { devices[1] }
           </Col>
         </Row>
@@ -26,12 +21,20 @@ const MainView = ({ devices, exitQueue }) => {
           </Col>
           <Col xs={24} sm={24} md={24} lg={10} xl={8} />
         </Row>
-      </Col>
-      <Col xs={24} sm={24} md={10} lg={6} xl={6}>
-        { exitQueue }
-      </Col>
-    </Row>
-  )
+    </Col>
+    <Col xs={24} sm={24} md={10} lg={6} xl={6}>
+      { exitQueue }
+    </Col>
+  </Row>
+)
+
+Page.getInitialProps = async () => {
+  const props = {
+    activeItem: '1',
+    def: def,
+    pageRole: VALET
+  }
+  return props
 }
 
-export default withAuthSync(AppUi(def, VALET, MainView))
+export default withAuthSync(withOverview(Page))

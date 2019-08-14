@@ -32,8 +32,8 @@ function withAuthSync (WrappedComponent) {
 
       if (statusCode === 401) return { statusCode: statusCode }
 
-      ctx.store.dispatch({ type: 'UI_NAVBAR_SET_USER', user: { ...currentUser, url: ctx.asPath } })
-      ctx.store.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: activeItem })
+      ctx.reduxStore.dispatch({ type: 'UI_NAVBAR_SET_USER', user: { ...currentUser, url: ctx.asPath } })
+      ctx.reduxStore.dispatch({ type: 'UI_SIDEBAR_SET_MENU', item: activeItem })
 
       return { ...props, currentUser }
     }

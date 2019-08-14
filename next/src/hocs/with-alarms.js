@@ -1,4 +1,3 @@
-import React from 'react'
 import fetch from 'isomorphic-unfetch'
 import { Alert, Badge, Button, Tabs } from 'antd'
 import Layout from 'src/components/Layout'
@@ -28,56 +27,51 @@ const Ready = (props) => {
   )
 }
 
-export default function (def, role) {
-  const { APS, APS_TITLE, BACKEND_URL, SIDEBAR_MENU, WEBSOCK_URL } = def
+const withAlarms = Page => {
   return class extends React.Component {
-    static async getInitialProps () {
-      const props = {
-        activeItem: '5',
-        pageRole: role
-      }
-      const res = await fetch(`${BACKEND_URL}/aps/${APS}/alarms`)
+    static async getInitialProps (ctx) {
+      const props = Page.getInitialProps ? await Page.getInitialProps(ctx) : {}
+      const { BACKEND_URL } = props.def
+      const url = `${BACKEND_URL}/alarms`
+      const res = await fetch(url)
       const json = await res.json()
       return {
         ...props,
-        alarms: json  //.alarms
+        alarms: json
       }
     }
-    constructor (props) {
-      super(props)
-      this.state = {
-        isFetching: true,
-        alarms: props.alarms
-      }
+
+    state = {
+      alarms: this.props.alarms
     }
-    componentDidMount () {
+
+    subscribe = () => {
+      const { diagnostic } = this.props
+      const { WEBSOCK_URL } = this.props.def
       this.ws = new WebSocket(`${WEBSOCK_URL}?channel=ch1`)
       this.ws.onerror = e => console.log(e)
       this.ws.onmessage = e => {
         const data = JSON.parse(e.data)
         Object.keys(data).forEach((key) => {
-          if (key === 'alarms') {
+          if (!diagnostic && key === 'alarms') {
             this.setState({
-              isFetching: false,
               alarms: data[key]
             })
           }
         })
       }
     }
+
+    componentDidMount () {
+      this.subscribe()
+    }
+
     componentWillUnmount () {
       this.ws.close()
     }
-    handleData = (data) => {
-      this.setState({
-        isFetching: false,
-        alarms: data.alarms
-      })
-    }
-    renderList = (alarms) => {
-      return alarms.map((a, i) => <Alarm a={a} key={i} />)
-    }
+
     render () {
+      const { APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } = this.props.def
       const { alarms } = this.state
       return (
         <Layout
@@ -106,5 +100,11 @@ export default function (def, role) {
         </Layout>
       )
     }
+
+    renderList = (alarms) => {
+      return alarms.map((a, i) => <Alarm a={a} key={i} />)
+    }
   }
 }
+
+export default withAlarms

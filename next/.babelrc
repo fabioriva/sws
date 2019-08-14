@@ -8,8 +8,12 @@
       {
         "root": ["./"],
         "alias": {
-          "components": "./src"
-        }
+          "components": "./src/components",
+          "constants": "./src/constants",
+          "lib": "./src/lib",
+          "styles": "./src/styles"
+        },
+        "extensions": [".js", ".jsx", ".es", ".es6", ".mjs", ".ts", ".tsx"]
       }
     ],
     [

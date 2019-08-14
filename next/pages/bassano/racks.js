@@ -1,7 +1,7 @@
 import * as def from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
 import { withAuthSync } from 'src/lib/auth'
-import AppUi from '/src/templates/plc'
+import { withRacks } from '/src/hocs/with-rack-list'
 
 const data = [
   {
@@ -30,4 +30,15 @@ const data = [
   }
 ]
 
-export default withAuthSync(AppUi(def, SERVICE, data))
+const Page = () => (<></>)
+
+Page.getInitialProps = async () => {
+  return {
+    activeItem: '4',
+    def: def,
+    pageRole: SERVICE,
+    data: data
+  }
+}
+
+export default withAuthSync(withRacks(Page))

@@ -13,7 +13,7 @@ class OperationRequestForm extends Component {
   componentDidMount () {
     // To disabled submit button at the beginning.
     this.props.form.validateFields()
-    console.log('componentDidMount', hasErrors(this.props.form.getFieldsError()))
+    console.log('componentDidMount has errors:', hasErrors(this.props.form.getFieldsError()))
   }
   render () {
     const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
@@ -126,7 +126,8 @@ const OperationModal = Form.create({
     }
   },
   onFieldsChange (props, fields) {
-    console.log('onFieldsChange', props, fields)
+    console.log('onFieldsChange, props:', props)
+    console.log('onFieldsChange, field:', fields)
     props.onChange(fields)
   }
 })(OperationRequestForm)

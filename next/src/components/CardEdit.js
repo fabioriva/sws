@@ -58,7 +58,7 @@ class CardEditForm extends React.Component {
     return (
       <Modal
         title='Edit Card'
-        visible={this.props.data.visible}
+        visible={visible}
         footer={[
           <Button
             key='back'
@@ -67,9 +67,10 @@ class CardEditForm extends React.Component {
           </Button>,
           <Button
             key='submit'
+            type='primary' 
             disabled={hasErrors(getFieldsError())}
             // onClick={() => this.props.onOk(card.value, code.value, timeFrom.value, timeTo.value)}
-            onClick={() => this.props.onOk(card.value, code.value, timeFrom.value.format('HH:mm:ss'), timeTo.value.format('HH:mm:ss'))}
+            onClick={() => this.props.onConfirm(card.value, code.value, timeFrom.value.format('HH:mm:ss'), timeTo.value.format('HH:mm:ss'))}
           >
             Confirm request
           </Button>

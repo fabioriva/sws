@@ -1,6 +1,16 @@
 import * as def from 'src/constants/bassano'
 import { SERVICE } from 'src/constants/roles'
 import { withAuthSync } from 'src/lib/auth'
-import AppUi from '/src/templates/cards'
+import withCards from '/src/hocs/with-cards'
 
-export default withAuthSync(AppUi(def, SERVICE))
+const Page = () => (<></>)
+
+Page.getInitialProps = async () => {
+  return {
+    activeItem: '3',
+    def: def,
+    pageRole: SERVICE
+  }
+}
+
+export default withAuthSync(withCards(Page))

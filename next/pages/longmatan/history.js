@@ -1,6 +1,16 @@
 import * as def from 'src/constants/longmatan'
 import { SERVICE } from 'src/constants/roles'
 import { withAuthSync } from 'src/lib/auth'
-import AppUi from '/src/templates/history'
+import withHistory from '/src/hocs/with-history'
 
-export default withAuthSync(AppUi(def, SERVICE))
+const Page = () => (<></>)
+
+Page.getInitialProps = async () => {
+  return {
+    activeItem: '6',
+    def: def,
+    pageRole: SERVICE
+  }
+}
+
+export default withAuthSync(withHistory(Page))
