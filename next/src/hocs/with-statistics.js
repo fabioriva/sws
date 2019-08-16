@@ -36,32 +36,34 @@ const withStatistics = Page => {
           sidebarMenu={SIDEBAR_MENU}
           socket={`${WEBSOCK_URL}?channel=ch2`}
         >
+          <DatePicker defaultValue={moment(dateString)} onChange={this.handleChange} />
           {
             data !== undefined &&
             <List
               grid={{
                 gutter: 16,
-                xs: 1,
-                sm: 1,
-                md: 1,
-                lg: 1,
-                xl: 2,
-                xxl: 2,
+                // xs: 1,
+                // sm: 1,
+                // md: 1,
+                // lg: 1,
+                // xl: 2,
+                // xxl: 2,
               }}
               dataSource={data}
               renderItem={item => (
                 <List.Item>
-                  <Card
-                    title={item.title}
-                    extra={<DatePicker defaultValue={moment(dateString)} onChange={this.handleChange} />}
+                  {/* <Card
+                    // title={item.title}
+                    // extra={<DatePicker defaultValue={moment(dateString)} onChange={this.handleChange} />}
                     style={{ width: '100%', height: 400 }}
-                  >
+                  > */}
                     <Operations
                       data={item.data}
                       label={item.label}
+                      title={item.title}
                       showModal={this.openModal}
                     />
-                  </Card>
+                  {/* </Card> */}
                 </List.Item>
               )}
             />

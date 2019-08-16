@@ -165,7 +165,7 @@ export const weeklyOperations = (start, end, history, callback) => {
     })
     const operations = {
       data: statistics,
-      label: `From ${moment(start).startOf('day').format('YYYY-MM-DD')} To ${moment(end).startOf('day').format('YYYY-MM-DD')}`,
+      label: `${moment(start).startOf('day').format('YYYY-MM-DD')} - ${moment(end).startOf('day').format('YYYY-MM-DD')}`,
       title: 'Weekly operations'
     }
     callback(null, operations)
@@ -202,7 +202,7 @@ export const monthlyOperations = (start, end, history, callback) => {
     })
     const operations = {
       data: statistics,
-      label: `From ${moment(start).startOf('day').format('YYYY-MM-DD')} To ${moment(end).startOf('day').format('YYYY-MM-DD')}`,
+      label: `${moment(start).startOf('day').format('YYYY-MM-DD')} - ${moment(end).startOf('day').format('YYYY-MM-DD')}`,
       title: 'Monthly operations'
     }
     callback(null, operations)
@@ -238,7 +238,7 @@ export const yearlyOperations = (start, end, history, callback) => {
     })
     const operations = {
       data: statistics,
-      label: `From ${moment(start).startOf('day').format('YYYY-MM-DD')} To ${moment(end).startOf('day').format('YYYY-MM-DD')}`,
+      label: `${moment(start).startOf('day').format('YYYY-MM-DD')} - ${moment(end).startOf('day').format('YYYY-MM-DD')}`,
       title: 'Yearly operations'
     }
     callback(null, operations)

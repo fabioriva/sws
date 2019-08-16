@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 // import { connect } from 'react-redux'
-import { Modal, Form, Button, DatePicker, Radio } from 'antd'
+import { Modal, Form, Button, DatePicker, InputNumber, Radio } from 'antd'
 // import moment from 'moment'
 import intl from 'react-intl-universal'
 
@@ -18,11 +18,8 @@ class HistoryQueryForm extends Component {
     // To disabled submit button at the beginning.
     this.props.form.validateFields()
   }
-  onChange = (date, dateString) => {
-    console.log(date, dateString)
-  }
   render () {
-    const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form
+    const { getFieldDecorator, getFieldsError, getFieldError, getFieldValue, isFieldTouched } = this.props.form
     // Only show error after a field is touched.
     // const fromError = isFieldTouched('dateFrom') && getFieldError('dateFrom')
     // const toError = isFieldTouched('dateTo') && getFieldError('dateTo')
@@ -46,6 +43,10 @@ class HistoryQueryForm extends Component {
     // const filterConfig = {
     //   rules: [{ type: 'array', required: true, message: 'Please select time!' }]
     // }
+    const c = 'Insert card number'
+    const d = 'Insert stall number'
+    const e = 'Insert alarm id'
+    const inputLabel = getFieldValue('filter') === 'c' ? c : getFieldValue('filter') === 'd' ? d : getFieldValue('filter') === 'e' ? e : 'Not used'
     return (
       <Modal
         style={{ minWidth: 640 }}
@@ -59,8 +60,9 @@ class HistoryQueryForm extends Component {
           </Button>,
           <Button
             key='submit'
+            type='primary'
             disabled={hasErrors(getFieldsError())}
-            onClick={() => this.props.onConfirm(range.value[0], range.value[1], filter.value)}
+            onClick={() => this.props.onConfirm(this.props.data)} //range.value[0], range.value[1], filter.value, number.value)}
           >
             {intl.get('CONFIRM')}
           </Button>
@@ -88,7 +90,31 @@ class HistoryQueryForm extends Component {
               <RadioGroup>
                 <Radio value='a'>{intl.get('ALL')}</Radio>
                 <Radio value='b'>{intl.get('ALARMS')}</Radio>
+                <Radio value='c'>Card</Radio>
+                <Radio value='d'>Stall</Radio>
+                <Radio value='e'>Alarm</Radio>
               </RadioGroup>
+            )}
+          </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label={inputLabel}
+            style={{ display: getFieldValue('filter') === 'a' ? 'none' : getFieldValue('filter') === 'b' ? 'none' : 'block' }}
+          >
+            {getFieldDecorator('number', {
+              // initialValue: 1,
+              rules: [{
+                required: true,
+                type: 'integer',
+                min: 1,
+                max: 10,
+                message: 'Please insert a valid number!' }],
+            })(
+              <InputNumber
+                // style={inputStyle}
+                placeholder='Insert number here'
+                disabled={getFieldValue('filter') === 'a' || getFieldValue('filter') === 'b'}
+              />
             )}
           </FormItem>
         </Form>
@@ -101,30 +127,6 @@ HistoryQueryForm.propTypes = {
   form: PropTypes.object
 }
 
-// const QueryModal = connect((state) => {
-//   // const { history } = state
-//   // return history.modal
-//   console.log('redux state:', state)
-//   return state
-// })(Form.create({
-//   mapPropsToFields (props) {
-//     return {
-//       range: Form.createFormField({
-//         ...props.data.range,
-//         value: props.data.range.value
-//       }),
-//       filter: Form.createFormField({
-//         ...props.data.filter,
-//         value: props.data.filter.value
-//       })
-//     }
-//   },
-//   onFieldsChange (props, fields) {
-//     console.log('onFieldsChange', props, fields)
-//     props.onChange(fields)
-//   }
-// })(HistoryQueryForm))
-
 const QueryModal = Form.create({
   mapPropsToFields (props) {
     return {
@@ -135,11 +137,14 @@ const QueryModal = Form.create({
       filter: Form.createFormField({
         ...props.data.filter,
         value: props.data.filter.value
+      }),
+      number: Form.createFormField({
+        ...props.data.number,
+        value: props.data.number.value
       })
     }
   },
   onFieldsChange (props, fields) {
-    console.log('onFieldsChange', props, fields)
     props.onChange(fields)
   }
 })(HistoryQueryForm)

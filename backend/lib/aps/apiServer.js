@@ -183,7 +183,8 @@ function getDiagnostic (query, diagnostic, s7def, s7obj, callback) {
 }
 
 function getHistory (query, history, callback) {
-  const { dateFrom, dateTo, filter } = query
+  const { dateFrom, dateTo, filter, device, number } = query
+  console.log(query)
   const from = dateFrom || moment().hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
   const to = dateTo || moment().hours(23).minutes(59).seconds(59)
   const queryFilter = {
@@ -191,7 +192,11 @@ function getHistory (query, history, callback) {
       $gte: from,
       $lt: to
     },
-    'operation.id': filter === 'b' ? { $gte: 1, $lte: 2 } : { $ne: 0 }
+    'device.id': device === undefined ? { $ne: 0 } : device !== '0' ? { $eq: device } : { $ne: 0 },
+    'operation.id': filter === 'b' ? { $gte: 1, $lte: 2 } : { $ne: 0 },
+    card: filter === 'c' ? { $eq: number } : { $gte: 0 },
+    stall: filter === 'd' ? { $eq: number } : { $gte: 0 },
+    'alarm.id': filter === 'e' ? { $eq: number } : { $gte: 0 }
   }
   history.countDocuments(queryFilter, function (err, count) {
     if (err) return callback(err)

@@ -36,6 +36,9 @@ const withHistory = Page => {
           filter: {
             value: 'a'
           },
+          number: {
+            value: 1
+          },
           visible: false
         }
       }
@@ -78,6 +81,9 @@ const withHistory = Page => {
           filter: {
             value: 'a'
           },
+          number: {
+            value: 1
+          },
           visible: true
         }
       })
@@ -101,11 +107,12 @@ const withHistory = Page => {
       })
     }
 
-    handleConfirm = async (dateFrom, dateTo, filter) => {
-      const { BACKEND_URL, APS_ID } = this.props.def
-      const from = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
-      const to = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
-      const url = `${BACKEND_URL}/history?system=${APS_ID}&dateFrom=${from}&dateTo=${to}&filter=${filter}`
+    handleConfirm = async (data) => { // (dateFrom, dateTo, filter, number) => {
+      console.log(data)
+      // const { BACKEND_URL, APS_ID } = this.props.def
+      // const from = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
+      // const to = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
+      const url = this.getUrl(data)
       const res = await fetch(url)
       const history = await res.json()
       this.setState({
@@ -120,9 +127,20 @@ const withHistory = Page => {
           filter: {
             value: 'a'
           },
+          number: {
+            value: 1
+          },
           visible: false
         }
       })
+    }
+
+    getUrl = (data) => {
+      const { BACKEND_URL, APS_ID } = this.props.def
+      const { filter, range, number } = data
+      const from = moment(range.value[0]).format('YYYY-MM-DD HH:mm:ss')
+      const to = moment(range.value[1]).format('YYYY-MM-DD HH:mm:ss')
+      return `${BACKEND_URL}/history?system=${APS_ID}&dateFrom=${from}&dateTo=${to}&filter=${filter.value}&device=0&number=${number.value}`
     }
   }
 }
