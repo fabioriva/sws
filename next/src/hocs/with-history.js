@@ -13,7 +13,7 @@ const withHistory = Page => {
       const { BACKEND_URL, APS_ID } = props.def
       const dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
       const dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
-      const url = `${BACKEND_URL}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`
+      const url = `${BACKEND_URL}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}&device=0`
 
       const token = auth(ctx)
       const res = await fetch(url, {
