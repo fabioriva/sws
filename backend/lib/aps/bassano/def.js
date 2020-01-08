@@ -67,9 +67,9 @@ export const DBS_ALARM = [DB_ALARM_1, DB_ALARM_2, DB_ALARM_3]
 export const EMAIL_ADDRESSES_RECIPIENT = [
   'f.riva@sotefin.ch',
   'ufficiotecnico@dvelecon.com',
-  'dl.elecon@dvelecon.com'
-  // 'assistenza@gruppoelt.it',
-  // 'info@zilioimpiantielettrici.it',
-  // 'g.fantinato@zilioimpiantielettrici.it',
-  // 'allarmi@vergati.it'
+  'dl.elecon@dvelecon.com',
+  'assistenza@gruppoelt.it',
+  'info@zilioimpiantielettrici.it',
+  'g.fantinato@zilioimpiantielettrici.it',
+  'allarmi@vergati.it'
 ]
