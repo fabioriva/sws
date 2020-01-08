@@ -16,7 +16,8 @@ function connect (uri) {
   const options = {
     autoIndex: process.env.NODE_ENV !== 'production',
     useCreateIndex: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true
   }
   mongoose.connect(uri, options)
   return mongoose.connection

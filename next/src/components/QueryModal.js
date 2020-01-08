@@ -90,9 +90,9 @@ class HistoryQueryForm extends Component {
               <RadioGroup>
                 <Radio value='a'>{intl.get('ALL')}</Radio>
                 <Radio value='b'>{intl.get('ALARMS')}</Radio>
-                <Radio value='c' disabled>Card</Radio>
-                <Radio value='d' disabled>Stall</Radio>
-                <Radio value='e' disabled>Alarm</Radio>
+                <Radio value='c'>Card</Radio>
+                <Radio value='d'>Stall</Radio>
+                <Radio value='e'>Alarm</Radio>
               </RadioGroup>
             )}
           </FormItem>
@@ -107,7 +107,7 @@ class HistoryQueryForm extends Component {
                 required: true,
                 type: 'integer',
                 min: 1,
-                max: 10,
+                // max: 10,
                 message: 'Please insert a valid number!' }],
             })(
               <InputNumber

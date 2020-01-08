@@ -1,9 +1,12 @@
 import micro, { send, json } from 'micro'
-// import fetch from 'isomorphic-unfetch'
+import fetch from 'isomorphic-unfetch'
 import moment from 'moment'
-import url, { URL } from 'url'
+// import url from 'url'
+import { URL } from 'url'
 import { series } from 'async'
 import {
+  getAlarms,
+
   dailyOperations,
   weeklyOperations,
   monthlyOperations,
@@ -16,96 +19,121 @@ import {
 
 module.exports = function startServer (diagnostic, history, s7def, s7obj) {
   const server = micro(async (req, res) => {
-    const parsedUrl = url.parse(req.url, true)
-    const { pathname, query } = parsedUrl
-    const page = pathname.split('/').pop()
+    if (!('authorization' in req.headers)) {
+      return send(res, 401, { success: false, message: 'Authorization header missing' })
+    }
 
-    // const myURL = new URL(req.url, 'https://www.sotefinservice.com/')
-    // const page = myURL.pathname.split('/').pop()
-    // const query = myURL.searchParams // .get('dateString')
+    const auth = await req.headers.authorization
+    const url = 'http://localhost:3001/api/profile.js'
+    try {
+      const { token } = JSON.parse(auth)
+      const response = await fetch(url, {
+        credentials: 'include',
+        headers: {
+          Authorization: JSON.stringify({ token })
+        }
+      })
+      if (response.ok) {
+        const myURL = new URL(req.url, 'https://www.sotefinservice.com/')
+        const page = myURL.pathname.split('/').pop()
+        const query = myURL.searchParams // .get('dateString')
+        console.log(page, query)
+        // const parsedUrl = url.parse(req.url, true)
+        // const { pathname, query } = parsedUrl
+        // const page = pathname.split('/').pop()
 
-    // const { method, url } = req
-    // console.log(method, url)
-
-    // switch (method) {
-    //   case 'GET':
-    //     console.log('method is GET', parsedUrl.query)
-    //     break
-    //   case 'POST':
-    //     const { query } = await json(req)
-    //     console.log('method is POST', query)
-    //     break
-    //   default:
-    //     console.log('hhhhh')
-    // }
-
-    // if (!('authorization' in req.headers)) {
-    //   // throw createError(401, 'Authorization header missing')
-    //   return send(res, 401, { success: false, message: 'Authorization header missing' })
-    // }
-
-    // const auth = await req.headers.authorization
-    // const { token } = JSON.parse(auth)
-
-    // const { query } = await json(req)
-    // console.log('!!!!?', pathname, page, query)//, token !== undefined ? token : 'Authorization header missing')
-
-    // const apiUrl = `localhost:3001/api/profile.js`
-    // const response = await fetch(apiUrl, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': JSON.stringify({ token }) // 'Authorization': token
-    //   },
-    //   body: JSON.stringify({ pathname }) // body: JSON.stringify({ pathname: getUrl(ctx) })
-    // })
-    // const user = await response.json()
-    // console.log('rrrrrrrrrrrrrrrrres', user)
-
-    switch (page) {
-      case 'alarms':
-        return s7obj.diag
-      case 'cards':
-        return s7obj.cards
-      case 'diagnostic':
-        getDiagnostic(query, diagnostic, s7def, s7obj, function (err, s7obj) {
-          if (err) return send(res, 500, `/diagnostic: Error ${err}`)
-          const json = {
-            overview: s7obj.overview,
-            racks: s7obj.racks,
-            map: s7obj.map
+        switch (page) {
+          case 'alarms': {
+            const { dateString } = query
+            const date = moment(dateString) // query.date)
+            const yearEnd = date.clone().subtract(1, 'months').endOf('month').format('YYYY-MM-DD HH:mm')
+            const yearStart = moment(yearEnd).clone().subtract(1, 'years').startOf('month').format('YYYY-MM-DD HH:mm')
+            const tasks = []
+            for (let i = 0; i < s7obj.overview.devices.length; i++) {
+              tasks.push(
+                function (cb) {
+                  getAlarms(yearStart, yearEnd, (i + 1), history, function (err, result) {
+                    if (err) cb(err)
+                    cb(null, result)
+                  })
+                }
+              )
+            }
+            series(tasks, function (err, results) {
+              if (err) return send(res, 500, `/alarms: Error ${err}`)
+              send(res, 200, {
+                diag: s7obj.diag,
+                stat: results
+              })
+            })
+            break
           }
-          send(res, 200, json)
-        })
-        break
-      case 'history':
-        getHistory(query, history, function (err, json) {
-          if (err) return send(res, 500, `/history: Error ${err}`)
-          send(res, 200, json)
-        })
-        break
-      case 'map':
-        return s7obj.map
-      case 'overview':
-        return s7obj.overview
-      case 'racks':
-        return s7obj.racks
-      case 'statistics':
-        getStatistics(query, history, function (err, results) {
-          if (err) return send(res, 500, `/statistics: Error ${err}`)
-          send(res, 200, results)
-        })
-        break
-      default:
-        send(res, 500, 'Page not found')
+          // return s7obj.diag
+
+          // getAlarms(yearStart, yearEnd, 1, history, function (err, result) {
+          //   if (err) return send(res, 500, `/alarms: Error ${err}`)
+          //   console.log('(2)', result)
+          //   send(res, 200, {
+          //     diag: s7obj.diag,
+          //     stat: result
+          //   })
+          // })
+          // send(res, 200, s7obj.diag)
+          // break
+          case 'cards':
+            return s7obj.cards
+          case 'diagnostic':
+            getDiagnostic(query, diagnostic, s7def, s7obj, function (err, s7obj) {
+              if (err) return send(res, 500, `/diagnostic: Error ${err}`)
+              const json = {
+                overview: s7obj.overview,
+                racks: s7obj.racks,
+                map: s7obj.map
+              }
+              send(res, 200, json)
+            })
+            break
+          case 'history':
+            getHistory(query, history, function (err, json) {
+              if (err) return send(res, 500, `/history: Error ${err}`)
+              send(res, 200, json)
+            })
+            break
+          case 'map':
+            return s7obj.map
+          case 'overview':
+            return s7obj.overview
+          case 'racks':
+            return s7obj.racks
+          case 'statistics':
+            getStatistics(query, history, function (err, results) {
+              if (err) return send(res, 500, `/statistics: Error ${err}`)
+              send(res, 200, results)
+            })
+            break
+          default:
+            send(res, 500, 'Page not found')
+        }
+      } else {
+        const error = new Error(response.statusText)
+        error.response = response
+        throw error
+      }
+    } catch (error) {
+      const { response } = error
+      return response
+        ? res.status(response.status).json({ message: response.statusText })
+        : res.status(400).json({ message: error.message })
     }
   })
   return server
 }
 
 function getStatistics (query, history, callback) {
-  const { dateString } = query
+  // const { dateString } = query
+  const dateString = query.get('dateString')
   const date = moment(dateString) // query.date)
+  console.log(dateString, date)
   const day = date.format('YYYY-MM-DD HH:mm')
   const weekStart = date.clone().subtract(1, 'weeks').startOf('week').format('YYYY-MM-DD HH:mm')
   const weekEnd = date.clone().subtract(1, 'weeks').endOf('week').format('YYYY-MM-DD HH:mm')
@@ -115,10 +143,10 @@ function getStatistics (query, history, callback) {
   // const yearEnd = date.clone().subtract(1, 'years').endOf('year').format('YYYY-MM-DD HH:mm')
   const yearEnd = date.clone().subtract(1, 'months').endOf('month').format('YYYY-MM-DD HH:mm')
   const yearStart = moment(yearEnd).clone().subtract(1, 'years').startOf('month').format('YYYY-MM-DD HH:mm')
-  // console.log(day)
-  // console.log(weekStart, weekEnd)
-  // console.log(monthStart, monthEnd)
-  // console.log(yearStart, yearEnd)
+  console.log(day)
+  console.log(weekStart, weekEnd)
+  console.log(monthStart, monthEnd)
+  console.log(yearStart, yearEnd)
   series([
     function (cb) {
       dailyOperations(day, history, function (err, result) {
@@ -157,7 +185,8 @@ function getStatistics (query, history, callback) {
 }
 
 function getDiagnostic (query, diagnostic, s7def, s7obj, callback) {
-  const { id } = query
+  // const { id } = query
+  const id = query.get('id')
   diagnostic.findOne({ alarmId: id }).exec(function (err, data) {
     if (err) return callback(err)
     if (!data) return callback(null, s7obj)
@@ -183,8 +212,13 @@ function getDiagnostic (query, diagnostic, s7def, s7obj, callback) {
 }
 
 function getHistory (query, history, callback) {
-  const { dateFrom, dateTo, filter, device, number } = query
-  console.log(query)
+  // const { dateFrom, dateTo, filter, device, number } = query
+  const dateFrom = query.get('dateFrom')
+  const dateTo = query.get('dateTo')
+  const filter = query.get('filter')
+  const device = query.get('device')
+  const number = query.get('number')
+
   const from = dateFrom || moment().hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
   const to = dateTo || moment().hours(23).minutes(59).seconds(59)
   const queryFilter = {

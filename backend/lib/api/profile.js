@@ -1,14 +1,11 @@
 const { send, createError, run, json } = require('micro')
-const fs = require('fs')
-const jwt = require('jsonwebtoken')
-const path = require('path')
+const { verifySync } = require('./jwt')
 
 const profile = async (req, res) => {
   if (!('authorization' in req.headers)) {
     // throw createError(401, 'Authorization header missing')
     send(res, 401, { success: false, message: 'Authorization header missing' })
   }
-
   const auth = await req.headers.authorization
   const { token } = JSON.parse(auth)
 
@@ -18,10 +15,10 @@ const profile = async (req, res) => {
   console.log('(0)', auth, token) //, pathname, apsPath)
 
   try {
-    const cert = fs.readFileSync(path.join(__dirname, '../../ssh-key/jwtRS256.key'))
-    const decoded = jwt.verify(token, cert)
-    console.log('(1)', decoded)
-    send(res, 200, JSON.stringify(decoded))
+    const user = verifySync(token)
+    console.log('(1)', user)
+    send(res, 200, JSON.stringify(user))
+
     // const { aps } = decoded
     // if (aps === apsPath) {
     //   send(res, 200, JSON.stringify(decoded))

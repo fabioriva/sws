@@ -20,19 +20,17 @@ const PageLogin: NextPage<Props> = ({ apiUrl, token }) => (
       <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' />
       <link rel='icon' type='image/png' href='https://www.sotefinservice.com/static/favicon.png' />
     </Head>
-    <div className='text-center'>
-      <div className='app'>
-        <h1>&#x1F680;&nbsp;<span className='app-title'>Sotefin&nbsp;Web&nbsp;Service</span></h1>
-        <h4 className='text-muted'>The future of automated parking systems servicing</h4>
-      </div>
-      <LoginForm
-        apiUrl={apiUrl}
-        token={token}
-      />
-      <p className='text-center text-muted'>
-        Copyright <Icon type='copyright' /> 2017-present <a href='http://www.sotefin.com'>Sotefin SA</a>
-      </p>
+    <div className='app text-center'>
+      <h1>&#x1F680;&nbsp;<span className='app-title'>Sotefin&nbsp;Web&nbsp;Service</span></h1>
+      <h4 className='text-muted'>The future of automated parking systems servicing.</h4>
     </div>
+    <LoginForm
+      apiUrl={apiUrl}
+      token={token}
+    />
+    <p className='text-center text-muted'>
+      Copyright <Icon type='copyright' /> 2017-present <a href='http://www.sotefin.com'>Sotefin SA</a>
+    </p>
     <style jsx global>{`
       html, body {
         height: 100%;

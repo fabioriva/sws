@@ -3,27 +3,37 @@ import moment from 'moment'
 // add zero: 2013-02-08  # A calendar date part
 const addZero = (n) => n <= 9 ? '0' + n.toString() : n.toString()
 
-export const getAlarms = (query, history, callback) => {
-  const { dateFrom, dateTo } = query
+export const getAlarms = (start, end, device, history, callback) => {
+  // const { dateFrom, dateTo } = query
   history.aggregate([
     { $match: {
-      $and: [ { 'date': { $gte: new Date(dateFrom), $lt: new Date(dateTo) } }, { 'operation.id': 1 } ] } },
+      $and: [
+        { date: { $gte: new Date(start), $lt: new Date(end) } },
+        { 'device.id': device },
+        { 'operation.id': 1 }
+      ] } },
     { $group: {
       // '_id': {
       //   'year': { '$year': '$date' },
       //   'month': { '$month': '$date' },
       //   'day': { '$dayOfMonth': '$date' }
       // },
-      '_id': '$alarm.id',
-      'total': { $sum: 1 }
+      _id: '$alarm.id',
+      total: { $sum: 1 },
+      info: { $first: '$alarm.info' }
     } },
-    { $sort: { '_id': 1 } } // order by date ascending
+    // { $project: {
+    //   _id: 1,
+    //   info: 1,
+    //   total: 1
+    // } },
+    { $sort: { total: -1 } } // order by date ascending
   ], function (err, result) {
     if (err) return callback(err)
-    // console.log('Alarms Statistics:', result)
     const alarms = result.map((e) => {
       return {
         name: `Id ${e._id}`,
+        info: e.info,
         total: e.total
       }
     })

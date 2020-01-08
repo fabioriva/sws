@@ -3,6 +3,7 @@ import moment from 'moment'
 import { List, Card, DatePicker } from 'antd'
 import Layout from 'src/components/Layout'
 import Operations from 'src/components/charts/Operations'
+import { auth } from 'src/lib/auth'
 
 const withStatistics = Page => {
   return class extends React.Component {
@@ -11,14 +12,24 @@ const withStatistics = Page => {
       const { BACKEND_URL } = props.def
       const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD')
       const url = `${BACKEND_URL}/statistics?dateString=${yesterday}`
-      const res = await fetch(url)
+      
+      const token = auth(ctx)
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
       return {
         ...props,
         statistics: {
           data: json,
           dateString: yesterday
-        }
+        },
+        token
       }
     }
 
@@ -36,7 +47,7 @@ const withStatistics = Page => {
           sidebarMenu={SIDEBAR_MENU}
           socket={`${WEBSOCK_URL}?channel=ch2`}
         >
-          <DatePicker defaultValue={moment(dateString)} onChange={this.handleChange} />
+          <DatePicker defaultValue={moment(dateString)} onChange={this.handleChange} style={{ marginBottom: '16px' }}/>
           {
             data !== undefined &&
             <List
@@ -76,8 +87,18 @@ const withStatistics = Page => {
       console.log(date, dateString)
       const { BACKEND_URL } = this.props.def
       const url = `${BACKEND_URL}/statistics?dateString=${dateString}`
-      const res = await fetch(url)
+
+      const { token } = this.props
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
+      console.log(json)
       this.setState({
         statistics: {
           data: json,

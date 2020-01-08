@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Head from 'next/head'
-import Link from 'next/link'
+//import Link from 'next/link'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 import { Layout, Icon } from 'antd'
@@ -41,7 +41,7 @@ const PageLayout: React.FunctionComponent<Props> = ({
           { children }
         </Content>
         <Footer className='app-footer'>
-          Copyright <Icon type='copyright' /> 2017-present <Link href='http://www.sotefin.com'><a>Sotefin SA</a></Link>
+          Copyright <Icon type='copyright' /> 2017-present <a href='http://www.sotefin.com'>Sotefin SA</a>
         </Footer>
       </Layout>
     </Layout>

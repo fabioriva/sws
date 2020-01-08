@@ -1,6 +1,9 @@
 import fetch from 'isomorphic-unfetch'
-import { Alert, Badge, Button, Tabs } from 'antd'
+import moment from 'moment'
+import { Row, Col, Alert, Badge, Button, Tabs } from 'antd'
 import Layout from 'src/components/Layout'
+import Alarms from 'src/components/charts/Alarms'
+import { auth } from 'src/lib/auth'
 
 const Alarm = (props) => {
   const { a } = props
@@ -32,12 +35,23 @@ const withAlarms = Page => {
     static async getInitialProps (ctx) {
       const props = Page.getInitialProps ? await Page.getInitialProps(ctx) : {}
       const { BACKEND_URL } = props.def
-      const url = `${BACKEND_URL}/alarms`
-      const res = await fetch(url)
+      const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD')
+      const url = `${BACKEND_URL}/alarms?dateString=${yesterday}`
+
+      const token = auth(ctx)
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
       return {
         ...props,
-        alarms: json
+        alarms: json.diag,
+        statistics: json.stat
       }
     }
 
@@ -73,6 +87,7 @@ const withAlarms = Page => {
     render () {
       const { APS_TITLE, SIDEBAR_MENU, WEBSOCK_URL } = this.props.def
       const { alarms } = this.state
+      console.log(this.props.statistics)
       return (
         <Layout
           aps={APS_TITLE}
@@ -87,7 +102,14 @@ const withAlarms = Page => {
                   tab={<Badge count={g.count}><span style={{ padding: 12 }}>{g.title}</span></Badge>}
                   key={key}
                 >
-                  {g.active.length > 0 ? this.renderList(g.active) : <Ready label={g.title} />}
+                  <Row gutter={32}>
+                    <Col span={14}>
+                      {g.active.length > 0 ? this.renderList(g.active) : <Ready label={g.title} />}
+                    </Col>
+                    <Col span={10}>
+                      <Alarms data={this.props.statistics[key]} />
+                    </Col>
+                  </Row>
                 </Tabs.TabPane>
               ))
             }

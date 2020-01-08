@@ -65,3 +65,6 @@ config/
 
 # ./dist don't accidentally commit our built files to git.
 backend/dist
+
+# ./ssh-key jwt signature
+backend/ssh-keys

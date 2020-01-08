@@ -6,6 +6,7 @@ import Layout from 'src/components/Layout'
 import List from 'src/components/PlcList'
 import Rack from 'src/components/PlcRack'
 import { Mobile, Default } from 'src/constants/mediaQueries'
+import { auth } from 'src/lib/auth'
 
 const withRack = Page => {
   return class extends React.Component {
@@ -14,7 +15,16 @@ const withRack = Page => {
       const { BACKEND_URL } = props.def
       const { diagnostic } = nextCookie(ctx)
       const url = diagnostic ? `${BACKEND_URL}/diagnostic?id=${diagnostic}` : `${BACKEND_URL}/racks`
-      const res = await fetch(url)
+
+      const token = auth(ctx)
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
       const data = diagnostic ? json.racks : json
       return {

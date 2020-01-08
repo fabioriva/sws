@@ -1,3 +1,4 @@
+const Email = require('email-templates')
 const nodemailer = require('nodemailer')
 
 // let account = {
@@ -6,7 +7,6 @@ const nodemailer = require('nodemailer')
 // }
 
 const account = {
-  // user: 'info@sotefinservice.com',
   user: 'no-reply@sotefinservice.com',
   pass: 'aGep9I*h'
 }
@@ -27,14 +27,45 @@ const transporter = nodemailer.createTransport({
 })
 
 // verify connection configuration
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log(error)
-  } else {
-    console.log('Server is ready to take our messages', success)
-  }
-})
+// transporter.verify(function (error, success) {
+//   if (error) {
+//     console.log(error)
+//   } else {
+//     console.log('Server is ready to take our messages', success)
+//   }
+// })
 
+exports.mailer = function (system, doc, recipient) {
+  const { logged, alarm, device } = doc
+  const email = new Email({
+    message: {
+      from: '<no-reply@sotefinservice.com>'
+    },
+    // uncomment below to send emails in development/test env:
+    send: true,
+    // transport: {
+    //   jsonTransport: true
+    // },
+    transport: transporter
+  })
+
+  email
+    .send({
+      template: 'alarm',
+      message: {
+        to: recipient // 'f.riva@sotefin.ch'
+      },
+      locals: {
+        alarm: alarm,
+        device: device,
+        logged: logged,
+        system: system
+      }
+    })
+    .then(console.log)
+    .catch(console.error)
+}
+/*
 module.exports = async function main (system, doc, recipient) {
   // try {
   const { logged, alarm, device } = doc
@@ -66,3 +97,4 @@ module.exports = async function main (system, doc, recipient) {
   //   throw error
   // }
 }
+*/

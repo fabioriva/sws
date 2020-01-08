@@ -5,6 +5,7 @@ import Layout from 'src/components/Layout'
 import Edit from 'src/components/CardEdit'
 import List from 'src/components/CardList'
 import { confirm } from 'src/lib/modalConfirm'
+import { auth } from 'src/lib/auth'
 
 const withCards = Page => {
   return class extends React.Component {
@@ -12,7 +13,16 @@ const withCards = Page => {
       const props = Page.getInitialProps ? await Page.getInitialProps(ctx) : {}
       const { BACKEND_URL } = props.def
       const url = `${BACKEND_URL}/cards`
-      const res = await fetch(url)
+
+      const token = auth(ctx)
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
       return {
         ...props,

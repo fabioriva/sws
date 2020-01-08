@@ -1,8 +1,5 @@
 const { json, send, createError, run } = require('micro')
-const crypto = require('crypto')
-const fs = require('fs')
-const jwt = require('jsonwebtoken')
-const path = require('path')
+const { sign } = require('./jwt')
 const User = require('./UserSchema')
 
 const login = async (req, res) => {
@@ -16,16 +13,9 @@ const login = async (req, res) => {
       }
       if (user) {
         console.log('/authentication', user)
-        var cert = fs.readFileSync(path.join(__dirname, '../../ssh-key/jwtRS256.key'))
-        var token = jwt.sign({
-          aps: user.aps,
-          role: user.role,
-          locale: user.locales[0],
-          username: user.username,
-          xsrfToken: crypto.createHash('md5').update(user.password).digest('hex')
-        }, cert, {
-          expiresIn: 24 * 60 * 60
-        })
+
+        const token = sign(user)
+
         send(res, 200, {
           success: true,
           message: 'User authenticated',

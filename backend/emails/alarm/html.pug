@@ -1,0 +1,19 @@
+- const style = "font-family: Montserrat, Arial, sans-serif; font-size: 14px;"
+
+body(style=style)
+
+h4 Alarm notification from #[strong #{system}] aps
+
+table(style="width:100%;border-collapse: collapse;", border="1px solid #ff00ff")
+  tr
+    th(style="text-align: left;padding: 3px") Logged
+    th(style="text-align: left;padding: 3px") Device
+    th(style="text-align: left;padding: 3px") Alarm
+  tr
+    td(style="text-align: left;padding: 3px") #{logged}
+    td(style="text-align: left;padding: 3px") #{device}
+    td(style="text-align: left;padding: 3px") #{alarm}
+
+p Check for more details #[a(href="https://sotefinservice.com") sotefinservice.com]
+hr
+p This is an automatic message. Please #[strong do not reply].

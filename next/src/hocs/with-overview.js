@@ -6,6 +6,7 @@ import Device from 'src/components/Device'
 import Queue from 'src/components/Queue'
 import Operation from 'src/components/OperationModal'
 import { confirm } from 'src/lib/modalConfirm'
+import { auth } from 'src/lib/auth'
 
 const withOverview = Page => {
   return class extends React.Component {
@@ -14,7 +15,16 @@ const withOverview = Page => {
       const { BACKEND_URL } = props.def
       const { diagnostic } = nextCookie(ctx)
       const url = diagnostic ? `${BACKEND_URL}/diagnostic?id=${diagnostic}` : `${BACKEND_URL}/overview`
-      const res = await fetch(url)
+
+      const token = auth(ctx)
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
       const data = diagnostic ? json.overview : json
       return {

@@ -7,7 +7,7 @@ import api from 'lib/aps/apiServer'
 import log from 'lib/aps/logServer'
 import plc from 'lib/aps/plc'
 import websocket from 'lib/aps/ws'
-import mailer from 'lib/aps/mailer'
+import { mailer } from 'lib/aps/mailer'
 import notification from 'lib/aps/notification'
 import LogSchema from 'lib/models/LogSchema'
 import DiagSchema from 'lib/models/DiagSchema'
@@ -32,7 +32,8 @@ const mongodbUri = 'mongodb://localhost:27017/bassano'
 const options = {
   autoIndex: dev,
   useCreateIndex: true,
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 }
 
 const appEmitter = new AppEmitter()
@@ -85,16 +86,17 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
   appEmitter.on('ws-event', (client, mesg) => {
     const { event, data } = JSON.parse(mesg)
     switch (event) {
-      case 'edit-stall':
+      case 'edit-stall': {
         const { stall, card } = data
         const buffer = Buffer.alloc(4)
         buffer.writeUInt16BE(stall, 0)
         buffer.writeUInt16BE(card, 2)
         appEmitter.emit('plc-write', 0x84, s7def.DB_DATA, s7def.MAP_INDEX_INIT, 4, 0x02, buffer)
         break
-      case 'overview-operation':
+      }
+      case 'overview-operation': {
         const { operation, value } = data
-        let s = s7obj.stalls.find(s => s.status === value)
+        const s = s7obj.stalls.find(s => s.status === value)
         switch (operation) {
           case 1: // Entry 1
             break
@@ -111,6 +113,7 @@ mongoose.createConnection(mongodbUri, options).then(conn => {
             }
         }
         break
+      }
     }
   })
 })

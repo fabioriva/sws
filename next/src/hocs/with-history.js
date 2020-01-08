@@ -3,6 +3,7 @@ import moment from 'moment'
 import Layout from 'src/components/Layout'
 import History from 'src/components/History'
 import Query from 'src/components/QueryModal'
+import { auth } from 'src/lib/auth'
 import { ADMIN } from 'src/constants/roles'
 
 const withHistory = Page => {
@@ -13,11 +14,21 @@ const withHistory = Page => {
       const dateFrom = moment().hours(0).minutes(0).seconds(0).format('YYYY-MM-DD HH:mm:ss')
       const dateTo = moment().hours(23).minutes(59).seconds(59).format('YYYY-MM-DD HH:mm:ss')
       const url = `${BACKEND_URL}/history?system=${APS_ID}&dateFrom=${dateFrom}&dateTo=${dateTo}`
-      const res = await fetch(url)
+
+      const token = auth(ctx)
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const json = await res.json()
       return {
         ...props,
-        history: json
+        history: json,
+        token
       }
     }
 
@@ -108,12 +119,21 @@ const withHistory = Page => {
     }
 
     handleConfirm = async (data) => { // (dateFrom, dateTo, filter, number) => {
-      console.log(data)
+      // console.log(data)
       // const { BACKEND_URL, APS_ID } = this.props.def
       // const from = moment(dateFrom).format('YYYY-MM-DD HH:mm:ss')
       // const to = moment(dateTo).format('YYYY-MM-DD HH:mm:ss')
       const url = this.getUrl(data)
-      const res = await fetch(url)
+
+      const { token } = this.props
+      const res = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Authorization: JSON.stringify({ token })
+        }
+      })
+
+      // const res = await fetch(url)
       const history = await res.json()
       this.setState({
         count: history.count,
