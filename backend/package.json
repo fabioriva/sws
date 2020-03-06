@@ -7,14 +7,15 @@
   "scripts": {
     "start": "micro",
     "dev": "micro-dev . -p 3001",
-    "gen": "babel-node lib/aps/trumpeldor/generator.js --exec babel-node --presets @babel/env",
+    "gen": "babel-node lib/aps/wareham/generator.js --exec babel-node --presets @babel/env",
     "build": "rm -r dist && babel lib -d dist",
     "api": "NODE_ENV=production pm2 start dist/api/start.js --name api",
     "bassano": "nodemon lib/aps/bassano/index.js --exec babel-node --presets @babel/env",
     "nyu": "nodemon lib/aps/nyu/index.js --exec babel-node --presets @babel/env",
     "muse": "nodemon lib/aps/muse/index.js --exec babel-node --presets @babel/env",
     "trumpeldor": "nodemon lib/aps/trumpeldor/index.js --exec babel-node --presets @babel/env",
-    "longmatan": "nodemon lib/aps/longmatan/index.js --exec babel-node --presets @babel/env"
+    "longmatan": "nodemon lib/aps/longmatan/index.js --exec babel-node --presets @babel/env",
+    "wareham": "nodemon lib/aps/wareham/index.js --exec babel-node --presets @babel/env"
   },
   "dependencies": {
     "async": "^3.1.0",
@@ -23,6 +24,7 @@
     "isomorphic-unfetch": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
     "micro": "^9.3.4",
+    "micro-cors": "^0.1.1",
     "moment": "^2.24.0",
     "mongoose": "^5.8.5",
     "node-snap7": "^1.0.3",

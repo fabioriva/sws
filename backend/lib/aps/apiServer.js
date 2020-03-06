@@ -17,8 +17,10 @@ import {
   updateMap
 } from './utils'
 
+const cors = require('micro-cors')({ origin: '*' })
+
 module.exports = function startServer (diagnostic, history, s7def, s7obj) {
-  const server = micro(async (req, res) => {
+  const handler = async (req, res) => {
     if (!('authorization' in req.headers)) {
       return send(res, 401, { success: false, message: 'Authorization header missing' })
     }
@@ -125,7 +127,8 @@ module.exports = function startServer (diagnostic, history, s7def, s7obj) {
         ? res.status(response.status).json({ message: response.statusText })
         : res.status(400).json({ message: error.message })
     }
-  })
+  }
+  const server = micro(cors(handler))
   return server
 }
 
@@ -218,7 +221,6 @@ function getHistory (query, history, callback) {
   const filter = query.get('filter')
   const device = query.get('device')
   const number = query.get('number')
-
   const from = dateFrom || moment().hours(0).minutes(0).seconds(0) // moment().subtract(1, 'days')
   const to = dateTo || moment().hours(23).minutes(59).seconds(59)
   const queryFilter = {
@@ -226,7 +228,7 @@ function getHistory (query, history, callback) {
       $gte: from,
       $lt: to
     },
-    'device.id': device === undefined ? { $ne: 0 } : device !== '0' ? { $eq: device } : { $ne: 0 },
+    'device.id': device === undefined ? { $ne: 0 } : device !== '0' ? { $eq: device } : { $gte: 0 },
     'operation.id': filter === 'b' ? { $gte: 1, $lte: 2 } : { $ne: 0 },
     card: filter === 'c' ? { $eq: number } : { $gte: 0 },
     stall: filter === 'd' ? { $eq: number } : { $gte: 0 },
