@@ -30,7 +30,7 @@
     "pino-http": "^4.2.0",
     "pino-pretty": "^3.2.0",
     "uuid": "^3.3.2",
-    "ws": "^7.1.1",
+    "ws": "^7.4.6",
     "xlsx": "^0.14.4"
   },
   "devDependencies": {
