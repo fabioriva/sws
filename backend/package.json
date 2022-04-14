@@ -17,7 +17,7 @@
     "longmatan": "nodemon lib/aps/longmatan/index.js --exec babel-node --presets @babel/env"
   },
   "dependencies": {
-    "async": "^3.1.0",
+    "async": "^3.2.2",
     "bcrypt": "^3.0.6",
     "isomorphic-unfetch": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
