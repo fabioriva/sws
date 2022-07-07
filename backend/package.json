@@ -22,7 +22,7 @@
     "isomorphic-unfetch": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
     "micro": "^9.3.4",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "mongoose": "^5.6.5",
     "node-snap7": "^1.0.3",
     "nodemailer": "^6.3.0",
